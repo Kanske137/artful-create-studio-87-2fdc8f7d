@@ -11,10 +11,14 @@
 //   portraits          — { [slotId]: publicPortraitUrl }
 //   designId           — used for the output filename
 //
-// Calls Replicate `google/nano-banana-2` (Nano Banana 2 / Gemini 3.1 Flash
-// Image — samma modell som tidigare via Lovable AI Gateway, migrerad
-// 2026-07-21 för kostnadskontroll), passing image 1 = reference,
-// image 2..N+1 = portraits in slot order.
+// Två motorer, båda via Replicate:
+//   2 personer (DEFAULT sedan 2026-07-22): cdingram crop-composite —
+//     detekterade ansiktslådor (cachade per referens), exklusiva
+//     beskärningar, 2× cdingram/face-swap parallellt, feather-komposit
+//     tillbaka på den pixelbevarade referensen.
+//   3–4 personer: `google/nano-banana-2` (prompt-baserad omritning) med
+//     image 1 = reference, image 2..N+1 = portraits i slot-ordning.
+//   ?engine=nano|cdingram = explicit override för test/rollback.
 //
 // Always returns HTTP 200. On recoverable errors the body is
 // { error, fallback: true, userMessage } so the client can show a friendly
@@ -335,9 +339,12 @@ async function runCdingramTwoFaceSwap(params: {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  // Testflagga (Steg 1): ?engine=cdingram aktiverar crop-composite-motorn.
-  // Default är alltid nano-banana-2 — ingen klient skickar parametern ännu.
-  const engine = new URL(req.url).searchParams.get("engine") === "cdingram" ? "cdingram" : "nano";
+  // Motorval (default flippad till cdingram 2026-07-22 efter A/B — nano
+  // ritade om hela referensen medan cdingram bevarar den pixelexakt):
+  //   2 personer  → cdingram crop-composite (default)
+  //   3–4 personer → nano-banana-2 (enda motorn för fler än 2 ansikten)
+  //   ?engine=nano / ?engine=cdingram = explicit override för test/rollback.
+  const engineParam = new URL(req.url).searchParams.get("engine");
 
   let genId: string | null = null;
   const genT0 = Date.now();
@@ -381,6 +388,13 @@ Deno.serve(async (req) => {
       ? adminPrompt
       : `You are given several images. Image 1 is the reference artwork to preserve exactly. Re-render image 1 with the following face replacements: {{SLOTS}}. Keep everything else unchanged. Return one single edited image with the same aspect ratio as image 1.`
     ).replace(/\{\{SLOTS\}\}/g, slotMappingText);
+
+    const engine =
+      engineParam === "nano" || engineParam === "cdingram"
+        ? engineParam
+        : normalisedSlots.length === 2
+          ? "cdingram"
+          : "nano";
 
     if (engine === "cdingram" && normalisedSlots.length !== 2) {
       return fallbackResponse(
