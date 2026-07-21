@@ -168,6 +168,9 @@
     "dragToRotate": "dra för att rotera",
     "title3D": "3D-förhandsvisning"
   },
+  "watermark": {
+    "notice": "Arthena-vattenmärket visas bara i förhandsvisningen – det kommer inte med på trycket."
+  },
   "cartAdd": {
     "added": "Lagt till i varukorgen",
     "prepareFailed": "Kunde inte förbereda tryckfil",

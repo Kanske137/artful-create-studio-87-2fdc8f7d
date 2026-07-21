@@ -168,6 +168,9 @@
     "dragToRotate": "drag to rotate",
     "title3D": "3D preview"
   },
+  "watermark": {
+    "notice": "The Arthena watermark appears only in the preview – it will not be on the printed product."
+  },
   "cartAdd": {
     "added": "Added to cart",
     "prepareFailed": "Could not prepare print file",

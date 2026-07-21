@@ -168,6 +168,9 @@
     "dragToRotate": "dra for å rotere",
     "title3D": "3D-forhåndsvisning"
   },
+  "watermark": {
+    "notice": "Arthena-vannmerket vises bare i forhåndsvisningen – det kommer ikke med på trykket."
+  },
   "cartAdd": {
     "added": "Lagt til i handlekurven",
     "prepareFailed": "Kunne ikke forberede trykkfil",

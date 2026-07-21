@@ -168,6 +168,9 @@
     "dragToRotate": "trascina per ruotare",
     "title3D": "Anteprima 3D"
   },
+  "watermark": {
+    "notice": "La filigrana Arthena appare solo nell'anteprima – non sarà presente sul prodotto stampato."
+  },
   "cartAdd": {
     "added": "Aggiunto al carrello",
     "prepareFailed": "Impossibile preparare il file di stampa",

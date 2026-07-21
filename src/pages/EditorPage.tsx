@@ -310,7 +310,8 @@ export default function EditorPage() {
       });
 
       // 2) Thumbnail for cart display — multi-layer snapshot WITH frame/wrap
-      //    overlay so the cart preview matches the editor exactly.
+      //    overlay so the cart preview matches the editor exactly. Watermark
+      //    ingår här (preview) men aldrig i tryckfilen ovan.
       const thumbDataUrl = await renderTemplateSnapshot({
         ...baseTemplateInput,
         frameColor: !isCanvas ? frameColor : undefined,
@@ -318,6 +319,7 @@ export default function EditorPage() {
         hangerColor: hangerColor ?? undefined,
         canvasWrap: isCanvas,
         acrylicCorners: config?.product_type === "acrylic",
+        watermark: true,
       });
       previewUrl = await uploadCartPreview(thumbDataUrl, designId);
     } catch (err) {

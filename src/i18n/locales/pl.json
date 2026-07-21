@@ -168,6 +168,9 @@
     "dragToRotate": "przeciągnij, aby obrócić",
     "title3D": "Podgląd 3D"
   },
+  "watermark": {
+    "notice": "Znak wodny Arthena widoczny jest tylko w podglądzie – nie pojawi się na wydruku."
+  },
   "cartAdd": {
     "added": "Dodano do koszyka",
     "prepareFailed": "Nie można przygotować pliku do druku",

@@ -168,6 +168,9 @@
     "dragToRotate": "ziehen zum Drehen",
     "title3D": "3D-Vorschau"
   },
+  "watermark": {
+    "notice": "Das Arthena-Wasserzeichen erscheint nur in der Vorschau – auf dem Druck ist es nicht enthalten."
+  },
   "cartAdd": {
     "added": "Zum Warenkorb hinzugefügt",
     "prepareFailed": "Druckdatei konnte nicht vorbereitet werden",

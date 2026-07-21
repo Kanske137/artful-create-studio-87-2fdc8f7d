@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import type mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEditorStore, type PhotoLayerValue } from "@/stores/editorStore";
@@ -16,6 +17,7 @@ import {
 } from "@/lib/layer-utils";
 import { AcrylicCornerOverlay } from "./AcrylicCornerOverlay";
 import { MapIconsOverlay } from "./MapIconsOverlay";
+import { WatermarkOverlay } from "./WatermarkOverlay";
 import { isCustomLayerId } from "@/lib/freeform-layers";
 
 interface Props {
@@ -254,6 +256,7 @@ export function MapPreview({
   wrapCm = 0,
   layersIncludeWrap = false,
 }: Props) {
+  const { t } = useTranslation();
   const frameRef = useRef<HTMLDivElement>(null);
   /** Per-layer Mapbox instance refs, populated by `MapLayerInstance` via
    *  `onMapReady`. Used by `MapIconsOverlay` to project geo-anchored icons. */
@@ -905,7 +908,12 @@ export function MapPreview({
             fallbackColor={frameColor}
           />
         )}
+        {/* Vattenmärke överst (z 60) — endast förhandsvisning, aldrig tryckfil. */}
+        <WatermarkOverlay />
       </div>
+      <p className="text-xs text-muted-foreground text-center max-w-sm">
+        {t("watermark.notice")}
+      </p>
       {allLayers.some((l) => l.type === "map") && (
         <p className="text-[10px] text-muted-foreground">© Mapbox · © OpenStreetMap</p>
       )}

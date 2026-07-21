@@ -98,6 +98,7 @@ export function MockupGallery() {
           wrapCm: isCanvas ? canvasDepthCm : 0,
           bleedCm: isCanvas ? BLEED_CM : 0,
           acrylicCorners: config.product_type === "acrylic",
+          watermark: true,
           photoOverlays: { ...photoSources && Object.fromEntries(Object.entries(photoSources).map(([id, s]) => [id, s.previewUrl])), ...photoAiResults },
           aiPhotoResults,
         });
@@ -282,6 +283,9 @@ export function MockupGallery() {
               );
             })}
           </div>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            {t("watermark.notice")}
+          </p>
         </div>
       </div>
 

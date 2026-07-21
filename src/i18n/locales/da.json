@@ -168,6 +168,9 @@
     "dragToRotate": "træk for at rotere",
     "title3D": "3D-forhåndsvisning"
   },
+  "watermark": {
+    "notice": "Arthena-vandmærket vises kun i forhåndsvisningen – det kommer ikke med på trykket."
+  },
   "cartAdd": {
     "added": "Tilføjet til kurven",
     "prepareFailed": "Kunne ikke forberede trykfil",

@@ -168,6 +168,9 @@
     "dragToRotate": "vedä kiertääksesi",
     "title3D": "3D-esikatselu"
   },
+  "watermark": {
+    "notice": "Arthena-vesileima näkyy vain esikatselussa – se ei tule painotuotteeseen."
+  },
   "cartAdd": {
     "added": "Lisätty ostoskoriin",
     "prepareFailed": "Tulostustiedoston valmistelu epäonnistui",

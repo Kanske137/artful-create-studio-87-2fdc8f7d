@@ -168,6 +168,9 @@
     "dragToRotate": "sleep om te draaien",
     "title3D": "3D-voorbeeld"
   },
+  "watermark": {
+    "notice": "Het Arthena-watermerk is alleen zichtbaar in de voorbeeldweergave – het komt niet op het gedrukte product."
+  },
   "cartAdd": {
     "added": "Toegevoegd aan winkelwagen",
     "prepareFailed": "Kan drukbestand niet voorbereiden",

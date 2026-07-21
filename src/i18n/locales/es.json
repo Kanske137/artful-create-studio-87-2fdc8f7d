@@ -168,6 +168,9 @@
     "dragToRotate": "arrastra para rotar",
     "title3D": "Vista previa 3D"
   },
+  "watermark": {
+    "notice": "La marca de agua Arthena solo aparece en la vista previa – no estará en el producto impreso."
+  },
   "cartAdd": {
     "added": "Añadido al carrito",
     "prepareFailed": "No se pudo preparar el archivo de impresión",

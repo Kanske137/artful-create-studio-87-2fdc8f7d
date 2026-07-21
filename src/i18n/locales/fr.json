@@ -168,6 +168,9 @@
     "dragToRotate": "glisser pour pivoter",
     "title3D": "Aperçu 3D"
   },
+  "watermark": {
+    "notice": "Le filigrane Arthena n'apparaît que dans l'aperçu – il ne sera pas présent sur le produit imprimé."
+  },
   "cartAdd": {
     "added": "Ajouté au panier",
     "prepareFailed": "Impossible de préparer le fichier d'impression",

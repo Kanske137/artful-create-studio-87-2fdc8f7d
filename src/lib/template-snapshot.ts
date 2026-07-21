@@ -85,6 +85,12 @@ export interface TemplateSnapshotInput {
   /** Customer toggle: when false, the white margin layer is omitted and all
    *  other layers are expanded proportionally to fill the freed area. */
   whiteMarginEnabled?: boolean;
+
+  /** Diagonalt upprepat "Arthena"-vattenmärke ovanpå hela motivet. Endast
+   *  kundvända previews (kundvagnsbild, mockups, 3D). ALDRIG tryckfil —
+   *  hires-vägen nollar flaggan i renderHiresTemplateSnapshotSafe och
+   *  ritsteget dubbelgardar med `!input.hires`. */
+  watermark?: boolean;
 }
 
 export interface TemplateSnapshotResult {
@@ -613,6 +619,37 @@ function drawShapeLayer(
   ctx.restore();
 }
 
+/** Diagonalt kaklat "Arthena"-vattenmärke över hela ytan. Ritas sist så det
+ *  ligger ovanpå alla lager. Vit fyllning + mörk kantlinje syns på både ljusa
+ *  och mörka motiv. Storlek/täthet skalar med canvasens kortsida så previews
+ *  och mockuper får samma visuella täthet oavsett upplösning. */
+function drawWatermark(ctx: CanvasRenderingContext2D, w: number, h: number): void {
+  const base = Math.min(w, h);
+  const fontPx = Math.max(14, Math.round(base * 0.055));
+  ctx.save();
+  ctx.font = `600 ${fontPx}px Inter, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.translate(w / 2, h / 2);
+  ctx.rotate((-30 * Math.PI) / 180);
+  const stepX = ctx.measureText("Arthena").width + fontPx * 2.2;
+  const stepY = fontPx * 3.2;
+  // Täck hela den roterade ytan — halva diagonalen räcker åt alla håll.
+  const half = Math.hypot(w, h) / 2;
+  ctx.lineWidth = Math.max(1, fontPx * 0.06);
+  ctx.strokeStyle = "rgba(0, 0, 0, 0.18)";
+  ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+  let row = 0;
+  for (let y = -half; y <= half; y += stepY, row++) {
+    const offset = row % 2 === 0 ? 0 : stepX / 2;
+    for (let x = -half - stepX; x <= half + stepX; x += stepX) {
+      ctx.strokeText("Arthena", x + offset, y);
+      ctx.fillText("Arthena", x + offset, y);
+    }
+  }
+  ctx.restore();
+}
+
 /**
  * Render the full template (all layers, in zIndex order) to a PNG/JPEG dataURL.
  * Map layers are rendered sequentially to avoid WebGL context exhaustion.
@@ -920,6 +957,13 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
     }
   }
 
+  // Vattenmärke — ritas sist, ovanpå allt, så previews inte kan användas som
+  // färdig bild. Ritas FÖRE hängar-blittningen så båda utgångarna får det.
+  // Tryckfiler är alltid hires → dubbelgarden gör flaggan verkningslös där.
+  if (input.watermark && !input.hires) {
+    drawWatermark(ctx, w, h);
+  }
+
   // Posterhängare — trälist topp+botten + snöre (preview/cart only).
   // Listerna ritas OVANPÅ motivets översta och nedersta ~21 mm (matchar
   // Gelatos faktiska produkt: 21mm trälist monterad på posterns front).
@@ -1036,6 +1080,8 @@ export async function renderHiresTemplateSnapshotSafe(
         frameWidthCm: undefined,
         canvasWrap: false,
         acrylicCorners: false,
+        // Vattenmärket får ALDRIG följa med i tryckfilen — nolla oavsett caller.
+        watermark: false,
       });
       const base64 = dataUrl.split(",")[1] ?? "";
       const sizeBytes = Math.round((base64.length * 3) / 4);
