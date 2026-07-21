@@ -86,10 +86,11 @@ export interface TemplateSnapshotInput {
    *  other layers are expanded proportionally to fill the freed area. */
   whiteMarginEnabled?: boolean;
 
-  /** Diagonalt upprepat "Arthena"-vattenmärke ovanpå hela motivet. Endast
-   *  kundvända previews (kundvagnsbild, mockups, 3D). ALDRIG tryckfil —
-   *  hires-vägen nollar flaggan i renderHiresTemplateSnapshotSafe och
-   *  ritsteget dubbelgardar med `!input.hires`. */
+  /** Diagonalt upprepat "Arthena"-vattenmärke på varje BILDLAGER (photo /
+   *  aiPhoto / image — inte kartor, text eller bakgrund). Endast kundvända
+   *  previews (kundvagnsbild, mockups, 3D). ALDRIG tryckfil — hires-vägen
+   *  nollar flaggan i renderHiresTemplateSnapshotSafe och ritsteget
+   *  dubbelgardar med `!input.hires`. */
   watermark?: boolean;
 }
 
@@ -619,23 +620,31 @@ function drawShapeLayer(
   ctx.restore();
 }
 
-/** Diagonalt kaklat "Arthena"-vattenmärke över hela ytan. Ritas sist så det
- *  ligger ovanpå alla lager. Vit fyllning + mörk kantlinje syns på både ljusa
- *  och mörka motiv. Storlek/täthet skalar med canvasens kortsida så previews
- *  och mockuper får samma visuella täthet oavsett upplösning. */
-function drawWatermark(ctx: CanvasRenderingContext2D, w: number, h: number): void {
-  const base = Math.min(w, h);
-  const fontPx = Math.max(14, Math.round(base * 0.055));
+/** Diagonalt kaklat "Arthena"-vattenmärke över ETT bildlagers rect, klippt
+ *  till lagrets form. Anropas direkt efter att lagrets bild ritats så att
+ *  senare lager (marginal, text, ram) hamnar ovanpå — exakt som i editorn
+ *  där overlayen ligger inuti lagrets wrapper. Vit fyllning + mörk kantlinje
+ *  syns på både ljusa och mörka motiv; storlek/täthet skalar med lagrets
+ *  kortsida så previews och mockuper får samma visuella täthet. */
+function drawLayerWatermark(
+  ctx: CanvasRenderingContext2D,
+  rect: { x: number; y: number; w: number; h: number },
+  shape: string,
+): void {
+  const base = Math.min(rect.w, rect.h);
+  if (base < 24) return; // för litet för läsbar text
+  const fontPx = Math.max(10, Math.round(base * 0.09));
   ctx.save();
+  clipForShape(ctx, shape, rect.x, rect.y, rect.w, rect.h);
   ctx.font = `600 ${fontPx}px Inter, sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.translate(w / 2, h / 2);
+  ctx.translate(rect.x + rect.w / 2, rect.y + rect.h / 2);
   ctx.rotate((-30 * Math.PI) / 180);
-  const stepX = ctx.measureText("Arthena").width + fontPx * 2.2;
-  const stepY = fontPx * 3.2;
-  // Täck hela den roterade ytan — halva diagonalen räcker åt alla håll.
-  const half = Math.hypot(w, h) / 2;
+  const stepX = ctx.measureText("Arthena").width + fontPx * 2;
+  const stepY = fontPx * 2.8;
+  // Täck hela den roterade lagerytan — halva diagonalen räcker åt alla håll.
+  const half = Math.hypot(rect.w, rect.h) / 2;
   ctx.lineWidth = Math.max(1, fontPx * 0.06);
   ctx.strokeStyle = "rgba(0, 0, 0, 0.18)";
   ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
@@ -737,6 +746,11 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
   const liveMapId = layers.find((l) => l.type === "map")?.id ?? null;
   const liveTextId = layers.find((l) => l.type === "text")?.id ?? null;
 
+  // Vattenmärke per BILDLAGER — endast preview. Tryckfiler är alltid hires →
+  // dubbelgarden gör flaggan verkningslös där (utöver force-off i
+  // renderHiresTemplateSnapshotSafe).
+  const layerWatermark = !!input.watermark && !input.hires;
+
   for (const layer of layers) {
     const t = input.layerTransforms?.[layer.id];
     const baseRect = {
@@ -806,6 +820,9 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
     } else if (layer.type === "image") {
       try {
         await drawImageLayer(ctx, rect, layer);
+        if (layerWatermark && layer.defaults.url) {
+          drawLayerWatermark(ctx, rect, layer.defaults.shape);
+        }
       } catch (e) {
         console.warn("[template-snapshot] image layer failed", e);
       }
@@ -823,6 +840,7 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
         const zoom = pv?.zoom ?? 1;
         try {
           await drawPhotoLayer(ctx, rect, url, shape, layer.defaults.fit, offsetX, offsetY, zoom);
+          if (layerWatermark) drawLayerWatermark(ctx, rect, shape);
         } catch (e) {
           console.warn("[template-snapshot] photo layer failed", e);
         }
@@ -873,6 +891,7 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
         }
         try {
           await drawPhotoLayer(ctx, rect, url, shape, fit, offsetX, offsetY, zoom);
+          if (layerWatermark) drawLayerWatermark(ctx, rect, shape);
         } catch (e) {
           console.warn("[template-snapshot] aiPhoto layer failed", e);
         }
@@ -955,13 +974,6 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
       ctx.stroke();
       ctx.restore();
     }
-  }
-
-  // Vattenmärke — ritas sist, ovanpå allt, så previews inte kan användas som
-  // färdig bild. Ritas FÖRE hängar-blittningen så båda utgångarna får det.
-  // Tryckfiler är alltid hires → dubbelgarden gör flaggan verkningslös där.
-  if (input.watermark && !input.hires) {
-    drawWatermark(ctx, w, h);
   }
 
   // Posterhängare — trälist topp+botten + snöre (preview/cart only).

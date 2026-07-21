@@ -41,6 +41,7 @@ export function MockupGallery() {
     photoAiResults,
     aiPhotoResults,
     whiteMarginEnabled,
+    templateLayers,
   } = useEditorStore();
   const [slots, setSlots] = useState<MockupSlot[]>([]);
   const [snapshotUrl, setSnapshotUrl] = useState<string | null>(null);
@@ -283,9 +284,14 @@ export function MockupGallery() {
               );
             })}
           </div>
-          <p className="text-[11px] text-muted-foreground mt-1">
-            {t("watermark.notice")}
-          </p>
+          {/* Notis endast när mallen har bildlager (= vattenmärke kan synas). */}
+          {templateLayers().some(
+            (l) => l.type === "photo" || l.type === "aiPhoto" || (l.type === "image" && !!l.defaults.url),
+          ) && (
+            <p className="text-[11px] text-muted-foreground mt-1">
+              {t("watermark.notice")}
+            </p>
+          )}
         </div>
       </div>
 

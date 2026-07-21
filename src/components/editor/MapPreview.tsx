@@ -641,17 +641,21 @@ export function MapPreview({
                 overlay={<>{moveHandle}{resizeHandle}</>}
               >
                 {(clip) => (
-                  <PhotoLayerView
-                    layerId={l.id}
-                    src={src}
-                    fit={l.defaults.fit}
-                    shape={effectiveShape}
-                    staticClipPath={clip}
-                    offsetX={offsetX}
-                    offsetY={offsetY}
-                    zoom={zoom}
-                    draggable={!!src}
-                  />
+                  <>
+                    <PhotoLayerView
+                      layerId={l.id}
+                      src={src}
+                      fit={l.defaults.fit}
+                      shape={effectiveShape}
+                      staticClipPath={clip}
+                      offsetX={offsetX}
+                      offsetY={offsetY}
+                      zoom={zoom}
+                      draggable={!!src}
+                    />
+                    {/* Vattenmärke på bildlagret — endast förhandsvisning. */}
+                    {src ? <WatermarkOverlay clipPath={clip} /> : null}
+                  </>
                 )}
               </MapLayerSlot>
             );
@@ -742,6 +746,8 @@ export function MapPreview({
                         zoom={zoom}
                         draggable={!!src && !usingRefOrSwap}
                       />
+                      {/* Vattenmärke på AI-bildlagret — endast förhandsvisning. */}
+                      <WatermarkOverlay clipPath={clip} />
                     </>
                   ) : (
                     <div
@@ -809,6 +815,13 @@ export function MapPreview({
             return (
               <div key={l.id} style={wrapStyle}>
                 <ImageLayerView layer={l} />
+                {/* Vattenmärke på statiska bildlager — endast förhandsvisning.
+                    Samma cirkel-clip som ImageLayerView använder. */}
+                {l.defaults.url ? (
+                  <WatermarkOverlay
+                    clipPath={l.defaults.shape === "circle" ? "circle(50% at 50% 50%)" : undefined}
+                  />
+                ) : null}
                 {moveHandle}
                 {resizeHandle}
               </div>
@@ -908,12 +921,15 @@ export function MapPreview({
             fallbackColor={frameColor}
           />
         )}
-        {/* Vattenmärke överst (z 60) — endast förhandsvisning, aldrig tryckfil. */}
-        <WatermarkOverlay />
       </div>
-      <p className="text-xs text-muted-foreground text-center max-w-sm">
-        {t("watermark.notice")}
-      </p>
+      {/* Notis endast när mallen har bildlager (= vattenmärke kan synas). */}
+      {allLayers.some(
+        (l) => l.type === "photo" || l.type === "aiPhoto" || (l.type === "image" && !!l.defaults.url),
+      ) && (
+        <p className="text-xs text-muted-foreground text-center max-w-sm">
+          {t("watermark.notice")}
+        </p>
+      )}
       {allLayers.some((l) => l.type === "map") && (
         <p className="text-[10px] text-muted-foreground">© Mapbox · © OpenStreetMap</p>
       )}
