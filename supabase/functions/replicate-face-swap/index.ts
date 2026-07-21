@@ -59,6 +59,41 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
+// ---------- analytics: generations-logg (Fas 2) ----------
+// Loggar varje generering till `generations`-tabellen (service role). Får
+// ALDRIG påverka själva genereringen — alla fel sväljs och loggas bara.
+function genLogDb() {
+  return createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+}
+
+async function genLogStart(row: Record<string, unknown>): Promise<string | null> {
+  try {
+    const id = crypto.randomUUID();
+    const { error } = await genLogDb().from("generations").insert({ id, ...row });
+    if (error) throw new Error(error.message);
+    return id;
+  } catch (e) {
+    console.warn("[gen-log] start failed:", e instanceof Error ? e.message : e);
+    return null;
+  }
+}
+
+async function genLogEnd(id: string | null, patch: Record<string, unknown>): Promise<void> {
+  if (!id) return;
+  try {
+    const { error } = await genLogDb()
+      .from("generations")
+      .update({ ...patch, completed_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) throw new Error(error.message);
+  } catch (e) {
+    console.warn("[gen-log] end failed:", e instanceof Error ? e.message : e);
+  }
+}
+
 function fallbackResponse(userMessage: string, internal: string) {
   console.error(`[face-swap] fallback: ${internal}`);
   return jsonResponse({
@@ -1011,6 +1046,8 @@ Deno.serve(async (req) => {
   const stubParam = reqUrl.searchParams.get("stub");
   const stubUrlParam = reqUrl.searchParams.get("stubUrl");
 
+  let genId: string | null = null;
+  const genT0 = Date.now();
   try {
     const body = await req.json();
     const referenceImageUrl: string | undefined = body?.referenceImageUrl;
@@ -1146,6 +1183,17 @@ Deno.serve(async (req) => {
       : willUseFlux ? "black-forest-labs/flux-kontext-pro+851-labs/background-remover"
       : ANIMAL_MODEL;
 
+    genId = await genLogStart({
+      session_key: typeof body?.sessionKey === "string" ? body.sessionKey : null,
+      design_id: designId,
+      subject_kind: subjectKind,
+      provider: modelUsed,
+      style_id: removeBackgroundStyleId,
+      style_label: removeBackgroundStyleLabel,
+      input_image_url: faceImageUrl,
+      reference_image_url: referenceImageUrl ?? null,
+    });
+
     console.log(
       `[face-swap] start route=${route} model=${modelUsed} ` +
         `subjectKind=${subjectKind} designId=${designId} ` +
@@ -1210,7 +1258,14 @@ Deno.serve(async (req) => {
           });
 
 
-    if (!result.ok) return result.response;
+    if (!result.ok) {
+      await genLogEnd(genId, {
+        status: "failed",
+        duration_ms: Date.now() - genT0,
+        error: "model fallback (se funktionsloggar)",
+      });
+      return result.response;
+    }
 
     // Sanity-check dimensions to catch collages / weirdly-shaped outputs.
     // When a targetAspectRatio was provided, allow any ratio reasonably close
@@ -1230,6 +1285,11 @@ Deno.serve(async (req) => {
         maxRatio = Math.max(maxRatio, targetAspectRatio * 2.0);
       }
       if (ratio > maxRatio || ratio < minRatio) {
+        await genLogEnd(genId, {
+          status: "failed",
+          duration_ms: Date.now() - genT0,
+          error: `Suspicious output dimensions ${dims.w}x${dims.h}`,
+        });
         return fallbackResponse(
           "AI-modellen returnerade en ogiltig bild. Prova att skapa igen, eller använd en tydligare bild.",
           `Suspicious output dimensions ${dims.w}x${dims.h} — likely a collage`,
@@ -1250,6 +1310,11 @@ Deno.serve(async (req) => {
       .from("print-files")
       .upload(path, result.bytes, { contentType: result.contentType, upsert: true });
     if (upErr) {
+      await genLogEnd(genId, {
+        status: "failed",
+        duration_ms: Date.now() - genT0,
+        error: `Print upload failed: ${upErr.message}`,
+      });
       return fallbackResponse(
         "Vi kunde inte spara den genererade bilden. Försök igen.",
         `Print upload failed: ${upErr.message}`,
@@ -1262,6 +1327,12 @@ Deno.serve(async (req) => {
       `[face-swap] done route=${route} → printFileUrl=${printFileUrl} ` +
         `aiOutputUrl=${result.outputUrl}`,
     );
+
+    await genLogEnd(genId, {
+      status: "succeeded",
+      duration_ms: Date.now() - genT0,
+      output_image_url: printFileUrl,
+    });
 
     return jsonResponse({
       output: printFileUrl,
@@ -1276,6 +1347,11 @@ Deno.serve(async (req) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
     console.error("[face-swap] error:", msg);
+    await genLogEnd(genId, {
+      status: "failed",
+      duration_ms: Date.now() - genT0,
+      error: msg,
+    });
     return fallbackResponse(
       "Något gick fel. Försök igen om en stund.",
       msg,

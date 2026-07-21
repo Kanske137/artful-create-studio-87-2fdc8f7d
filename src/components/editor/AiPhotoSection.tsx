@@ -23,6 +23,7 @@ import { useEditorStore } from "@/stores/editorStore";
 import { useAiBusyStore } from "@/stores/aiBusyStore";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadCartPreview } from "@/lib/upload-preview";
+import { getSessionKey } from "@/lib/analytics";
 import { hashFile } from "@/lib/ai-cache-storage";
 import type { TemplateLayer, AiStylePreset } from "@/lib/template-schema";
 import { toast } from "sonner";
@@ -312,6 +313,7 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
           prompt: swapPrompt,
           subjectKind,
           designId,
+          sessionKey: getSessionKey(),
           removeBackgroundStyleId: selectedPreset?.id ?? null,
           removeBackgroundStylePrompt: selectedPreset?.prompt ?? null,
           removeBackgroundStyleLabel: selectedPreset?.label ?? null,

@@ -172,6 +172,10 @@
     "notice": "Arthena-vandmærket vises kun i forhåndsvisningen – det kommer ikke med på trykket."
   },
   "cartAdd": {
+    "blockedGeneration": "Upload dit billede og tryk på Skab nu, før du bestiller",
+    "blockedPhoto": "Upload dit billede, før du bestiller",
+    "blockedPhotoMulti": "Udfyld alle billedpladser, før du bestiller",
+    "blockedCustomize": "Tilpas dit design – f.eks. kortet eller teksten – før du bestiller",
     "added": "Tilføjet til kurven",
     "prepareFailed": "Kunne ikke forberede trykfil",
     "variantUnavailable": "Denne kombination er endnu ikke tilgængelig i butikken",

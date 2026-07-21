@@ -8,20 +8,65 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// ---------- analytics: generations-logg (Fas 2) ----------
+// Loggar varje generering till `generations`-tabellen (service role). Får
+// ALDRIG påverka själva genereringen — alla fel sväljs och loggas bara.
+function genLogDb() {
+  return createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+}
+
+async function genLogStart(row: Record<string, unknown>): Promise<string | null> {
+  try {
+    const id = crypto.randomUUID();
+    const { error } = await genLogDb().from("generations").insert({ id, ...row });
+    if (error) throw new Error(error.message);
+    return id;
+  } catch (e) {
+    console.warn("[gen-log] start failed:", e instanceof Error ? e.message : e);
+    return null;
+  }
+}
+
+async function genLogEnd(id: string | null, patch: Record<string, unknown>): Promise<void> {
+  if (!id) return;
+  try {
+    const { error } = await genLogDb()
+      .from("generations")
+      .update({ ...patch, completed_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) throw new Error(error.message);
+  } catch (e) {
+    console.warn("[gen-log] end failed:", e instanceof Error ? e.message : e);
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  let genId: string | null = null;
+  const genT0 = Date.now();
   try {
     const REPLICATE_API_TOKEN = Deno.env.get("REPLICATE_API_TOKEN");
     if (!REPLICATE_API_TOKEN) throw new Error("REPLICATE_API_TOKEN not configured");
 
-    const { imageUrl, prompt, designId } = await req.json();
+    const { imageUrl, prompt, designId, sessionKey } = await req.json();
     if (!imageUrl || !prompt) {
       return new Response(JSON.stringify({ error: "imageUrl and prompt required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    genId = await genLogStart({
+      session_key: typeof sessionKey === "string" ? sessionKey : null,
+      design_id: typeof designId === "string" ? designId : null,
+      subject_kind: "style",
+      provider: "black-forest-labs/flux-kontext-pro",
+      input_image_url: imageUrl,
+    });
 
     // Starta prediction
     const start = await fetch("https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/predictions", {
@@ -92,6 +137,12 @@ Deno.serve(async (req) => {
     const { data: pub } = supabase.storage.from("print-files").getPublicUrl(path);
     const printFileUrl = pub.publicUrl;
 
+    await genLogEnd(genId, {
+      status: "succeeded",
+      duration_ms: Date.now() - genT0,
+      output_image_url: printFileUrl,
+    });
+
     return new Response(
       JSON.stringify({ output, previewUrl: output, printFileUrl }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -99,6 +150,11 @@ Deno.serve(async (req) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
     console.error("replicate-style error:", msg);
+    await genLogEnd(genId, {
+      status: "failed",
+      duration_ms: Date.now() - genT0,
+      error: msg,
+    });
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -15,6 +15,7 @@ import { useEditorStore } from "@/stores/editorStore";
 import { useAiBusyStore, useIsAnyAiBusy } from "@/stores/aiBusyStore";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadCartPreview } from "@/lib/upload-preview";
+import { getSessionKey } from "@/lib/analytics";
 import { hashFile } from "@/lib/ai-cache-storage";
 import type { AiStylePreset } from "@/lib/template-schema";
 import { toast } from "sonner";
@@ -138,7 +139,7 @@ export function AiStyleSection({ presets, layerId }: Props) {
       setStage("Skapar din bild…");
       updateAiJobStage(jobId, "Skapar din bild…");
       const { data, error } = await supabase.functions.invoke("replicate-style", {
-        body: { imageUrl, prompt: preset.prompt, designId },
+        body: { imageUrl, prompt: preset.prompt, designId, sessionKey: getSessionKey() },
       });
       if (error) throw error;
       setStage("Hämtar resultat…");

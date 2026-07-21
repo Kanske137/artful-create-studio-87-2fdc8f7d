@@ -177,6 +177,46 @@ async function processOrder(supabase: any, order: any) {
 
     if (!size) continue; // not an editor item
 
+    // ---- analytics (Fas 2): knyt köpet till editor-sessionen. Körs FÖRE
+    // print-fil-kontrollen — ett köp är ett köp även om tryckfilen saknas.
+    // Får aldrig störa orderflödet; alla fel sväljs och loggas bara.
+    try {
+      const sessionKey = getProp(props, "_session_id");
+      const designId = getProp(props, "_design_id");
+      if (sessionKey) {
+        await supabase.from("editor_events").insert({
+          session_key: sessionKey,
+          type: "order_placed",
+          design_id: designId,
+          handle: handle || null,
+          product_type: productType,
+          payload: {
+            shopifyOrderId,
+            orderName: shopifyOrderName,
+            lineItemId: String(li.id),
+            quantity: li.quantity ?? 1,
+            size,
+            variant,
+          },
+        });
+        // Koppla e-post → session (endast om sessionen saknar e-post) så
+        // Analytics-sidan kan visa individ, inte bara anonymt sessions-id.
+        const email = order.email ?? order.contact_email ?? null;
+        if (email) {
+          await supabase
+            .from("editor_sessions")
+            .update({ email, email_linked_at: new Date().toISOString() })
+            .eq("session_key", sessionKey)
+            .is("email", null);
+        }
+      }
+    } catch (e) {
+      console.warn(
+        "[shopify-webhook] analytics log failed:",
+        e instanceof Error ? e.message : e,
+      );
+    }
+
     console.log(
       `[shopify-webhook] line ${li.id}: clientPrintFileUrl=${clientPrintFileUrl ?? "MISSING"} source=${designSource}`
     );

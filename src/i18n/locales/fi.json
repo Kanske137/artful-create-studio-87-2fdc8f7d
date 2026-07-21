@@ -172,6 +172,10 @@
     "notice": "Arthena-vesileima näkyy vain esikatselussa – se ei tule painotuotteeseen."
   },
   "cartAdd": {
+    "blockedGeneration": "Lataa kuvasi ja paina Luo nyt ennen tilaamista",
+    "blockedPhoto": "Lataa kuvasi ennen tilaamista",
+    "blockedPhotoMulti": "Täytä kaikki kuvapaikat ennen tilaamista",
+    "blockedCustomize": "Muokkaa designiasi – esim. karttaa tai tekstiä – ennen tilaamista",
     "added": "Lisätty ostoskoriin",
     "prepareFailed": "Tulostustiedoston valmistelu epäonnistui",
     "variantUnavailable": "Tämä yhdistelmä ei ole vielä saatavilla kaupassa",

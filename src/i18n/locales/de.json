@@ -172,6 +172,10 @@
     "notice": "Das Arthena-Wasserzeichen erscheint nur in der Vorschau – auf dem Druck ist es nicht enthalten."
   },
   "cartAdd": {
+    "blockedGeneration": "Lade dein Foto hoch und drücke Jetzt erstellen, bevor du bestellst",
+    "blockedPhoto": "Lade dein Foto hoch, bevor du bestellst",
+    "blockedPhotoMulti": "Fülle alle Bildfelder aus, bevor du bestellst",
+    "blockedCustomize": "Personalisiere dein Design – z. B. Karte oder Text – bevor du bestellst",
     "added": "Zum Warenkorb hinzugefügt",
     "prepareFailed": "Druckdatei konnte nicht vorbereitet werden",
     "variantUnavailable": "Diese Kombination ist im Shop noch nicht verfügbar",

@@ -172,6 +172,10 @@
     "notice": "La marca de agua Arthena solo aparece en la vista previa – no estará en el producto impreso."
   },
   "cartAdd": {
+    "blockedGeneration": "Sube tu foto y pulsa Crear ahora antes de pedir",
+    "blockedPhoto": "Sube tu foto antes de pedir",
+    "blockedPhotoMulti": "Rellena todos los espacios de foto antes de pedir",
+    "blockedCustomize": "Personaliza tu diseño – p. ej. el mapa o el texto – antes de pedir",
     "added": "Añadido al carrito",
     "prepareFailed": "No se pudo preparar el archivo de impresión",
     "variantUnavailable": "Esta combinación aún no está disponible en la tienda",

@@ -172,6 +172,10 @@
     "notice": "The Arthena watermark appears only in the preview – it will not be on the printed product."
   },
   "cartAdd": {
+    "blockedGeneration": "Upload your photo and press Create now before ordering",
+    "blockedPhoto": "Upload your photo before ordering",
+    "blockedPhotoMulti": "Fill all photo slots before ordering",
+    "blockedCustomize": "Personalize your design – e.g. the map or text – before ordering",
     "added": "Added to cart",
     "prepareFailed": "Could not prepare print file",
     "variantUnavailable": "This combination is not yet available in the store",

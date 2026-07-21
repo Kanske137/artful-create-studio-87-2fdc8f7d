@@ -17,6 +17,7 @@ import { useEditorStore } from "@/stores/editorStore";
 import { useAiBusyStore } from "@/stores/aiBusyStore";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadCartPreview } from "@/lib/upload-preview";
+import { getSessionKey } from "@/lib/analytics";
 import { hashFile } from "@/lib/ai-cache-storage";
 import {
   loadMultiFaceCache,
@@ -246,6 +247,7 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
           slots: slots.map((s) => ({ id: s.id, position: s.position })),
           portraits: portraitsByID,
           designId,
+          sessionKey: getSessionKey(),
         },
       });
       if (error) throw error;

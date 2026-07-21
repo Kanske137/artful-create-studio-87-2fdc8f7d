@@ -172,6 +172,10 @@
     "notice": "La filigrana Arthena appare solo nell'anteprima – non sarà presente sul prodotto stampato."
   },
   "cartAdd": {
+    "blockedGeneration": "Carica la tua foto e premi Crea ora prima di ordinare",
+    "blockedPhoto": "Carica la tua foto prima di ordinare",
+    "blockedPhotoMulti": "Riempi tutti gli spazi foto prima di ordinare",
+    "blockedCustomize": "Personalizza il tuo design – ad es. la mappa o il testo – prima di ordinare",
     "added": "Aggiunto al carrello",
     "prepareFailed": "Impossibile preparare il file di stampa",
     "variantUnavailable": "Questa combinazione non è ancora disponibile in negozio",

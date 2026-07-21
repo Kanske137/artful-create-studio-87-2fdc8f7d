@@ -8,13 +8,16 @@ interface Props {
   summary?: string;
   loading?: boolean;
   disabled?: boolean;
+  /** Förklaring som visas när knappen är inaktiverad — talar om VAD kunden
+   *  behöver göra innan beställning (t.ex. ladda upp bild / trycka Skapa). */
+  disabledHint?: string;
   onAdd: () => void;
   /** Show a pulsing "Är du nöjd?"-badge above the cart button (mobile only). */
   showCartHint?: boolean;
   className?: string;
 }
 
-export function StickyCta({ price, summary, loading, disabled, onAdd, showCartHint, className }: Props) {
+export function StickyCta({ price, summary, loading, disabled, disabledHint, onAdd, showCartHint, className }: Props) {
   const { t } = useTranslation();
   const hintVisible = !!showCartHint && !loading && !disabled;
   return (
@@ -38,6 +41,9 @@ export function StickyCta({ price, summary, loading, disabled, onAdd, showCartHi
           <div className="text-[10px] uppercase tracking-wider opacity-60 truncate">{summary}</div>
         )}
         <div className="text-base md:text-lg font-semibold leading-tight">{price}</div>
+        {disabled && !loading && disabledHint && (
+          <div className="text-[11px] opacity-85 leading-tight mt-0.5">{disabledHint}</div>
+        )}
       </div>
       <Button
         onClick={onAdd}

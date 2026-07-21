@@ -23,6 +23,7 @@ import {
   makeFaceSwapKey,
   saveFaceSwapCache,
 } from "@/lib/face-swap-cache";
+import { track } from "@/lib/analytics";
 
 interface ApplyPlaceArgs {
   placeName: string;
@@ -327,6 +328,18 @@ interface EditorState {
   reorderLayers: (orderedIds: string[]) => void;
   /** True om fri mall har minst en designkälla med riktigt innehåll. */
   hasDesignContent: () => boolean;
+
+  /** Beställningsspärr för vanliga mallar: null = OK att beställa, annars en
+   *  orsakskod som UI:t översätter till en hint. Hindrar att kunden råkar
+   *  beställa mallens exempel-/defaultdesign:
+   *   - "generation": aiPhoto-lager saknar genererat resultat (skulle trycka
+   *     admin-referensen med modellens ansikte)
+   *   - "photo"/"photoMulti": foto-lager saknar kunduppladdning (skulle
+   *     trycka placeholder-exempelbilden)
+   *   - "customize": mall utan bildlager (t.ex. karttavla) där kunden inte
+   *     ändrat någon parameter alls från default
+   *  Freeform-mallar hanteras separat via hasDesignContent(). */
+  orderBlockReason: () => "generation" | "photo" | "photoMulti" | "customize" | null;
 
   // ---------- legacy globals (derived getters; mutators apply to first layer) ----------
   // These setters/getters keep older code (EditorPage cart payload, snapshot
@@ -1063,6 +1076,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       nextSources[layerId] = { file, previewUrl, hash: null, originalUrl: null };
       // New photo → drop any AI result for this layer.
       delete nextResults[layerId];
+      track("photo_uploaded", {
+        layerId,
+        kind: "photo",
+        handle: state.config?.shopify_handle,
+        productType: state.config?.product_type,
+      });
     }
     // Reset offset for this specific photo layer.
     const layerValues = { ...state.layerValues };
@@ -1212,6 +1231,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (prev?.previewUrl?.startsWith("blob:") && prev.previewUrl !== previewUrl) {
       try { URL.revokeObjectURL(prev.previewUrl); } catch { /* noop */ }
     }
+    track("photo_uploaded", {
+      layerId,
+      kind: "aiPhoto",
+      handle: get().config?.shopify_handle,
+      productType: get().config?.product_type,
+    });
     set({
       aiPhotoSources: {
         ...cur,
@@ -1296,6 +1321,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       delete layerMap[slotId];
     } else {
       layerMap[slotId] = { file, previewUrl, hash: null, uploadedUrl: null };
+      track("photo_uploaded", {
+        layerId,
+        kind: "multiFace",
+        slotId,
+        handle: get().config?.shopify_handle,
+        productType: get().config?.product_type,
+      });
     }
     const nextLayers = { ...cur };
     if (Object.keys(layerMap).length === 0) {
@@ -1587,6 +1619,76 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       },
     );
     set({ template: nextTemplate });
+  },
+  orderBlockReason: () => {
+    const state = get();
+    if (!state.template) return null;
+    // Freeform har egen spärr (hasDesignContent) — dubbelblockera inte.
+    if (state.config?.is_freeform) return null;
+    const layers = state.templateLayers().filter((l) => !state.hiddenLayerIds[l.id]);
+    if (layers.length === 0) return null;
+
+    // 1) aiPhoto utan resultat skulle trycka admin-referensen som den är.
+    if (layers.some((l) => l.type === "aiPhoto" && !state.aiPhotoResults[l.id])) {
+      return "generation";
+    }
+
+    // 2) Foto-lager: minst ett måste vara ifyllt, och alla med placeholder
+    //    måste ersättas (annars trycks exempelbilden i tomma platser).
+    const photoLayers = layers.filter((l) => l.type === "photo");
+    if (photoLayers.length > 0) {
+      const filledCount = photoLayers.filter((l) => !!state.photoSources[l.id]).length;
+      const missingPlaceholder = photoLayers.filter(
+        (l) =>
+          l.type === "photo" && !!l.defaults.placeholderUrl && !state.photoSources[l.id],
+      ).length;
+      if (filledCount === 0 || missingPlaceholder > 0) {
+        const missing = filledCount === 0 ? photoLayers.length : missingPlaceholder;
+        return missing > 1 ? "photoMulti" : "photo";
+      }
+    }
+
+    // 3) Mallar utan bildlager (karttavlor m.fl.): kräv att kunden ändrat
+    //    NÅGON parameter från default innan beställning.
+    const hasImageLayers = layers.some((l) => l.type === "photo" || l.type === "aiPhoto");
+    if (!hasImageLayers && layers.some((l) => l.type === "map" || l.type === "text")) {
+      const block = getActiveLayoutBlock(state.template, state.config?.product_type, state.layoutId)[state.orientation];
+      const defaultBg = block?.background?.color;
+      const customized =
+        Object.keys(state.layerTransforms).length > 0 ||
+        !state.whiteMarginEnabled ||
+        (!!defaultBg && state.posterBgColor !== defaultBg) ||
+        layers.some((l) => {
+          const v = state.layerValues[l.id];
+          if (l.type === "map" && v?.kind === "map") {
+            const d = l.defaults;
+            const moved =
+              Math.abs(d.center[0]! - v.center[0]) > 1e-6 ||
+              Math.abs(d.center[1]! - v.center[1]) > 1e-6 ||
+              Math.abs(d.zoom - v.zoom) > 1e-3;
+            return (
+              moved ||
+              v.styleId !== d.styleId ||
+              v.shape !== (d.shape as MapShape) ||
+              v.showLabels !== d.showLabels ||
+              (v.icons?.length ?? 0) > 0 ||
+              (v.placeName ?? "") !== (d.placeName ?? "")
+            );
+          }
+          if (l.type === "text" && v?.kind === "text") {
+            return (
+              v.overrideText !== null ||
+              v.fontSizePt !== null ||
+              v.font !== l.defaults.font ||
+              !v.visible
+            );
+          }
+          return false;
+        });
+      if (!customized) return "customize";
+    }
+
+    return null;
   },
   hasDesignContent: () => {
     const state = get();

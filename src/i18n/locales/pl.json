@@ -172,6 +172,10 @@
     "notice": "Znak wodny Arthena widoczny jest tylko w podglądzie – nie pojawi się na wydruku."
   },
   "cartAdd": {
+    "blockedGeneration": "Prześlij zdjęcie i naciśnij Utwórz teraz przed zamówieniem",
+    "blockedPhoto": "Prześlij zdjęcie przed zamówieniem",
+    "blockedPhotoMulti": "Wypełnij wszystkie miejsca na zdjęcia przed zamówieniem",
+    "blockedCustomize": "Dostosuj swój projekt – np. mapę lub tekst – przed zamówieniem",
     "added": "Dodano do koszyka",
     "prepareFailed": "Nie można przygotować pliku do druku",
     "variantUnavailable": "Ta kombinacja nie jest jeszcze dostępna w sklepie",

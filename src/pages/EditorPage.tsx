@@ -30,6 +30,7 @@ import { getPrintFileUrl } from "@/lib/print-pipeline";
 import { resolveShopifyVariantId } from "@/lib/shopify-variant-resolver";
 import { hangerColorFromVariant } from "@/lib/mockup-scenes";
 import { mutateActiveLayoutBlock } from "@/lib/freeform-layers";
+import { ensureSession, getSessionKey, track } from "@/lib/analytics";
 import { toast } from "sonner";
 
 const FRAME_COLORS: Record<string, string> = {
@@ -144,6 +145,22 @@ export default function EditorPage() {
     })();
   }, []);
 
+  // Analytics: registrera sessionen + logga editor-öppning per mall/produkttyp.
+  useEffect(() => {
+    if (!config) return;
+    ensureSession({
+      locale: shopCtx.locale,
+      country: shopCtx.country ?? undefined,
+      handle: config.shopify_handle,
+    });
+    track("editor_opened", {
+      handle: config.shopify_handle,
+      productType: config.product_type,
+      freeform: Boolean(config.is_freeform),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config?.shopify_handle, config?.product_type]);
+
   // Iframe-höjdkommunikation: rapportera .editor-root verkliga höjd.
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -247,8 +264,25 @@ export default function EditorPage() {
 
   const hiddenLayerIds = useEditorStore((s) => s.hiddenLayerIds);
   const hasDesignContent = useEditorStore((s) => s.hasDesignContent);
+  const orderBlockReason = useEditorStore((s) => s.orderBlockReason);
   const isFreeform = Boolean(config?.is_freeform);
-  const canAddToCart = !isFreeform || hasDesignContent();
+  // Beställningsspärr: freeform kräver innehåll; vanliga mallar kräver att
+  // designen faktiskt personaliserats (ingen exempel-/defaultdesign i tryck).
+  const blockReason = isFreeform ? null : orderBlockReason();
+  const canAddToCart = (!isFreeform || hasDesignContent()) && blockReason === null;
+  const blockHint = blockReason
+    ? t(
+        blockReason === "generation"
+          ? "cartAdd.blockedGeneration"
+          : blockReason === "photo"
+            ? "cartAdd.blockedPhoto"
+            : blockReason === "photoMulti"
+              ? "cartAdd.blockedPhotoMulti"
+              : "cartAdd.blockedCustomize",
+      )
+    : isFreeform && !hasDesignContent()
+      ? t("cartAdd.freeformEmpty")
+      : undefined;
 
   const handleAddToCart = async () => {
     if (!config || !size || !variant) return;
@@ -256,6 +290,12 @@ export default function EditorPage() {
       toast.error(t("cartAdd.freeformEmpty"), {
         description: t("cartAdd.freeformEmptyHint"),
       });
+      return;
+    }
+    // Skyddsnät utöver disabled-knappen — designen får aldrig beställas
+    // opersonaliserad (exempel-/defaultinnehåll i tryckfilen).
+    if (blockReason) {
+      if (blockHint) toast.error(blockHint);
       return;
     }
     const inIframe = window.self !== window.top;
@@ -352,7 +392,19 @@ export default function EditorPage() {
       _design_source: designSource,
       _preview_image: previewUrl,
       _print_file_url: printFileUrl,
+      _session_id: getSessionKey(),
     };
+
+    track("add_to_cart", {
+      designId,
+      handle: config.shopify_handle,
+      productType: config.product_type,
+      size,
+      variant,
+      orientation,
+      source: designSource,
+      priceSek: currentPrice(),
+    });
 
     if (inIframe) {
       window.parent.postMessage(
@@ -430,6 +482,7 @@ export default function EditorPage() {
       summary={summary}
       loading={isAdding || isPreparing}
       disabled={!canAddToCart}
+      disabledHint={blockHint}
       onAdd={handleAddToCart}
       showCartHint={showCartHint}
     />

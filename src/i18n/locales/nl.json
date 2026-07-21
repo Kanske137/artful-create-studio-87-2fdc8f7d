@@ -172,6 +172,10 @@
     "notice": "Het Arthena-watermerk is alleen zichtbaar in de voorbeeldweergave – het komt niet op het gedrukte product."
   },
   "cartAdd": {
+    "blockedGeneration": "Upload je foto en druk op Nu maken voordat je bestelt",
+    "blockedPhoto": "Upload je foto voordat je bestelt",
+    "blockedPhotoMulti": "Vul alle fotovakken voordat je bestelt",
+    "blockedCustomize": "Personaliseer je ontwerp – bijv. de kaart of tekst – voordat je bestelt",
     "added": "Toegevoegd aan winkelwagen",
     "prepareFailed": "Kan drukbestand niet voorbereiden",
     "variantUnavailable": "Deze combinatie is nog niet beschikbaar in de winkel",
