@@ -33,7 +33,9 @@ const corsHeaders = {
 // som replicate-face-swap använder för human-swappar.
 const FACE_SWAP_MODEL_NAME = "cdingram/face-swap";
 const FACE_SWAP_MODEL_VERSION = "d1d6ea8c8be89d664a07a457526f7128109dee7030fdac424788d762c71ed111";
-const FACE_DETECT_MODEL = "adirik/grounding-dino";
+// Community-modeller kräver pinnad versionshash (models-path ger 404).
+const FACE_DETECT_MODEL_NAME = "adirik/grounding-dino";
+const FACE_DETECT_MODEL_VERSION = "efd10a8ddc57ea28773327e881ce95e20cc1d734c589f7dd01d2036921ed78aa";
 const CDINGRAM_PROVIDER = `${FACE_SWAP_MODEL_NAME} x2 (crop-composite)`;
 const CROP_FEATHER_PX = 24;
 
@@ -168,7 +170,7 @@ async function getFaceBoxes(
   }
 
   const det = await runReplicateRaw({
-    model: FACE_DETECT_MODEL,
+    version: FACE_DETECT_MODEL_VERSION,
     input: { image: referenceUrl, query: "face", box_threshold: 0.3, show_visualisation: false },
     timeoutMs: 90_000,
   });
@@ -192,7 +194,7 @@ async function getFaceBoxes(
     await db
       .from("reference_face_boxes")
       .upsert(
-        { reference_url: referenceUrl, boxes, provider: FACE_DETECT_MODEL },
+        { reference_url: referenceUrl, boxes, provider: FACE_DETECT_MODEL_NAME },
         { onConflict: "reference_url" },
       );
   } catch (e) {
