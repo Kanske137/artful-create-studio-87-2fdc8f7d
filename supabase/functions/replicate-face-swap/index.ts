@@ -35,7 +35,7 @@
 // toast instead of crashing on a non-2xx.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-
+// Deploy-markör 2026-07-21: analytics-loggning (generations-tabellen) aktiv.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -43,8 +43,7 @@ const corsHeaders = {
 };
 
 // Replicate human face-swap model. Pinned to a specific version for stability.
-const FACE_SWAP_MODEL_VERSION =
-  "cdingram/face-swap:d1d6ea8c8be89d664a07a457526f7128109dee7030fdac424788d762c71ed111";
+const FACE_SWAP_MODEL_VERSION = "cdingram/face-swap:d1d6ea8c8be89d664a07a457526f7128109dee7030fdac424788d762c71ed111";
 const FACE_SWAP_MODEL_NAME = "cdingram/face-swap";
 
 // Lovable AI Gateway — Nano Banana 2 (Gemini 3.1 Flash Image).
@@ -63,16 +62,15 @@ function jsonResponse(body: unknown, status = 200) {
 // Loggar varje generering till `generations`-tabellen (service role). Får
 // ALDRIG påverka själva genereringen — alla fel sväljs och loggas bara.
 function genLogDb() {
-  return createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
+  return createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 }
 
 async function genLogStart(row: Record<string, unknown>): Promise<string | null> {
   try {
     const id = crypto.randomUUID();
-    const { error } = await genLogDb().from("generations").insert({ id, ...row });
+    const { error } = await genLogDb()
+      .from("generations")
+      .insert({ id, ...row });
     if (error) throw new Error(error.message);
     return id;
   } catch (e) {
@@ -107,10 +105,7 @@ function fallbackResponse(userMessage: string, internal: string) {
 // recognised — we then skip the dimension sanity check.
 function readImageSize(bytes: Uint8Array): { w: number; h: number } | null {
   // PNG: 8-byte signature, then IHDR with width/height as big-endian u32.
-  if (
-    bytes.length > 24 &&
-    bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47
-  ) {
+  if (bytes.length > 24 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
     const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
     return { w: dv.getUint32(16), h: dv.getUint32(20) };
   }
@@ -141,9 +136,7 @@ function readImageSize(bytes: Uint8Array): { w: number; h: number } | null {
 
 // Convert a base64 string (possibly a data URL) to a Uint8Array.
 function base64ToBytes(b64: string): Uint8Array {
-  const cleaned = b64.startsWith("data:")
-    ? b64.slice(b64.indexOf(",") + 1)
-    : b64;
+  const cleaned = b64.startsWith("data:") ? b64.slice(b64.indexOf(",") + 1) : b64;
   const bin = atob(cleaned);
   const out = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
@@ -155,8 +148,9 @@ async function runReplicateFaceSwap(params: {
   referenceImageUrl: string;
   faceImageUrl: string;
   designId: string;
-}): Promise<{ ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
-  | { ok: false; response: Response }> {
+}): Promise<
+  { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
+> {
   const REPLICATE_API_TOKEN = Deno.env.get("REPLICATE_API_TOKEN");
   if (!REPLICATE_API_TOKEN) {
     return {
@@ -213,9 +207,7 @@ async function runReplicateFaceSwap(params: {
   if (prediction.status !== "succeeded") {
     const errStr = String(prediction.error ?? "").toLowerCase();
     const noFace =
-      errStr.includes("no face") ||
-      errStr.includes("face not detected") ||
-      errStr.includes("could not detect");
+      errStr.includes("no face") || errStr.includes("face not detected") || errStr.includes("could not detect");
     return {
       ok: false,
       response: fallbackResponse(
@@ -227,9 +219,7 @@ async function runReplicateFaceSwap(params: {
     };
   }
 
-  const output = Array.isArray(prediction.output)
-    ? prediction.output[0]
-    : prediction.output;
+  const output = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
   if (!output) {
     return {
       ok: false,
@@ -275,9 +265,7 @@ async function callNanoBananaOnce(params: {
   | { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
   | { ok: false; retriable: boolean; status: number; reason: string; userMessage: string }
 > {
-  const content: Array<Record<string, unknown>> = [
-    { type: "text", text: params.promptText },
-  ];
+  const content: Array<Record<string, unknown>> = [{ type: "text", text: params.promptText }];
   for (const url of params.imageUrls) {
     content.push({ type: "image_url", image_url: { url } });
   }
@@ -304,8 +292,7 @@ async function callNanoBananaOnce(params: {
         retriable: true,
         status: 429,
         reason: "Lovable AI rate-limited (429)",
-        userMessage:
-          "AI-tjänsten är överbelastad just nu. Vänta 10–15 sekunder och försök igen.",
+        userMessage: "AI-tjänsten är överbelastad just nu. Vänta 10–15 sekunder och försök igen.",
       };
     }
     if (aiRes.status === 402) {
@@ -341,9 +328,7 @@ async function callNanoBananaOnce(params: {
   const imageUrl: string | undefined =
     msg?.images?.[0]?.image_url?.url ??
     msg?.images?.[0]?.url ??
-    (typeof msg?.content === "string" && msg.content.startsWith("data:")
-      ? msg.content
-      : undefined);
+    (typeof msg?.content === "string" && msg.content.startsWith("data:") ? msg.content : undefined);
 
   if (!imageUrl) {
     console.error("[face-swap] AI returned no image", JSON.stringify(data).slice(0, 500));
@@ -352,8 +337,7 @@ async function callNanoBananaOnce(params: {
       retriable: true,
       status: 200,
       reason: "AI gateway response missing image",
-      userMessage:
-        "AI-modellen returnerade ingen bild den här gången. Försök igen.",
+      userMessage: "AI-modellen returnerade ingen bild den här gången. Försök igen.",
     };
   }
 
@@ -389,8 +373,9 @@ async function callNanoBananaOnce(params: {
 async function callNanoBanana(params: {
   promptText: string;
   imageUrls: string[];
-}): Promise<{ ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
-  | { ok: false; response: Response }> {
+}): Promise<
+  { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
+> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
     return {
@@ -406,9 +391,7 @@ async function callNanoBanana(params: {
   const BACKOFF_MS = [4000, 8000];
   const MAX_ATTEMPTS = BACKOFF_MS.length + 1; // 1 initial + 2 retries
 
-  let lastFail:
-    | { reason: string; userMessage: string; status: number }
-    | null = null;
+  let lastFail: { reason: string; userMessage: string; status: number } | null = null;
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     const result = await callNanoBananaOnce({
@@ -443,8 +426,7 @@ async function callNanoBanana(params: {
   return {
     ok: false,
     response: fallbackResponse(
-      lastFail?.userMessage ??
-        "Vi kunde inte skapa bilden just nu. Försök igen om en stund.",
+      lastFail?.userMessage ?? "Vi kunde inte skapa bilden just nu. Försök igen om en stund.",
       `${lastFail?.reason ?? "unknown"} (after ${MAX_ATTEMPTS} attempts)`,
     ),
   };
@@ -454,12 +436,9 @@ async function callNanoBanana(params: {
 // Same multi-image edit pattern as pet, but the admin's free-text prompt
 // (`layer.defaults.swapPrompt`) is the primary instruction describing WHAT
 // to take from the customer's photo and how to place it onto the reference.
-async function runHumanSwap(params: {
-  referenceImageUrl: string;
-  faceImageUrl: string;
-  adminPrompt: string;
-}) {
-  const artistInstruction = params.adminPrompt?.trim() ||
+async function runHumanSwap(params: { referenceImageUrl: string; faceImageUrl: string; adminPrompt: string }) {
+  const artistInstruction =
+    params.adminPrompt?.trim() ||
     "Take the person's face and head from image #2 and place it onto the person in image #1. Preserve the customer's facial identity from image #2 (features, eye color, skin tone, age, expression).";
 
   const promptText = [
@@ -479,11 +458,7 @@ async function runHumanSwap(params: {
 }
 
 // ---------- Route 2b: pet face/identity transfer (cats + dogs) ----------
-async function runPetSwap(params: {
-  referenceImageUrl: string;
-  faceImageUrl: string;
-  adminPrompt: string;
-}) {
+async function runPetSwap(params: { referenceImageUrl: string; faceImageUrl: string; adminPrompt: string }) {
   const adminPromptLine = params.adminPrompt?.trim()
     ? `Additional styling guidance from the artist: ${params.adminPrompt.trim()}`
     : "";
@@ -494,7 +469,9 @@ async function runPetSwap(params: {
     `Keep EVERYTHING ELSE from image #1 unchanged: the costume/clothing, props, background, lighting, camera angle, art style, composition, framing, and aspect ratio. Do not change the pose unless required to make the new pet fit naturally.`,
     `Return ONE single edited image (NOT a collage, NOT side-by-side, NOT a comparison). Output must have the same aspect ratio as image #1.`,
     adminPromptLine,
-  ].filter(Boolean).join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   return callNanoBanana({
     promptText,
@@ -537,9 +514,9 @@ async function runRemoveBackground(params: {
   const backdropIsWhite = backdropHex.toUpperCase() === "#FFFFFF";
 
   const adminPromptLine = params.adminPrompt?.trim()
-    ? (isWatercolorStyle
-        ? `HIGH-PRIORITY artist guidance for the dot/splatter color tones and density (this overrides any conflicting default below): ${params.adminPrompt.trim()}`
-        : `HIGH-PRIORITY artist guidance (this overrides any conflicting default below — apply only where compatible with the chosen style, do NOT use it as an excuse to add watercolor dots or splatters): ${params.adminPrompt.trim()}`)
+    ? isWatercolorStyle
+      ? `HIGH-PRIORITY artist guidance for the dot/splatter color tones and density (this overrides any conflicting default below): ${params.adminPrompt.trim()}`
+      : `HIGH-PRIORITY artist guidance (this overrides any conflicting default below — apply only where compatible with the chosen style, do NOT use it as an excuse to add watercolor dots or splatters): ${params.adminPrompt.trim()}`
     : "";
 
   const preserveColorsLine = params.preserveSubjectColors
@@ -573,9 +550,9 @@ async function runRemoveBackground(params: {
 
   // Step 5 — framing. Either "fill the frame" (legacy) OR "preserve framing".
   const framingInstruction = params.fillFrame
-    ? (isWatercolorStyle
-        ? `5. FILL THE FRAME — the subject must be SCALED UP to fill as much of the output image as possible while keeping the soft watercolor feathered edge intact on all four sides. Aim for the subject (including its dissolving watercolor halo) to occupy roughly 90-95% of the output canvas, leaving only a thin (~2-5%) sliver of ${surroundColorPhrase} at the very outer edge. DO NOT leave large empty backdrop margins around the subject. The watercolor splatter should fade from full intensity at the subject down to nothing within that thin outer sliver, with no hard splatters touching or bleeding off any of the four edges — and NEVER forming a ring or oval around the subject.`
-        : `5. FILL THE FRAME — the subject must be SCALED UP to fill as much of the output image as possible while keeping a soft style-native feathered edge on all four sides. Aim for the subject to occupy roughly 90-95% of the output canvas, leaving only a thin (~2-5%) sliver of ${surroundColorPhrase} at the very outer edge. DO NOT leave large empty backdrop margins around the subject. Nothing should touch or bleed off any of the four edges, and the soft fade from styled subject into the backdrop must look symmetrical on all four sides.`)
+    ? isWatercolorStyle
+      ? `5. FILL THE FRAME — the subject must be SCALED UP to fill as much of the output image as possible while keeping the soft watercolor feathered edge intact on all four sides. Aim for the subject (including its dissolving watercolor halo) to occupy roughly 90-95% of the output canvas, leaving only a thin (~2-5%) sliver of ${surroundColorPhrase} at the very outer edge. DO NOT leave large empty backdrop margins around the subject. The watercolor splatter should fade from full intensity at the subject down to nothing within that thin outer sliver, with no hard splatters touching or bleeding off any of the four edges — and NEVER forming a ring or oval around the subject.`
+      : `5. FILL THE FRAME — the subject must be SCALED UP to fill as much of the output image as possible while keeping a soft style-native feathered edge on all four sides. Aim for the subject to occupy roughly 90-95% of the output canvas, leaving only a thin (~2-5%) sliver of ${surroundColorPhrase} at the very outer edge. DO NOT leave large empty backdrop margins around the subject. Nothing should touch or bleed off any of the four edges, and the soft fade from styled subject into the backdrop must look symmetrical on all four sides.`
     : `5. PRESERVE EXACT FRAMING — the subject must keep the SAME position, scale, rotation, perspective and crop as it has in the input photo. Do NOT zoom in, zoom out, re-center, re-crop, rotate, mirror or otherwise re-frame the subject. The only thing that changes from input to output is the background (replaced with the configured backdrop) and, where applicable, the surface treatment from the chosen art style. Empty backdrop margins around the subject are EXPECTED and CORRECT — do not try to fill them by enlarging the subject.`;
 
   function aspectLabel(ar: number): string {
@@ -594,18 +571,22 @@ async function runRemoveBackground(params: {
     let bestDiff = Math.abs(ar - best.value);
     for (const c of candidates) {
       const d = Math.abs(ar - c.value);
-      if (d < bestDiff) { best = c; bestDiff = d; }
+      if (d < bestDiff) {
+        best = c;
+        bestDiff = d;
+      }
     }
     return best.label;
   }
 
-  const aspectInstruction = params.targetAspectRatio && params.targetAspectRatio > 0
-    ? (params.fillFrame
+  const aspectInstruction =
+    params.targetAspectRatio && params.targetAspectRatio > 0
+      ? params.fillFrame
         ? `Return ONE single edited image with an output aspect ratio of approximately ${aspectLabel(params.targetAspectRatio)} (width:height ≈ ${params.targetAspectRatio.toFixed(3)}). The whole subject must be visible and SCALED UP to fill the output frame as much as possible. Never stretch or distort the subject. No collage, no side-by-side, no before/after comparison.`
-        : `Return ONE single edited image with an output aspect ratio of approximately ${aspectLabel(params.targetAspectRatio)} (width:height ≈ ${params.targetAspectRatio.toFixed(3)}). Keep the subject's original position and scale from the input — do NOT enlarge it to fill the new aspect ratio; simply extend the backdrop as needed. No collage, no side-by-side.`)
-    : (params.fillFrame
+        : `Return ONE single edited image with an output aspect ratio of approximately ${aspectLabel(params.targetAspectRatio)} (width:height ≈ ${params.targetAspectRatio.toFixed(3)}). Keep the subject's original position and scale from the input — do NOT enlarge it to fill the new aspect ratio; simply extend the backdrop as needed. No collage, no side-by-side.`
+      : params.fillFrame
         ? `Return ONE single edited image with the same aspect ratio as the input. The subject must fill the frame as much as possible. No collage, no side-by-side, no before/after comparison.`
-        : `Return ONE single edited image with the same aspect ratio as the input. Keep the subject's original position and scale. No collage, no side-by-side.`);
+        : `Return ONE single edited image with the same aspect ratio as the input. Keep the subject's original position and scale. No collage, no side-by-side.`;
 
   // Style-neutral motif/isolation block from the template config. Inserted
   // BEFORE the customer's chosen style so style words always win at the end.
@@ -625,7 +606,9 @@ async function runRemoveBackground(params: {
     `6. Keep the subject's identity, shape, surfaces, colors and proportions exactly as in the input photo unless an artistic style is specified below.`,
     styleBlock,
     aspectInstruction,
-  ].filter(Boolean).join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   // simpleStyleMode: short Kontext-Pro instruction, then bg-remove. Skips
   // ALL the legacy prompt construction below.
@@ -664,20 +647,19 @@ async function runRemoveBackground(params: {
   // snapshot/preview.
   const styleLabelLower = (params.styleLabel ?? "").toLowerCase();
   const styleHaystackForBridge = `${styleLabelLower} ${(params.stylePrompt ?? "").toLowerCase()}`;
-  const bridge =
-    /water\s*colou?r|akvarell|aquarelle/.test(styleHaystackForBridge)
-      ? "soft watercolor painting, wet-on-wet washes, pigment bleed, visible paper grain, not a photo"
-      : /oil|olja|oljemålning|impasto/.test(styleHaystackForBridge)
-        ? "oil painting, impasto, brush strokes, canvas texture, not a photo"
-        : /sketch|skiss|pencil|graphite/.test(styleHaystackForBridge)
-          ? "pencil drawing, graphite strokes, paper grain, cross hatching, not a photo"
-          : /line|linje|ink|kontur/.test(styleHaystackForBridge)
-            ? "black ink line drawing, minimal fill, white paper, not a photo"
-            : /pop[\s-]?art|warhol/.test(styleHaystackForBridge)
-              ? "flat comic poster, halftone, hard outlines, saturated color blocks, not a photo"
-              : /vintage|retro|aged/.test(styleHaystackForBridge)
-                ? "screen printed 1950s poster illustration, flat shapes, limited palette, grain, not a photo"
-                : "artistic illustration, painterly surface, not a photo";
+  const bridge = /water\s*colou?r|akvarell|aquarelle/.test(styleHaystackForBridge)
+    ? "soft watercolor painting, wet-on-wet washes, pigment bleed, visible paper grain, not a photo"
+    : /oil|olja|oljemålning|impasto/.test(styleHaystackForBridge)
+      ? "oil painting, impasto, brush strokes, canvas texture, not a photo"
+      : /sketch|skiss|pencil|graphite/.test(styleHaystackForBridge)
+        ? "pencil drawing, graphite strokes, paper grain, cross hatching, not a photo"
+        : /line|linje|ink|kontur/.test(styleHaystackForBridge)
+          ? "black ink line drawing, minimal fill, white paper, not a photo"
+          : /pop[\s-]?art|warhol/.test(styleHaystackForBridge)
+            ? "flat comic poster, halftone, hard outlines, saturated color blocks, not a photo"
+            : /vintage|retro|aged/.test(styleHaystackForBridge)
+              ? "screen printed 1950s poster illustration, flat shapes, limited palette, grain, not a photo"
+              : "artistic illustration, painterly surface, not a photo";
 
   const fluxBase =
     "The subject is the main object in the input photo. Preserve its structure, " +
@@ -696,14 +678,15 @@ async function runRemoveBackground(params: {
         bridge,
         "Render the subject in the following art style. Apply it fully to the subject while keeping its structure and identity recognizable. The style is a SURFACE TREATMENT only — it must not change the subject's orientation, facing direction, position or scale:",
         params.stylePrompt.trim(),
-      ].filter(Boolean).join("\n")
+      ]
+        .filter(Boolean)
+        .join("\n")
     : "";
 
   const fluxMotifLine = params.fluxStylePrompt?.trim() ?? "";
-  const fluxPromptText = [
-    fluxMotifLine ? `${fluxBase} ${fluxMotifLine}` : fluxBase,
-    fluxStyleTail,
-  ].filter(Boolean).join("\n\n");
+  const fluxPromptText = [fluxMotifLine ? `${fluxBase} ${fluxMotifLine}` : fluxBase, fluxStyleTail]
+    .filter(Boolean)
+    .join("\n\n");
 
   console.log("[runRemoveBackground] config", {
     designId: params.designId,
@@ -742,8 +725,7 @@ async function runRemoveBackground(params: {
 // Returns the bg-remover's RGBA PNG bytes RAW — no Canvas, no flatten, no
 // JPEG — so the caller's existing upload (~line 803-820) preserves alpha.
 const FLUX_KONTEXT_MODEL = "black-forest-labs/flux-kontext-pro";
-const BG_REMOVER_VERSION =
-  "a029dff38972b5fda4ec5d75d7d1cd25aeff621d2cf4946a41055d7db66b80bc";
+const BG_REMOVER_VERSION = "a029dff38972b5fda4ec5d75d7d1cd25aeff621d2cf4946a41055d7db66b80bc";
 
 async function pollReplicate(
   predictionId: string,
@@ -751,16 +733,12 @@ async function pollReplicate(
   maxAttempts: number,
   shortMs: number,
   longMs: number,
-): Promise<
-  | { ok: true; output: string }
-  | { ok: false; reason: string }
-> {
+): Promise<{ ok: true; output: string } | { ok: false; reason: string }> {
   for (let i = 1; i <= maxAttempts; i++) {
     await new Promise((r) => setTimeout(r, i < 5 ? shortMs : longMs));
-    const r = await fetch(
-      `https://api.replicate.com/v1/predictions/${predictionId}`,
-      { headers: { Authorization: `Bearer ${token}` } },
-    );
+    const r = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const j = await r.json();
     const status = j?.status;
     if (status === "succeeded") {
@@ -782,8 +760,7 @@ async function callFluxRemoveBg(params: {
   promptText: string;
   designId: string;
 }): Promise<
-  | { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
-  | { ok: false; response: Response }
+  { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
 > {
   const REPLICATE_API_TOKEN = Deno.env.get("REPLICATE_API_TOKEN");
   if (!REPLICATE_API_TOKEN) {
@@ -799,26 +776,23 @@ async function callFluxRemoveBg(params: {
   console.log(`[flux-removebg] start designId=${params.designId}`);
 
   // Step 1: Flux Kontext Pro — restyle / isolate against flat backdrop.
-  const fluxStart = await fetch(
-    `https://api.replicate.com/v1/models/${FLUX_KONTEXT_MODEL}/predictions`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${REPLICATE_API_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        input: {
-          input_image: params.faceImageUrl,
-          prompt: params.promptText,
-          output_format: "png",
-          safety_tolerance: 2,
-          prompt_upsampling: false,
-          aspect_ratio: "match_input_image",
-        },
-      }),
+  const fluxStart = await fetch(`https://api.replicate.com/v1/models/${FLUX_KONTEXT_MODEL}/predictions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${REPLICATE_API_TOKEN}`,
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      input: {
+        input_image: params.faceImageUrl,
+        prompt: params.promptText,
+        output_format: "png",
+        safety_tolerance: 2,
+        prompt_upsampling: false,
+        aspect_ratio: "match_input_image",
+      },
+    }),
+  });
   const fluxJson = await fluxStart.json();
   if (!fluxStart.ok || !fluxJson?.id) {
     return {
@@ -833,10 +807,7 @@ async function callFluxRemoveBg(params: {
   if (!fluxPoll.ok) {
     return {
       ok: false,
-      response: fallbackResponse(
-        "Vi kunde inte skapa bilden den här gången. Försök igen.",
-        `Flux ${fluxPoll.reason}`,
-      ),
+      response: fallbackResponse("Vi kunde inte skapa bilden den här gången. Försök igen.", `Flux ${fluxPoll.reason}`),
     };
   }
   const fluxUrl = fluxPoll.output;
@@ -913,8 +884,7 @@ async function callKontextSimpleStyle(params: {
   instruction: string;
   designId: string;
 }): Promise<
-  | { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
-  | { ok: false; response: Response }
+  { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
 > {
   const REPLICATE_API_TOKEN = Deno.env.get("REPLICATE_API_TOKEN");
   if (!REPLICATE_API_TOKEN) {
@@ -927,31 +897,26 @@ async function callKontextSimpleStyle(params: {
     };
   }
 
-  console.log(
-    `[kontext-simple] start designId=${params.designId} instruction="${params.instruction}"`,
-  );
+  console.log(`[kontext-simple] start designId=${params.designId} instruction="${params.instruction}"`);
 
   // Step 1: flux-kontext-pro with ONLY the short instruction.
-  const fluxStart = await fetch(
-    `https://api.replicate.com/v1/models/${FLUX_KONTEXT_MODEL}/predictions`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${REPLICATE_API_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        input: {
-          input_image: params.faceImageUrl,
-          prompt: params.instruction,
-          output_format: "png",
-          safety_tolerance: 2,
-          prompt_upsampling: false,
-          aspect_ratio: "match_input_image",
-        },
-      }),
+  const fluxStart = await fetch(`https://api.replicate.com/v1/models/${FLUX_KONTEXT_MODEL}/predictions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${REPLICATE_API_TOKEN}`,
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      input: {
+        input_image: params.faceImageUrl,
+        prompt: params.instruction,
+        output_format: "png",
+        safety_tolerance: 2,
+        prompt_upsampling: false,
+        aspect_ratio: "match_input_image",
+      },
+    }),
+  });
   const fluxJson = await fluxStart.json();
   if (!fluxStart.ok || !fluxJson?.id) {
     return {
@@ -1032,10 +997,6 @@ async function callKontextSimpleStyle(params: {
   return { ok: true, bytes, contentType, outputUrl: cutoutUrl };
 }
 
-
-
-
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -1053,32 +1014,24 @@ Deno.serve(async (req) => {
     const referenceImageUrl: string | undefined = body?.referenceImageUrl;
     const faceImageUrl: string | undefined = body?.faceImageUrl;
     const prompt: string = typeof body?.prompt === "string" ? body.prompt : "";
-    const subjectKindRaw: string =
-      typeof body?.subjectKind === "string" ? body.subjectKind : "human";
+    const subjectKindRaw: string = typeof body?.subjectKind === "string" ? body.subjectKind : "human";
     // Accept the new vocabulary AND the old one — the client may be a stale
     // cached bundle still sending cat/dog/other. Map them to "pet".
     const normalizedKind: string =
-      subjectKindRaw === "cat" || subjectKindRaw === "dog" || subjectKindRaw === "other"
-        ? "pet"
-        : subjectKindRaw;
-    const subjectKind = (["human", "pet", "removeBackground"].includes(normalizedKind)
-      ? normalizedKind
-      : "human") as "human" | "pet" | "removeBackground";
-    const designId: string =
-      typeof body?.designId === "string" ? body.designId : crypto.randomUUID();
+      subjectKindRaw === "cat" || subjectKindRaw === "dog" || subjectKindRaw === "other" ? "pet" : subjectKindRaw;
+    const subjectKind = (["human", "pet", "removeBackground"].includes(normalizedKind) ? normalizedKind : "human") as
+      | "human"
+      | "pet"
+      | "removeBackground";
+    const designId: string = typeof body?.designId === "string" ? body.designId : crypto.randomUUID();
 
     // -------- Fas 0 stub: skip all models, return a known transparent PNG --
     // Trigger: ?engine=flux&stub=1 with subjectKind=removeBackground.
     // Source: ?stubUrl=<https://...> OR env FACE_SWAP_DIAG_TRANSPARENT_PNG_URL.
     // Purpose: verify that the editor + print pipeline composites the per-layer
     // backdropColor under a truly-transparent AI result. Default flow untouched.
-    if (
-      engineParam === "flux" &&
-      stubParam === "1" &&
-      subjectKind === "removeBackground"
-    ) {
-      const stubUrl =
-        stubUrlParam ?? Deno.env.get("FACE_SWAP_DIAG_TRANSPARENT_PNG_URL") ?? "";
+    if (engineParam === "flux" && stubParam === "1" && subjectKind === "removeBackground") {
+      const stubUrl = stubUrlParam ?? Deno.env.get("FACE_SWAP_DIAG_TRANSPARENT_PNG_URL") ?? "";
       if (!stubUrl) {
         return fallbackResponse(
           "Stub-URL saknas.",
@@ -1089,28 +1042,19 @@ Deno.serve(async (req) => {
       try {
         const r = await fetch(stubUrl);
         if (!r.ok) {
-          return fallbackResponse(
-            "Kunde inte hämta stub-bilden.",
-            `stub fetch ${r.status}`,
-          );
+          return fallbackResponse("Kunde inte hämta stub-bilden.", `stub fetch ${r.status}`);
         }
         const ab = await r.arrayBuffer();
         const bytes = new Uint8Array(ab);
         const contentType = r.headers.get("content-type") ?? "image/png";
-        const supabase = createClient(
-          Deno.env.get("SUPABASE_URL")!,
-          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-        );
+        const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
         const ext = contentType.includes("png") ? "png" : "jpg";
         const path = `${designId}.${ext}`;
         const { error: upErr } = await supabase.storage
           .from("print-files")
           .upload(path, bytes, { contentType, upsert: true });
         if (upErr) {
-          return fallbackResponse(
-            "Kunde inte spara stub-bilden.",
-            `stub upload failed: ${upErr.message}`,
-          );
+          return fallbackResponse("Kunde inte spara stub-bilden.", `stub upload failed: ${upErr.message}`);
         }
         const { data: pub } = supabase.storage.from("print-files").getPublicUrl(path);
         const printFileUrl = pub.publicUrl;
@@ -1130,19 +1074,12 @@ Deno.serve(async (req) => {
       }
     }
 
-
     const removeBackgroundStylePrompt: string | null =
-      typeof body?.removeBackgroundStylePrompt === "string"
-        ? body.removeBackgroundStylePrompt
-        : null;
+      typeof body?.removeBackgroundStylePrompt === "string" ? body.removeBackgroundStylePrompt : null;
     const removeBackgroundStyleLabel: string | null =
-      typeof body?.removeBackgroundStyleLabel === "string"
-        ? body.removeBackgroundStyleLabel
-        : null;
+      typeof body?.removeBackgroundStyleLabel === "string" ? body.removeBackgroundStyleLabel : null;
     const removeBackgroundStyleId: string | null =
-      typeof body?.removeBackgroundStyleId === "string"
-        ? body.removeBackgroundStyleId
-        : null;
+      typeof body?.removeBackgroundStyleId === "string" ? body.removeBackgroundStyleId : null;
 
     // Validation: faceImageUrl is always required. referenceImageUrl is
     // required only for human + pet routes.
@@ -1154,10 +1091,8 @@ Deno.serve(async (req) => {
     }
 
     const fluxEnabledHandler = Deno.env.get("FLUX_REMOVEBG_ENABLED") === "true";
-    const hasFluxStyle =
-      typeof body?.fluxStylePrompt === "string" && body.fluxStylePrompt.trim().length > 0;
-    const simpleStyleMode: boolean =
-      subjectKind === "removeBackground" && body?.simpleStyleMode === true;
+    const hasFluxStyle = typeof body?.fluxStylePrompt === "string" && body.fluxStylePrompt.trim().length > 0;
+    const simpleStyleMode: boolean = subjectKind === "removeBackground" && body?.simpleStyleMode === true;
     const styleInstruction: string | null =
       typeof body?.styleInstruction === "string" && body.styleInstruction.trim().length > 0
         ? body.styleInstruction.trim()
@@ -1165,23 +1100,23 @@ Deno.serve(async (req) => {
     const willUseSimple =
       simpleStyleMode &&
       (!!styleInstruction ||
-        (typeof body?.removeBackgroundStylePrompt === "string" &&
-          body.removeBackgroundStylePrompt.trim().length > 0));
-    const willUseFlux =
-      !willUseSimple &&
-      subjectKind === "removeBackground" &&
-      fluxEnabledHandler &&
-      hasFluxStyle;
+        (typeof body?.removeBackgroundStylePrompt === "string" && body.removeBackgroundStylePrompt.trim().length > 0));
+    const willUseFlux = !willUseSimple && subjectKind === "removeBackground" && fluxEnabledHandler && hasFluxStyle;
     const route =
-      subjectKind === "human" ? "human-nano-banana"
-      : subjectKind === "pet" ? "pet-nano-banana"
-      : willUseSimple ? "remove-bg-simple"
-      : willUseFlux ? "remove-bg-flux"
-      : "remove-bg-nano-banana";
-    const modelUsed =
-      willUseSimple ? "black-forest-labs/flux-kontext-pro+851-labs/background-remover"
-      : willUseFlux ? "black-forest-labs/flux-kontext-pro+851-labs/background-remover"
-      : ANIMAL_MODEL;
+      subjectKind === "human"
+        ? "human-nano-banana"
+        : subjectKind === "pet"
+          ? "pet-nano-banana"
+          : willUseSimple
+            ? "remove-bg-simple"
+            : willUseFlux
+              ? "remove-bg-flux"
+              : "remove-bg-nano-banana";
+    const modelUsed = willUseSimple
+      ? "black-forest-labs/flux-kontext-pro+851-labs/background-remover"
+      : willUseFlux
+        ? "black-forest-labs/flux-kontext-pro+851-labs/background-remover"
+        : ANIMAL_MODEL;
 
     genId = await genLogStart({
       session_key: typeof body?.sessionKey === "string" ? body.sessionKey : null,
@@ -1204,29 +1139,19 @@ Deno.serve(async (req) => {
     );
 
     const targetAspectRatio: number | null =
-      typeof body?.targetAspectRatio === "number" &&
-      isFinite(body.targetAspectRatio) &&
-      body.targetAspectRatio > 0
+      typeof body?.targetAspectRatio === "number" && isFinite(body.targetAspectRatio) && body.targetAspectRatio > 0
         ? body.targetAspectRatio
         : null;
 
     const backdropColor: string | null =
-      typeof body?.backdropColor === "string" &&
-      /^#([0-9a-fA-F]{6})$/.test(body.backdropColor)
+      typeof body?.backdropColor === "string" && /^#([0-9a-fA-F]{6})$/.test(body.backdropColor)
         ? body.backdropColor.toUpperCase()
         : null;
-    const fillFrame: boolean =
-      typeof body?.fillFrame === "boolean" ? body.fillFrame : true;
+    const fillFrame: boolean = typeof body?.fillFrame === "boolean" ? body.fillFrame : true;
     const preserveSubjectColors: boolean =
-      typeof body?.preserveSubjectColors === "boolean"
-        ? body.preserveSubjectColors
-        : true;
+      typeof body?.preserveSubjectColors === "boolean" ? body.preserveSubjectColors : true;
     const fluxStylePrompt: string | null =
-      typeof body?.fluxStylePrompt === "string" && body.fluxStylePrompt.trim().length > 0
-        ? body.fluxStylePrompt
-        : null;
-
-
+      typeof body?.fluxStylePrompt === "string" && body.fluxStylePrompt.trim().length > 0 ? body.fluxStylePrompt : null;
 
     const result =
       subjectKind === "human"
@@ -1236,27 +1161,26 @@ Deno.serve(async (req) => {
             adminPrompt: prompt,
           })
         : subjectKind === "pet"
-        ? await runPetSwap({
-            referenceImageUrl: referenceImageUrl!,
-            faceImageUrl,
-            adminPrompt: prompt,
-          })
-        : await runRemoveBackground({
-            faceImageUrl,
-            adminPrompt: prompt,
-            stylePrompt: removeBackgroundStylePrompt,
-            styleLabel: removeBackgroundStyleLabel,
-            targetAspectRatio,
-            backdropColor,
-            fillFrame,
-            preserveSubjectColors,
-            designId,
-            fluxStylePrompt,
-            subjectKind: "removeBackground",
-            simpleStyleMode,
-            styleInstruction,
-          });
-
+          ? await runPetSwap({
+              referenceImageUrl: referenceImageUrl!,
+              faceImageUrl,
+              adminPrompt: prompt,
+            })
+          : await runRemoveBackground({
+              faceImageUrl,
+              adminPrompt: prompt,
+              stylePrompt: removeBackgroundStylePrompt,
+              styleLabel: removeBackgroundStyleLabel,
+              targetAspectRatio,
+              backdropColor,
+              fillFrame,
+              preserveSubjectColors,
+              designId,
+              fluxStylePrompt,
+              subjectKind: "removeBackground",
+              simpleStyleMode,
+              styleInstruction,
+            });
 
     if (!result.ok) {
       await genLogEnd(genId, {
@@ -1298,10 +1222,7 @@ Deno.serve(async (req) => {
     }
 
     // Upload to print-files so the customer gets a stable public URL.
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
     const ext = result.contentType.includes("png") ? "png" : "jpg";
     const path = `${designId}.${ext}`;
@@ -1323,10 +1244,7 @@ Deno.serve(async (req) => {
 
     const { data: pub } = supabase.storage.from("print-files").getPublicUrl(path);
     const printFileUrl = pub.publicUrl;
-    console.log(
-      `[face-swap] done route=${route} → printFileUrl=${printFileUrl} ` +
-        `aiOutputUrl=${result.outputUrl}`,
-    );
+    console.log(`[face-swap] done route=${route} → printFileUrl=${printFileUrl} ` + `aiOutputUrl=${result.outputUrl}`);
 
     await genLogEnd(genId, {
       status: "succeeded",
@@ -1352,9 +1270,6 @@ Deno.serve(async (req) => {
       duration_ms: Date.now() - genT0,
       error: msg,
     });
-    return fallbackResponse(
-      "Något gick fel. Försök igen om en stund.",
-      msg,
-    );
+    return fallbackResponse("Något gick fel. Försök igen om en stund.", msg);
   }
 });
