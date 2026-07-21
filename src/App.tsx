@@ -8,6 +8,8 @@ import NotFound from "./pages/NotFound.tsx";
 import EditorPage from "./pages/EditorPage.tsx";
 import AdminConfigs from "./pages/AdminConfigs.tsx";
 import DesignerPage from "./pages/admin/DesignerPage.tsx";
+import AnalyticsPage from "./pages/admin/AnalyticsPage.tsx";
+import { RequireAdmin } from "./components/admin/RequireAdmin.tsx";
 
 import { useCartSync } from "./hooks/useCartSync";
 import { useShopContextBootstrap } from "./hooks/useShopContextBootstrap";
@@ -19,11 +21,14 @@ const AppRoutes = () => {
   useShopContextBootstrap();
   return (
     <Routes>
-      <Route path="/" element={<AdminConfigs />} />
+      {/* Kundvända sidor — aldrig grindade. */}
       <Route path="/home" element={<Index />} />
       <Route path="/editor" element={<EditorPage />} />
-      <Route path="/admin/configs" element={<AdminConfigs />} />
-      <Route path="/admin/designer/:handle" element={<DesignerPage />} />
+      {/* Adminsidor — kräver inloggad admin (RequireAdmin). */}
+      <Route path="/" element={<RequireAdmin><AdminConfigs /></RequireAdmin>} />
+      <Route path="/admin/configs" element={<RequireAdmin><AdminConfigs /></RequireAdmin>} />
+      <Route path="/admin/designer/:handle" element={<RequireAdmin><DesignerPage /></RequireAdmin>} />
+      <Route path="/admin/analytics" element={<RequireAdmin><AnalyticsPage /></RequireAdmin>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

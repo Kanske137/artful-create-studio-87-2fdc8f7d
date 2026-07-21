@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { loadAllConfigsRaw, type ProductConfig } from "@/lib/product-config";
-import { Loader2, ExternalLink, Zap, Pencil, Plus, CheckCircle2, AlertCircle, Download } from "lucide-react";
+import { Loader2, ExternalLink, Zap, Pencil, Plus, CheckCircle2, AlertCircle, Download, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { resolveTemplate } from "@/lib/template-migrate";
@@ -123,6 +123,12 @@ export default function AdminConfigs() {
               <p className="text-sm text-muted-foreground">Layouter, kartstilar, storlekar och Gelato-mappning</p>
             </div>
             <div className="flex items-center gap-2">
+              <Button variant="outline" asChild>
+                <Link to="/admin/analytics">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Analytics
+                </Link>
+              </Button>
               <Button variant="outline" onClick={() => setCreateOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Skapa ny mall
