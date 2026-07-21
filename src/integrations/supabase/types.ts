@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      editor_events: {
+        Row: {
+          design_id: string | null
+          handle: string | null
+          id: number
+          payload: Json
+          product_type: string | null
+          session_key: string
+          ts: string
+          type: string
+        }
+        Insert: {
+          design_id?: string | null
+          handle?: string | null
+          id?: never
+          payload?: Json
+          product_type?: string | null
+          session_key: string
+          ts?: string
+          type: string
+        }
+        Update: {
+          design_id?: string | null
+          handle?: string | null
+          id?: never
+          payload?: Json
+          product_type?: string | null
+          session_key?: string
+          ts?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      editor_sessions: {
+        Row: {
+          country: string | null
+          created_at: string
+          device: string | null
+          email: string | null
+          email_linked_at: string | null
+          embedded: boolean | null
+          first_handle: string | null
+          id: string
+          last_seen_at: string
+          locale: string | null
+          session_key: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          email?: string | null
+          email_linked_at?: string | null
+          embedded?: boolean | null
+          first_handle?: string | null
+          id?: string
+          last_seen_at?: string
+          locale?: string | null
+          session_key: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          email?: string | null
+          email_linked_at?: string | null
+          embedded?: boolean | null
+          first_handle?: string | null
+          id?: string
+          last_seen_at?: string
+          locale?: string | null
+          session_key?: string
+        }
+        Relationships: []
+      }
       gelato_orders: {
         Row: {
           carrier: string | null
@@ -74,6 +149,66 @@ export type Database = {
           tracking_code?: string | null
           tracking_url?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      generations: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          design_id: string | null
+          duration_ms: number | null
+          error: string | null
+          handle: string | null
+          id: string
+          input_image_url: string | null
+          layer_id: string | null
+          output_image_url: string | null
+          provider: string | null
+          reference_image_url: string | null
+          session_key: string | null
+          status: string
+          style_id: string | null
+          style_label: string | null
+          subject_kind: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          design_id?: string | null
+          duration_ms?: number | null
+          error?: string | null
+          handle?: string | null
+          id?: string
+          input_image_url?: string | null
+          layer_id?: string | null
+          output_image_url?: string | null
+          provider?: string | null
+          reference_image_url?: string | null
+          session_key?: string | null
+          status?: string
+          style_id?: string | null
+          style_label?: string | null
+          subject_kind?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          design_id?: string | null
+          duration_ms?: number | null
+          error?: string | null
+          handle?: string | null
+          id?: string
+          input_image_url?: string | null
+          layer_id?: string | null
+          output_image_url?: string | null
+          provider?: string | null
+          reference_image_url?: string | null
+          session_key?: string | null
+          status?: string
+          style_id?: string | null
+          style_label?: string | null
+          subject_kind?: string | null
         }
         Relationships: []
       }
