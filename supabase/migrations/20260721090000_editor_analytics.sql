@@ -61,8 +61,13 @@ alter table public.editor_events enable row level security;
 alter table public.generations enable row level security;
 
 -- Anon: insert-only på händelser, insert + begränsad update på sessioner.
-create policy "anon_insert_sessions" on public.editor_sessions
-  for insert to anon with check (true);
+-- OBS: insert-policyn för sessions är `to public` (inte `to anon`) — empiriskt
+-- gav `to anon` RLS-fel vid insert i denna miljö. Klienten kör dessutom
+-- VANLIG insert (aldrig upsert/ON CONFLICT): konfliktkollen kräver
+-- läsrättigheter som anon medvetet saknar; dubletter (23505) ignoreras
+-- i klienten. Behörighetsskyddet ligger i grants/revokes nedan.
+create policy "sessions_insert_any" on public.editor_sessions
+  for insert to public with check (true);
 create policy "anon_update_sessions" on public.editor_sessions
   for update to anon using (true) with check (true);
 create policy "anon_insert_events" on public.editor_events

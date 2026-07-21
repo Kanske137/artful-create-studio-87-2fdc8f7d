@@ -14,13 +14,14 @@ import { supabase } from "@/integrations/supabase/client";
 // otypad vy av samma klient tills typerna regenererats av Lovable.
 const db = supabase as unknown as {
   from: (table: string) => {
-    insert: (row: Record<string, unknown>) => PromiseLike<{ error: { message: string } | null }>;
-    upsert: (
+    insert: (
       row: Record<string, unknown>,
-      opts: { onConflict: string; ignoreDuplicates: boolean },
-    ) => PromiseLike<{ error: { message: string } | null }>;
+    ) => PromiseLike<{ error: { message: string; code?: string } | null }>;
     update: (patch: Record<string, unknown>) => {
-      eq: (col: string, val: string) => PromiseLike<{ error: { message: string } | null }>;
+      eq: (
+        col: string,
+        val: string,
+      ) => PromiseLike<{ error: { message: string; code?: string } | null }>;
     };
   };
 };
@@ -66,22 +67,26 @@ export function ensureSession(ctx: SessionContext): void {
         sessionInserted = true;
         const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
         const device = /Mobi|Android|iPhone|iPad|iPod/i.test(ua) ? "mobile" : "desktop";
-        await db.from("editor_sessions").upsert(
-          {
-            session_key: key,
-            locale: ctx.locale ?? null,
-            country: ctx.country ?? null,
-            device,
-            embedded: typeof window !== "undefined" && window.self !== window.top,
-            first_handle: ctx.handle ?? null,
-          },
-          { onConflict: "session_key", ignoreDuplicates: true },
-        );
+        // OBS: vanlig insert, INTE upsert/ON CONFLICT — anon saknar (medvetet)
+        // läsrättigheter och ON CONFLICT-konfliktkollen kräver dem. Dublett
+        // (23505) betyder bara "sessionen finns redan" och ignoreras tyst.
+        const { error: insErr } = await db.from("editor_sessions").insert({
+          session_key: key,
+          locale: ctx.locale ?? null,
+          country: ctx.country ?? null,
+          device,
+          embedded: typeof window !== "undefined" && window.self !== window.top,
+          first_handle: ctx.handle ?? null,
+        });
+        if (insErr && insErr.code !== "23505") {
+          console.warn("[analytics] session insert:", insErr.message);
+        }
       }
-      await db
+      const { error: updErr } = await db
         .from("editor_sessions")
         .update({ last_seen_at: new Date().toISOString(), ...(ctx.locale ? { locale: ctx.locale } : {}) })
         .eq("session_key", key);
+      if (updErr) console.warn("[analytics] session update:", updErr.message);
     } catch {
       /* spårning får aldrig störa editorn */
     }
@@ -97,7 +102,7 @@ export function track(
   const { designId, handle, productType, ...rest } = payload;
   void (async () => {
     try {
-      await db.from("editor_events").insert({
+      const { error } = await db.from("editor_events").insert({
         session_key: getSessionKey(),
         type,
         design_id: (designId as string | undefined) ?? null,
@@ -105,6 +110,7 @@ export function track(
         product_type: (productType as string | undefined) ?? null,
         payload: rest,
       });
+      if (error) console.warn("[analytics] event insert:", error.message);
     } catch {
       /* spårning får aldrig störa editorn */
     }
