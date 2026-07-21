@@ -50,10 +50,14 @@ export function RequireAdmin({ children }: { children: ReactNode }) {
     );
   }
 
+  // Trimma alltid — autofyll/mobiltangentbord smyger ofta in blanksteg som
+  // annars fäller allowlist-jämförelsen.
+  const normEmail = email.trim();
+
   const signIn = async () => {
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email: normEmail, password });
       if (error) toast.error("Inloggning misslyckades", { description: error.message });
     } finally {
       setBusy(false);
@@ -61,13 +65,13 @@ export function RequireAdmin({ children }: { children: ReactNode }) {
   };
 
   const signUp = async () => {
-    if (!ADMIN_EMAILS.includes(email.toLowerCase())) {
+    if (!ADMIN_EMAILS.includes(normEmail.toLowerCase())) {
       toast.error("Endast admin-adressen kan registreras");
       return;
     }
     setBusy(true);
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email: normEmail, password });
       if (error) {
         toast.error("Registrering misslyckades", { description: error.message });
       } else if (!data.session) {
