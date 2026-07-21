@@ -11,22 +11,22 @@
 //   portraits          — { [slotId]: publicPortraitUrl }
 //   designId           — used for the output filename
 //
-// Calls Lovable AI Gateway with Nano Banana 2 (Gemini 3.1 flash image),
-// passing image 1 = reference, image 2..N+1 = portraits in slot order.
+// Calls Replicate `google/nano-banana-2` (Nano Banana 2 / Gemini 3.1 Flash
+// Image — samma modell som tidigare via Lovable AI Gateway, migrerad
+// 2026-07-21 för kostnadskontroll), passing image 1 = reference,
+// image 2..N+1 = portraits in slot order.
 //
 // Always returns HTTP 200. On recoverable errors the body is
 // { error, fallback: true, userMessage } so the client can show a friendly
 // toast instead of crashing on a non-2xx.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { NANO_BANANA_MODEL, runNanoBanana } from "../_shared/replicate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-const AI_GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "google/gemini-3.1-flash-image-preview";
 
 // ---------- analytics: generations-logg (Fas 2) ----------
 // Loggar varje generering till `generations`-tabellen (service role). Får
@@ -75,14 +75,6 @@ function fallbackResponse(userMessage: string, internal: string) {
   return jsonResponse({ error: internal, fallback: true, userMessage });
 }
 
-function base64ToBytes(b64: string): Uint8Array {
-  const cleaned = b64.startsWith("data:") ? b64.slice(b64.indexOf(",") + 1) : b64;
-  const bin = atob(cleaned);
-  const out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-  return out;
-}
-
 function buildSlotMappingText(slots: Array<{ id: string; position: string }>): string {
   return slots
     .map((s, i) => `- The person at the ${s.position} position becomes the face in image ${i + 2}`)
@@ -92,123 +84,31 @@ function buildSlotMappingText(slots: Array<{ id: string; position: string }>): s
 async function callNanoBananaOnce(params: {
   promptText: string;
   imageUrls: string[];
-  apiKey: string;
 }): Promise<
   | { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
   | { ok: false; retriable: boolean; status: number; reason: string; userMessage: string }
 > {
-  const content: Array<Record<string, unknown>> = [
-    { type: "text", text: params.promptText },
-  ];
-  for (const url of params.imageUrls) {
-    content.push({ type: "image_url", image_url: { url } });
-  }
-
-  const res = await fetch(AI_GATEWAY_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${params.apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      modalities: ["image", "text"],
-      messages: [{ role: "user", content }],
-    }),
-  });
-
-  if (!res.ok) {
-    const errBody = await res.text();
-    console.error("[multi-face-swap] AI gateway error", res.status, errBody);
-    if (res.status === 429) {
-      return {
-        ok: false, retriable: true, status: 429,
-        reason: "Lovable AI rate-limited (429)",
-        userMessage: "AI-tjänsten är överbelastad just nu. Vänta 10–15 sekunder och försök igen.",
-      };
-    }
-    if (res.status === 402) {
-      return {
-        ok: false, retriable: false, status: 402,
-        reason: "Lovable AI payment required (402)",
-        userMessage: "AI-krediten är slut. Kontakta supporten så löser vi det.",
-      };
-    }
-    const retriable = res.status >= 500;
-    return {
-      ok: false, retriable, status: res.status,
-      reason: `AI gateway error ${res.status}: ${errBody.slice(0, 200)}`,
-      userMessage: "Vi kunde inte skapa bilden just nu. Försök igen om en stund.",
-    };
-  }
-
-  const data = await res.json();
-  const usage = data?.usage;
-  if (usage) {
-    console.log(
-      `[multi-face-swap] AI usage prompt=${usage.prompt_tokens ?? "?"} ` +
-      `completion=${usage.completion_tokens ?? "?"} total=${usage.total_tokens ?? "?"}`,
-    );
-  }
-
-  const msg = data?.choices?.[0]?.message;
-  const imageUrl: string | undefined =
-    msg?.images?.[0]?.image_url?.url ??
-    msg?.images?.[0]?.url ??
-    (typeof msg?.content === "string" && msg.content.startsWith("data:") ? msg.content : undefined);
-
-  if (!imageUrl) {
-    console.error("[multi-face-swap] AI returned no image", JSON.stringify(data).slice(0, 500));
-    return {
-      ok: false, retriable: true, status: 200,
-      reason: "AI gateway response missing image",
-      userMessage: "AI-modellen returnerade ingen bild den här gången. Försök igen.",
-    };
-  }
-
-  let bytes: Uint8Array;
-  let contentType = "image/png";
-  if (imageUrl.startsWith("data:")) {
-    const mimeMatch = imageUrl.match(/^data:([^;]+);base64,/);
-    if (mimeMatch) contentType = mimeMatch[1];
-    bytes = base64ToBytes(imageUrl);
-  } else {
-    const r = await fetch(imageUrl);
-    if (!r.ok) {
-      return {
-        ok: false, retriable: r.status >= 500, status: r.status,
-        reason: `AI image fetch failed ${r.status}`,
-        userMessage: "Vi kunde inte hämta den genererade bilden. Försök igen.",
-      };
-    }
-    bytes = new Uint8Array(await r.arrayBuffer());
-    contentType = r.headers.get("content-type") ?? contentType;
-  }
-
+  const r = await runNanoBanana({ promptText: params.promptText, imageUrls: params.imageUrls });
+  if (r.ok) return r;
+  console.error("[multi-face-swap] replicate nano-banana error:", r.reason);
   return {
-    ok: true,
-    bytes,
-    contentType,
-    outputUrl: imageUrl.startsWith("data:") ? "(inline base64)" : imageUrl,
+    ok: false,
+    retriable: r.retriable,
+    status: r.status,
+    reason: r.reason,
+    userMessage:
+      r.status === 429
+        ? "AI-tjänsten är överbelastad just nu. Vänta 10–15 sekunder och försök igen."
+        : "Vi kunde inte skapa bilden just nu. Försök igen om en stund.",
   };
 }
 
 async function callNanoBanana(params: { promptText: string; imageUrls: string[] }) {
-  const apiKey = Deno.env.get("LOVABLE_API_KEY");
-  if (!apiKey) {
-    return {
-      ok: false as const,
-      response: fallbackResponse(
-        "Tjänsten är tillfälligt otillgänglig. Försök igen senare.",
-        "LOVABLE_API_KEY not configured",
-      ),
-    };
-  }
   const BACKOFF_MS = [4000, 8000];
   const MAX_ATTEMPTS = BACKOFF_MS.length + 1;
   let lastFail: { reason: string; userMessage: string; status: number } | null = null;
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    const r = await callNanoBananaOnce({ ...params, apiKey });
+    const r = await callNanoBananaOnce(params);
     if (r.ok) {
       if (attempt > 1) console.log(`[multi-face-swap] succeeded on retry ${attempt}/${MAX_ATTEMPTS}`);
       return { ok: true as const, ...r };
@@ -285,7 +185,7 @@ Deno.serve(async (req) => {
       design_id: designId,
       layer_id: layerId,
       subject_kind: "multiFace",
-      provider: MODEL,
+      provider: NANO_BANANA_MODEL,
       input_image_url: portraitUrls[0] ?? null,
       reference_image_url: referenceImageUrl,
     });
@@ -337,7 +237,7 @@ Deno.serve(async (req) => {
       printFileUrl,
       previewUrl: printFileUrl,
       output: printFileUrl,
-      modelUsed: MODEL,
+      modelUsed: NANO_BANANA_MODEL,
       usedReferenceImageUrl: referenceImageUrl,
       usedPortraitUrls: portraitUrls,
     });

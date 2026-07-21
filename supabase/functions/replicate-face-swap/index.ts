@@ -1,19 +1,23 @@
 // Edge function: face-swap / background-removal for the editor's aiPhoto
-// layer. Routed by `subjectKind`:
+// layer. ALL model calls go through Replicate (migrerat från Lovable AI
+// Gateway 2026-07-21 för kostnadskontroll — en leverantör, en faktura,
+// spend limits). Routed by `subjectKind`:
 //
 //   subjectKind === "human"
 //     → Replicate `cdingram/face-swap` (dedicated human face-swap model;
 //       structured input_image/swap_image; works very well on people).
+//       Tar inga prompter — adminens swapPrompt används inte på denna väg.
 //
 //   subjectKind === "pet"
-//     → Lovable AI Gateway, Nano Banana 2 (`google/gemini-3.1-flash-image-preview`).
+//     → Replicate `google/nano-banana-2` (Nano Banana 2 / Gemini 3.1 Flash
+//       Image — samma modell som tidigare via Lovable, samma prompter).
 //       Multi-image edit: reference scene + customer pet photo. Animals don't
 //       have the facial-landmark structure that face-swap models depend on,
 //       so a general identity-aware editor produces much better results for
 //       both cats and dogs.
 //
 //   subjectKind === "removeBackground"
-//     → Lovable AI Gateway, Nano Banana 2. SINGLE image: customer's photo.
+//     → Replicate `google/nano-banana-2`. SINGLE image: customer's photo.
 //       The model removes the background, places the subject on a white
 //       backdrop and surrounds it with a soft watercolor/dot ring. An
 //       optional AI style preset (sent as removeBackgroundStylePrompt) is
@@ -35,6 +39,7 @@
 // toast instead of crashing on a non-2xx.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { NANO_BANANA_MODEL, runNanoBanana } from "../_shared/replicate.ts";
 // Deploy-markör 2026-07-21: analytics-loggning (generations-tabellen) aktiv.
 
 const corsHeaders = {
@@ -45,11 +50,6 @@ const corsHeaders = {
 // Replicate human face-swap model. Pinned to a specific version for stability.
 const FACE_SWAP_MODEL_VERSION = "cdingram/face-swap:d1d6ea8c8be89d664a07a457526f7128109dee7030fdac424788d762c71ed111";
 const FACE_SWAP_MODEL_NAME = "cdingram/face-swap";
-
-// Lovable AI Gateway — Nano Banana 2 (Gemini 3.1 Flash Image).
-// Free of extra API keys: uses the auto-provisioned LOVABLE_API_KEY.
-const AI_GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const ANIMAL_MODEL = "google/gemini-3.1-flash-image-preview";
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -132,15 +132,6 @@ function readImageSize(bytes: Uint8Array): { w: number; h: number } | null {
     }
   }
   return null;
-}
-
-// Convert a base64 string (possibly a data URL) to a Uint8Array.
-function base64ToBytes(b64: string): Uint8Array {
-  const cleaned = b64.startsWith("data:") ? b64.slice(b64.indexOf(",") + 1) : b64;
-  const bin = atob(cleaned);
-  const out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-  return out;
 }
 
 // ---------- Route 1: Replicate human face-swap ----------
@@ -245,128 +236,33 @@ async function runReplicateFaceSwap(params: {
   return { ok: true, bytes, contentType, outputUrl: output };
 }
 
-// ---------- Shared helper: call Nano Banana 2 via Lovable AI Gateway ----------
-// Sends one user message with `promptText` plus an arbitrary number of input
-// images. Returns either the decoded image bytes or a Response wrapping a
-// friendly error.
+// ---------- Shared helper: call Nano Banana 2 via Replicate ----------
+// Sends `promptText` plus an arbitrary number of input images to
+// google/nano-banana-2 (see _shared/replicate.ts). Returns either the
+// downloaded image bytes or a Response wrapping a friendly error.
 //
-// Resilience: the underlying Google Vertex pool for Nano Banana 2 frequently
-// returns transient 429 (Resource Exhausted) when several requests land within
-// a few seconds, and the model occasionally responds with text instead of an
-// image. We auto-retry the EXACT same payload up to 2 times with exponential
-// backoff (4s, 8s) so the customer doesn't have to manually re-trigger the
-// generation. The payload itself (prompt, modalities, model, images) is never
-// changed — output bytes are identical to a single-shot call when it succeeds.
+// Resilience: Nano Banana kan returnera transient 429/5xx eller sakna bild i
+// svaret. Vi auto-retry:ar EXAKT samma payload upp till 2 gånger med
+// exponentiell backoff (4s, 8s) så kunden inte behöver trigga om manuellt.
 async function callNanoBananaOnce(params: {
   promptText: string;
   imageUrls: string[];
-  apiKey: string;
 }): Promise<
   | { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
   | { ok: false; retriable: boolean; status: number; reason: string; userMessage: string }
 > {
-  const content: Array<Record<string, unknown>> = [{ type: "text", text: params.promptText }];
-  for (const url of params.imageUrls) {
-    content.push({ type: "image_url", image_url: { url } });
-  }
-
-  const aiRes = await fetch(AI_GATEWAY_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${params.apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: ANIMAL_MODEL,
-      modalities: ["image", "text"],
-      messages: [{ role: "user", content }],
-    }),
-  });
-
-  if (!aiRes.ok) {
-    const errBody = await aiRes.text();
-    console.error("[face-swap] AI gateway error", aiRes.status, errBody);
-    if (aiRes.status === 429) {
-      return {
-        ok: false,
-        retriable: true,
-        status: 429,
-        reason: "Lovable AI rate-limited (429)",
-        userMessage: "AI-tjänsten är överbelastad just nu. Vänta 10–15 sekunder och försök igen.",
-      };
-    }
-    if (aiRes.status === 402) {
-      return {
-        ok: false,
-        retriable: false,
-        status: 402,
-        reason: "Lovable AI payment required (402)",
-        userMessage: "AI-krediten är slut. Kontakta supporten så löser vi det.",
-      };
-    }
-    // 5xx are likely transient as well — retry. 4xx (except handled above) are not.
-    const retriable = aiRes.status >= 500;
-    return {
-      ok: false,
-      retriable,
-      status: aiRes.status,
-      reason: `AI gateway error ${aiRes.status}: ${errBody.slice(0, 200)}`,
-      userMessage: "Vi kunde inte skapa bilden just nu. Försök igen om en stund.",
-    };
-  }
-
-  const data = await aiRes.json();
-  const usage = data?.usage;
-  if (usage) {
-    console.log(
-      `[face-swap] AI usage prompt=${usage.prompt_tokens ?? "?"} ` +
-        `completion=${usage.completion_tokens ?? "?"} total=${usage.total_tokens ?? "?"}`,
-    );
-  }
-
-  const msg = data?.choices?.[0]?.message;
-  const imageUrl: string | undefined =
-    msg?.images?.[0]?.image_url?.url ??
-    msg?.images?.[0]?.url ??
-    (typeof msg?.content === "string" && msg.content.startsWith("data:") ? msg.content : undefined);
-
-  if (!imageUrl) {
-    console.error("[face-swap] AI returned no image", JSON.stringify(data).slice(0, 500));
-    return {
-      ok: false,
-      retriable: true,
-      status: 200,
-      reason: "AI gateway response missing image",
-      userMessage: "AI-modellen returnerade ingen bild den här gången. Försök igen.",
-    };
-  }
-
-  let bytes: Uint8Array;
-  let contentType = "image/png";
-  if (imageUrl.startsWith("data:")) {
-    const mimeMatch = imageUrl.match(/^data:([^;]+);base64,/);
-    if (mimeMatch) contentType = mimeMatch[1];
-    bytes = base64ToBytes(imageUrl);
-  } else {
-    const r = await fetch(imageUrl);
-    if (!r.ok) {
-      return {
-        ok: false,
-        retriable: r.status >= 500,
-        status: r.status,
-        reason: `AI image fetch failed ${r.status}`,
-        userMessage: "Vi kunde inte hämta den genererade bilden. Försök igen.",
-      };
-    }
-    bytes = new Uint8Array(await r.arrayBuffer());
-    contentType = r.headers.get("content-type") ?? contentType;
-  }
-
+  const r = await runNanoBanana({ promptText: params.promptText, imageUrls: params.imageUrls });
+  if (r.ok) return r;
+  console.error("[face-swap] replicate nano-banana error:", r.reason);
   return {
-    ok: true,
-    bytes,
-    contentType,
-    outputUrl: imageUrl.startsWith("data:") ? "(inline base64)" : imageUrl,
+    ok: false,
+    retriable: r.retriable,
+    status: r.status,
+    reason: r.reason,
+    userMessage:
+      r.status === 429
+        ? "AI-tjänsten är överbelastad just nu. Vänta 10–15 sekunder och försök igen."
+        : "Vi kunde inte skapa bilden just nu. Försök igen om en stund.",
   };
 }
 
@@ -376,17 +272,6 @@ async function callNanoBanana(params: {
 }): Promise<
   { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
 > {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) {
-    return {
-      ok: false,
-      response: fallbackResponse(
-        "Tjänsten är tillfälligt otillgänglig. Försök igen senare.",
-        "LOVABLE_API_KEY not configured",
-      ),
-    };
-  }
-
   // Backoff schedule between retries (ms). Total worst-case extra latency: 12s.
   const BACKOFF_MS = [4000, 8000];
   const MAX_ATTEMPTS = BACKOFF_MS.length + 1; // 1 initial + 2 retries
@@ -397,7 +282,6 @@ async function callNanoBanana(params: {
     const result = await callNanoBananaOnce({
       promptText: params.promptText,
       imageUrls: params.imageUrls,
-      apiKey: LOVABLE_API_KEY,
     });
 
     if (result.ok) {
@@ -432,32 +316,10 @@ async function callNanoBanana(params: {
   };
 }
 
-// ---------- Route 2a: human face/identity transfer (Nano Banana 2) ----------
-// Same multi-image edit pattern as pet, but the admin's free-text prompt
-// (`layer.defaults.swapPrompt`) is the primary instruction describing WHAT
-// to take from the customer's photo and how to place it onto the reference.
-async function runHumanSwap(params: { referenceImageUrl: string; faceImageUrl: string; adminPrompt: string }) {
-  const artistInstruction =
-    params.adminPrompt?.trim() ||
-    "Take the person's face and head from image #2 and place it onto the person in image #1. Preserve the customer's facial identity from image #2 (features, eye color, skin tone, age, expression).";
-
-  const promptText = [
-    `You are editing image #1. Image #2 is a reference photo provided by the customer.`,
-    `Follow the artist's instruction below precisely — it describes exactly what to take from image #2 and how to place it into image #1. Everything in image #1 that the instruction does not explicitly change must stay identical (composition, framing, lighting, art style, background, props, clothing, pose, camera angle, aspect ratio).`,
-    ``,
-    `Artist instruction:`,
-    artistInstruction,
-    ``,
-    `Return ONE single edited image (NOT a collage, NOT side-by-side, NOT a before/after comparison). Output must have the same aspect ratio as image #1.`,
-  ].join("\n");
-
-  return callNanoBanana({
-    promptText,
-    imageUrls: [params.referenceImageUrl, params.faceImageUrl],
-  });
-}
-
-// ---------- Route 2b: pet face/identity transfer (cats + dogs) ----------
+// ---------- Route 2: pet face/identity transfer (cats + dogs) ----------
+// (Human-swappen går via Route 1 / cdingram — den prompt-baserade
+// human-varianten togs bort vid Replicate-migrationen 2026-07-21 eftersom
+// Nano Banana-vägen gav för många misslyckade/inadekvata swappar.)
 async function runPetSwap(params: { referenceImageUrl: string; faceImageUrl: string; adminPrompt: string }) {
   const adminPromptLine = params.adminPrompt?.trim()
     ? `Additional styling guidance from the artist: ${params.adminPrompt.trim()}`
@@ -1104,7 +966,7 @@ Deno.serve(async (req) => {
     const willUseFlux = !willUseSimple && subjectKind === "removeBackground" && fluxEnabledHandler && hasFluxStyle;
     const route =
       subjectKind === "human"
-        ? "human-nano-banana"
+        ? "human-cdingram"
         : subjectKind === "pet"
           ? "pet-nano-banana"
           : willUseSimple
@@ -1112,11 +974,12 @@ Deno.serve(async (req) => {
             : willUseFlux
               ? "remove-bg-flux"
               : "remove-bg-nano-banana";
-    const modelUsed = willUseSimple
-      ? "black-forest-labs/flux-kontext-pro+851-labs/background-remover"
-      : willUseFlux
-        ? "black-forest-labs/flux-kontext-pro+851-labs/background-remover"
-        : ANIMAL_MODEL;
+    const modelUsed =
+      subjectKind === "human"
+        ? FACE_SWAP_MODEL_NAME
+        : willUseSimple || willUseFlux
+          ? "black-forest-labs/flux-kontext-pro+851-labs/background-remover"
+          : NANO_BANANA_MODEL;
 
     genId = await genLogStart({
       session_key: typeof body?.sessionKey === "string" ? body.sessionKey : null,
@@ -1155,10 +1018,10 @@ Deno.serve(async (req) => {
 
     const result =
       subjectKind === "human"
-        ? await runHumanSwap({
+        ? await runReplicateFaceSwap({
             referenceImageUrl: referenceImageUrl!,
             faceImageUrl,
-            adminPrompt: prompt,
+            designId,
           })
         : subjectKind === "pet"
           ? await runPetSwap({
