@@ -28,7 +28,7 @@ export interface ReplicateFail {
 
 export type ReplicateResult = ReplicateOk | ReplicateFail;
 
-export async function runReplicateModel(opts: {
+interface ReplicateCallOpts {
   /** Officiell modell, t.ex. "google/nano-banana-2". Utesluter `version`. */
   model?: string;
   /** Pinnad community-versionshash (utan modellnamn). Utesluter `model`. */
@@ -36,7 +36,13 @@ export async function runReplicateModel(opts: {
   input: Record<string, unknown>;
   /** Total maxtid inklusive polling. Default 120 s. */
   timeoutMs?: number;
-}): Promise<ReplicateResult> {
+}
+
+/** Skapa prediction + polla till terminalstatus. Gemensam kärna för både
+ *  bild- och rådata-varianterna nedan. */
+async function createAndPoll(
+  opts: ReplicateCallOpts,
+): Promise<{ ok: true; output: unknown } | ReplicateFail> {
   const token = Deno.env.get("REPLICATE_API_TOKEN");
   if (!token) {
     return { ok: false, retriable: false, status: 0, reason: "REPLICATE_API_TOKEN not configured" };
@@ -89,7 +95,16 @@ export async function runReplicateModel(opts: {
     };
   }
 
-  const outputUrl = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output;
+  return { ok: true, output: prediction.output };
+}
+
+/** Kör en modell vars output är en bild-URL (eller en array av URL:er) —
+ *  laddar ner bilden och returnerar bytes. */
+export async function runReplicateModel(opts: ReplicateCallOpts): Promise<ReplicateResult> {
+  const r = await createAndPoll(opts);
+  if (!r.ok) return r;
+
+  const outputUrl = Array.isArray(r.output) ? r.output[0] : r.output;
   if (typeof outputUrl !== "string" || !outputUrl) {
     return { ok: false, retriable: true, status: 200, reason: "Replicate succeeded but returned no output URL" };
   }
@@ -109,6 +124,14 @@ export async function runReplicateModel(opts: {
     contentType: img.headers.get("content-type") ?? "image/png",
     outputUrl,
   };
+}
+
+/** Kör en modell och returnera outputen RÅ (JSON/objekt) — för modeller som
+ *  inte producerar bilder, t.ex. objektdetektering (grounding-dino). */
+export async function runReplicateRaw(
+  opts: ReplicateCallOpts,
+): Promise<{ ok: true; output: unknown } | ReplicateFail> {
+  return createAndPoll(opts);
 }
 
 /** Nano Banana 2 (Gemini 3.1 Flash Image) via Replicate — exakt samma modell
