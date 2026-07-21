@@ -290,6 +290,27 @@ export type Database = {
         }
         Relationships: []
       }
+      reference_face_boxes: {
+        Row: {
+          boxes: Json
+          detected_at: string
+          provider: string | null
+          reference_url: string
+        }
+        Insert: {
+          boxes: Json
+          detected_at?: string
+          provider?: string | null
+          reference_url: string
+        }
+        Update: {
+          boxes?: Json
+          detected_at?: string
+          provider?: string | null
+          reference_url?: string
+        }
+        Relationships: []
+      }
       shopify_app_installations: {
         Row: {
           access_token: string
