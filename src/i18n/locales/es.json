@@ -171,6 +171,20 @@
   "watermark": {
     "notice": "La marca de agua Arthena solo aparece en la vista previa – no estará en el producto impreso."
   },
+  "subGate": {
+    "title": "Sigue creando con IA",
+    "body": "¡Tu primera imagen con IA fue cortesía nuestra! Introduce tu correo para seguir creando y volver a tus diseños más tarde.",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "tu@email.es",
+    "newsletterLabel": "Sí, quiero recibir novedades y ofertas de Arthena (opcional).",
+    "submit": "Continuar",
+    "working": "Guardando…",
+    "privacyNote": "Usamos tu correo para guardar tus diseños y solo enviamos boletines si aceptas. Nunca compartimos tu correo con terceros.",
+    "errorInvalid": "Introduce un correo electrónico válido.",
+    "errorGeneric": "Algo salió mal. Inténtalo de nuevo.",
+    "rateLimited": "Has alcanzado el límite diario de generaciones con IA. Inténtalo mañana.",
+    "successToast": "¡Listo! Sigue creando."
+  },
   "cartAdd": {
     "blockedGeneration": "Sube tu foto y pulsa Crear ahora antes de pedir",
     "blockedPhoto": "Sube tu foto antes de pedir",

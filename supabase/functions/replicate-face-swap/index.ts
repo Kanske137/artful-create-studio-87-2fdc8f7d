@@ -40,6 +40,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { NANO_BANANA_MODEL, runNanoBanana } from "../_shared/replicate.ts";
+import { checkGenerationGate } from "../_shared/subscriber-gate.ts";
 // Deploy-markör 2026-07-21: analytics-loggning (generations-tabellen) aktiv.
 
 const corsHeaders = {
@@ -950,6 +951,19 @@ Deno.serve(async (req) => {
     }
     if (subjectKind !== "removeBackground" && !referenceImageUrl) {
       return jsonResponse({ error: "referenceImageUrl required for this subjectKind" }, 400);
+    }
+
+    // Fas 4: prenumerant-gate — EN gratis generering per enhet, därefter
+    // e-postkrav. Kollas FÖRE modellanrop; 200-svar med code + userMessage
+    // enligt funktionens fallback-konvention (gamla bundlar visar texten).
+    const gate = await checkGenerationGate(typeof body?.sessionKey === "string" ? body.sessionKey : null);
+    if (!gate.allowed) {
+      return jsonResponse({
+        error: "subscriber-gate",
+        code: gate.code,
+        fallback: true,
+        userMessage: gate.userMessage,
+      });
     }
 
     const fluxEnabledHandler = Deno.env.get("FLUX_REMOVEBG_ENABLED") === "true";

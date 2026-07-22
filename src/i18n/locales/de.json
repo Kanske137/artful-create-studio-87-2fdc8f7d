@@ -171,6 +171,20 @@
   "watermark": {
     "notice": "Das Arthena-Wasserzeichen erscheint nur in der Vorschau – auf dem Druck ist es nicht enthalten."
   },
+  "subGate": {
+    "title": "Weiter mit KI gestalten",
+    "body": "Dein erstes KI-Bild ging auf uns! Gib deine E-Mail-Adresse ein, um weiter zu gestalten und später zu deinen Designs zurückzukehren.",
+    "emailLabel": "E-Mail-Adresse",
+    "emailPlaceholder": "du@email.de",
+    "newsletterLabel": "Ja bitte, schickt mir Neuigkeiten und Angebote von Arthena (optional).",
+    "submit": "Weiter",
+    "working": "Wird gespeichert…",
+    "privacyNote": "Wir verwenden deine E-Mail, um deine Designs zu speichern, und senden Newsletter nur mit deiner Zustimmung. Deine E-Mail wird niemals an Dritte weitergegeben.",
+    "errorInvalid": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "rateLimited": "Du hast das Tageslimit für KI-Generierungen erreicht. Versuche es morgen erneut.",
+    "successToast": "Fertig! Gestalte weiter."
+  },
   "cartAdd": {
     "blockedGeneration": "Lade dein Foto hoch und drücke Jetzt erstellen, bevor du bestellst",
     "blockedPhoto": "Lade dein Foto hoch, bevor du bestellst",

@@ -171,6 +171,20 @@
   "watermark": {
     "notice": "The Arthena watermark appears only in the preview – it will not be on the printed product."
   },
+  "subGate": {
+    "title": "Keep creating with AI",
+    "body": "Your first AI image was on us! Enter your email to keep creating and to return to your designs later.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@email.com",
+    "newsletterLabel": "Yes please, send me news and offers from Arthena (optional).",
+    "submit": "Continue",
+    "working": "Saving…",
+    "privacyNote": "We use your email to save your designs and only send newsletters if you opt in. We never share your email with third parties.",
+    "errorInvalid": "Please enter a valid email address.",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "rateLimited": "You've reached today's limit for AI generations. Please try again tomorrow.",
+    "successToast": "Done! Keep creating."
+  },
   "cartAdd": {
     "blockedGeneration": "Upload your photo and press Create now before ordering",
     "blockedPhoto": "Upload your photo before ordering",

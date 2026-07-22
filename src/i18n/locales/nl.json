@@ -171,6 +171,20 @@
   "watermark": {
     "notice": "Het Arthena-watermerk is alleen zichtbaar in de voorbeeldweergave – het komt niet op het gedrukte product."
   },
+  "subGate": {
+    "title": "Blijf creëren met AI",
+    "body": "Je eerste AI-afbeelding was van ons! Vul je e-mailadres in om verder te creëren en later naar je ontwerpen terug te keren.",
+    "emailLabel": "E-mailadres",
+    "emailPlaceholder": "jij@email.nl",
+    "newsletterLabel": "Ja graag, stuur mij nieuws en aanbiedingen van Arthena (optioneel).",
+    "submit": "Doorgaan",
+    "working": "Opslaan…",
+    "privacyNote": "We gebruiken je e-mail om je ontwerpen te bewaren en sturen alleen nieuwsbrieven als je dat wilt. We delen je e-mail nooit met derden.",
+    "errorInvalid": "Vul een geldig e-mailadres in.",
+    "errorGeneric": "Er ging iets mis. Probeer het opnieuw.",
+    "rateLimited": "Je hebt de daglimiet voor AI-generaties bereikt. Probeer het morgen opnieuw.",
+    "successToast": "Klaar! Ga door met creëren."
+  },
   "cartAdd": {
     "blockedGeneration": "Upload je foto en druk op Nu maken voordat je bestelt",
     "blockedPhoto": "Upload je foto voordat je bestelt",

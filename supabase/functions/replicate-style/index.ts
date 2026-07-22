@@ -2,6 +2,7 @@
 // Output laddas upp till `print-files` bucket DIREKT så att klienten har en
 // färdig print-URL att skicka in i Shopify cart properties (single pipeline).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { checkGenerationGate } from "../_shared/subscriber-gate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -58,6 +59,23 @@ Deno.serve(async (req) => {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Fas 4: prenumerant-gate — EN gratis generering per enhet, därefter
+    // e-postkrav. Kollas FÖRE modellanropet. Svaret är 200 med code +
+    // userMessage: nya klienter visar e-postdialogen, gamla cachade bundlar
+    // hanterar det som vanligt "ingen bild"-fel utan att krascha.
+    const gate = await checkGenerationGate(typeof sessionKey === "string" ? sessionKey : null);
+    if (!gate.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: "subscriber-gate",
+          code: gate.code,
+          fallback: true,
+          userMessage: gate.userMessage,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
     genId = await genLogStart({

@@ -171,6 +171,20 @@
   "watermark": {
     "notice": "Arthena-vesileima näkyy vain esikatselussa – se ei tule painotuotteeseen."
   },
+  "subGate": {
+    "title": "Jatka luomista tekoälyllä",
+    "body": "Ensimmäinen tekoälykuvasi oli talon puolesta! Anna sähköpostiosoitteesi jatkaaksesi luomista ja palataksesi töihisi myöhemmin.",
+    "emailLabel": "Sähköpostiosoite",
+    "emailPlaceholder": "sinun@sahkoposti.fi",
+    "newsletterLabel": "Kyllä kiitos, lähettäkää minulle Arthenan uutisia ja tarjouksia (valinnainen).",
+    "submit": "Jatka",
+    "working": "Tallennetaan…",
+    "privacyNote": "Käytämme sähköpostiasi töidesi tallentamiseen ja lähetämme uutiskirjeitä vain suostumuksellasi. Emme koskaan jaa sähköpostiasi kolmansille osapuolille.",
+    "errorInvalid": "Anna kelvollinen sähköpostiosoite.",
+    "errorGeneric": "Jokin meni vikaan. Yritä uudelleen.",
+    "rateLimited": "Olet saavuttanut päivän tekoälygenerointien rajan. Yritä uudelleen huomenna.",
+    "successToast": "Valmis! Jatka luomista."
+  },
   "cartAdd": {
     "blockedGeneration": "Lataa kuvasi ja paina Luo nyt ennen tilaamista",
     "blockedPhoto": "Lataa kuvasi ennen tilaamista",

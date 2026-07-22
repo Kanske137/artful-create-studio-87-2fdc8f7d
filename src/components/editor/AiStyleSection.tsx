@@ -16,6 +16,7 @@ import { useAiBusyStore, useIsAnyAiBusy } from "@/stores/aiBusyStore";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadCartPreview } from "@/lib/upload-preview";
 import { getSessionKey } from "@/lib/analytics";
+import { invokeWithSubscriberGate, markFreeGenerationUsed } from "@/lib/subscriber-gate";
 import { hashFile } from "@/lib/ai-cache-storage";
 import type { AiStylePreset } from "@/lib/template-schema";
 import { toast } from "sonner";
@@ -138,9 +139,14 @@ export function AiStyleSection({ presets, layerId }: Props) {
       const designId = (crypto as any)?.randomUUID?.() ?? `${Date.now()}`;
       setStage("Skapar din bild…");
       updateAiJobStage(jobId, "Skapar din bild…");
-      const { data, error } = await supabase.functions.invoke("replicate-style", {
-        body: { imageUrl, prompt: preset.prompt, designId, sessionKey: getSessionKey() },
+      const res = await invokeWithSubscriberGate<{ printFileUrl?: string }>("replicate-style", {
+        imageUrl,
+        prompt: preset.prompt,
+        designId,
+        sessionKey: getSessionKey(),
       });
+      if (res.handled) return;
+      const { data, error } = res;
       if (error) throw error;
       setStage("Hämtar resultat…");
       updateAiJobStage(jobId, "Hämtar resultat…");
@@ -148,6 +154,7 @@ export function AiStyleSection({ presets, layerId }: Props) {
       if (!printFileUrl) throw new Error("Tjänsten returnerade ingen bild");
       setAiPrintFileUrlFor(layerId, printFileUrl);
       if (hash) addAiResultToCache(hash, preset.id, preset.label, printFileUrl);
+      markFreeGenerationUsed();
       toast.success(`Stil "${preset.label}" tillämpad`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Okänt fel";

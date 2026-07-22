@@ -171,6 +171,20 @@
   "watermark": {
     "notice": "La filigrana Arthena appare solo nell'anteprima – non sarà presente sul prodotto stampato."
   },
+  "subGate": {
+    "title": "Continua a creare con l'IA",
+    "body": "La tua prima immagine IA l'abbiamo offerta noi! Inserisci la tua email per continuare a creare e ritrovare i tuoi design più tardi.",
+    "emailLabel": "Indirizzo email",
+    "emailPlaceholder": "tua@email.it",
+    "newsletterLabel": "Sì, inviatemi novità e offerte di Arthena (facoltativo).",
+    "submit": "Continua",
+    "working": "Salvataggio…",
+    "privacyNote": "Usiamo la tua email per salvare i tuoi design e inviamo newsletter solo con il tuo consenso. Non condividiamo mai la tua email con terzi.",
+    "errorInvalid": "Inserisci un indirizzo email valido.",
+    "errorGeneric": "Qualcosa è andato storto. Riprova.",
+    "rateLimited": "Hai raggiunto il limite giornaliero di generazioni IA. Riprova domani.",
+    "successToast": "Fatto! Continua a creare."
+  },
   "cartAdd": {
     "blockedGeneration": "Carica la tua foto e premi Crea ora prima di ordinare",
     "blockedPhoto": "Carica la tua foto prima di ordinare",

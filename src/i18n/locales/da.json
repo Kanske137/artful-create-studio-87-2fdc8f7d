@@ -171,6 +171,20 @@
   "watermark": {
     "notice": "Arthena-vandmærket vises kun i forhåndsvisningen – det kommer ikke med på trykket."
   },
+  "subGate": {
+    "title": "Fortsæt med at skabe med AI",
+    "body": "Dit første AI-billede var på os! Indtast din e-mail for at fortsætte med at skabe og vende tilbage til dine designs senere.",
+    "emailLabel": "E-mailadresse",
+    "emailPlaceholder": "din@email.dk",
+    "newsletterLabel": "Ja tak, send mig nyheder og tilbud fra Arthena (valgfrit).",
+    "submit": "Fortsæt",
+    "working": "Gemmer…",
+    "privacyNote": "Vi bruger din e-mail til at gemme dine designs og sender kun nyhedsbreve, hvis du takker ja. Vi deler aldrig din e-mail med tredjepart.",
+    "errorInvalid": "Indtast en gyldig e-mailadresse.",
+    "errorGeneric": "Noget gik galt. Prøv igen.",
+    "rateLimited": "Du har nået dagens grænse for AI-genereringer. Prøv igen i morgen.",
+    "successToast": "Færdig! Fortsæt med at skabe."
+  },
   "cartAdd": {
     "blockedGeneration": "Upload dit billede og tryk på Skab nu, før du bestiller",
     "blockedPhoto": "Upload dit billede, før du bestiller",

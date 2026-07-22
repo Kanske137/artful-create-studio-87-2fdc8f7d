@@ -27,6 +27,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
 import { NANO_BANANA_MODEL, runNanoBanana, runReplicateModel, runReplicateRaw } from "../_shared/replicate.ts";
+import { checkGenerationGate } from "../_shared/subscriber-gate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -381,6 +382,19 @@ Deno.serve(async (req) => {
         );
       }
       portraitUrls.push(url);
+    }
+
+    // Fas 4: prenumerant-gate — EN gratis generering per enhet, därefter
+    // e-postkrav. Kollas FÖRE modellanrop; 200-svar med code + userMessage
+    // enligt funktionens fallback-konvention (gamla bundlar visar texten).
+    const gate = await checkGenerationGate(typeof body?.sessionKey === "string" ? body.sessionKey : null);
+    if (!gate.allowed) {
+      return jsonResponse({
+        error: "subscriber-gate",
+        code: gate.code,
+        fallback: true,
+        userMessage: gate.userMessage,
+      });
     }
 
     const slotMappingText = buildSlotMappingText(normalisedSlots);

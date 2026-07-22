@@ -171,6 +171,20 @@
   "watermark": {
     "notice": "Le filigrane Arthena n'apparaît que dans l'aperçu – il ne sera pas présent sur le produit imprimé."
   },
+  "subGate": {
+    "title": "Continuez à créer avec l'IA",
+    "body": "Votre première image IA était offerte ! Saisissez votre e-mail pour continuer à créer et retrouver vos créations plus tard.",
+    "emailLabel": "Adresse e-mail",
+    "emailPlaceholder": "vous@email.fr",
+    "newsletterLabel": "Oui, envoyez-moi les nouveautés et offres d'Arthena (facultatif).",
+    "submit": "Continuer",
+    "working": "Enregistrement…",
+    "privacyNote": "Nous utilisons votre e-mail pour sauvegarder vos créations et n'envoyons la newsletter qu'avec votre accord. Votre e-mail n'est jamais partagé avec des tiers.",
+    "errorInvalid": "Veuillez saisir une adresse e-mail valide.",
+    "errorGeneric": "Une erreur s'est produite. Veuillez réessayer.",
+    "rateLimited": "Vous avez atteint la limite quotidienne de générations IA. Réessayez demain.",
+    "successToast": "C'est fait ! Continuez à créer."
+  },
   "cartAdd": {
     "blockedGeneration": "Téléchargez votre photo et appuyez sur Créer avant de commander",
     "blockedPhoto": "Téléchargez votre photo avant de commander",

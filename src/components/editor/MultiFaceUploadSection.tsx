@@ -18,6 +18,7 @@ import { useAiBusyStore } from "@/stores/aiBusyStore";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadCartPreview } from "@/lib/upload-preview";
 import { getSessionKey } from "@/lib/analytics";
+import { invokeWithSubscriberGate, markFreeGenerationUsed } from "@/lib/subscriber-gate";
 import { hashFile } from "@/lib/ai-cache-storage";
 import {
   loadMultiFaceCache,
@@ -239,17 +240,22 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
         slots: slots.map((s) => s.id),
         portraitsByID,
       });
-      const { data, error } = await supabase.functions.invoke("multi-face-swap", {
-        body: {
-          layerId: layer.id,
-          referenceImageUrl: refUrl,
-          prompt: layer.defaults.swapPrompt,
-          slots: slots.map((s) => ({ id: s.id, position: s.position })),
-          portraits: portraitsByID,
-          designId,
-          sessionKey: getSessionKey(),
-        },
+      const res = await invokeWithSubscriberGate<{
+        printFileUrl?: string;
+        error?: string;
+        fallback?: boolean;
+        userMessage?: string;
+      }>("multi-face-swap", {
+        layerId: layer.id,
+        referenceImageUrl: refUrl,
+        prompt: layer.defaults.swapPrompt,
+        slots: slots.map((s) => ({ id: s.id, position: s.position })),
+        portraits: portraitsByID,
+        designId,
+        sessionKey: getSessionKey(),
       });
+      if (res.handled) return;
+      const { data, error } = res;
       if (error) throw error;
       updateAiJobStage(jobId, t("ai.stageFetch"));
       const payload = data as {
@@ -277,6 +283,7 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
         },
       };
       saveMultiFaceCache(cacheRef.current);
+      markFreeGenerationUsed();
       toast.success(t("aiPhoto.ready"));
     } catch (e) {
       const msg = e instanceof Error ? e.message : t("common.unknownError");

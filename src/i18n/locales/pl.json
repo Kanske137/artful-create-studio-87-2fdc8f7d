@@ -171,6 +171,20 @@
   "watermark": {
     "notice": "Znak wodny Arthena widoczny jest tylko w podglądzie – nie pojawi się na wydruku."
   },
+  "subGate": {
+    "title": "Twórz dalej z AI",
+    "body": "Pierwszy obraz AI był na nasz koszt! Podaj swój e-mail, aby tworzyć dalej i wracać do swoich projektów.",
+    "emailLabel": "Adres e-mail",
+    "emailPlaceholder": "ty@email.pl",
+    "newsletterLabel": "Tak, chcę otrzymywać nowości i oferty od Arthena (opcjonalnie).",
+    "submit": "Kontynuuj",
+    "working": "Zapisywanie…",
+    "privacyNote": "Używamy Twojego e-maila do zapisywania projektów, a newsletter wysyłamy tylko za Twoją zgodą. Nigdy nie udostępniamy Twojego e-maila osobom trzecim.",
+    "errorInvalid": "Podaj prawidłowy adres e-mail.",
+    "errorGeneric": "Coś poszło nie tak. Spróbuj ponownie.",
+    "rateLimited": "Osiągnięto dzienny limit generacji AI. Spróbuj ponownie jutro.",
+    "successToast": "Gotowe! Twórz dalej."
+  },
   "cartAdd": {
     "blockedGeneration": "Prześlij zdjęcie i naciśnij Utwórz teraz przed zamówieniem",
     "blockedPhoto": "Prześlij zdjęcie przed zamówieniem",

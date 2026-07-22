@@ -24,6 +24,7 @@ import { useAiBusyStore } from "@/stores/aiBusyStore";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadCartPreview } from "@/lib/upload-preview";
 import { getSessionKey } from "@/lib/analytics";
+import { invokeWithSubscriberGate, markFreeGenerationUsed } from "@/lib/subscriber-gate";
 import { hashFile } from "@/lib/ai-cache-storage";
 import type { TemplateLayer, AiStylePreset } from "@/lib/template-schema";
 import { toast } from "sonner";
@@ -306,26 +307,34 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
 
       setStage(t("ai.stageCreate"));
       updateAiJobStage(jobId, t("ai.stageCreate"));
-      const { data, error } = await supabase.functions.invoke("replicate-face-swap", {
-        body: {
-          referenceImageUrl: refUrl,
-          faceImageUrl,
-          prompt: swapPrompt,
-          subjectKind,
-          designId,
-          sessionKey: getSessionKey(),
-          removeBackgroundStyleId: selectedPreset?.id ?? null,
-          removeBackgroundStylePrompt: selectedPreset?.prompt ?? null,
-          removeBackgroundStyleLabel: selectedPreset?.label ?? null,
-          targetAspectRatio,
-          backdropColor: layer.defaults.backdropColor ?? null,
-          fillFrame: layer.defaults.fillFrame ?? null,
-          preserveSubjectColors: layer.defaults.preserveSubjectColors ?? null,
-          fluxStylePrompt: layer.defaults.fluxStylePrompt ?? null,
-          simpleStyleMode,
-          styleInstruction: selectedPreset?.styleInstruction ?? null,
-        },
+      const res = await invokeWithSubscriberGate<{
+        printFileUrl?: string;
+        error?: string;
+        fallback?: boolean;
+        userMessage?: string;
+        usedReferenceImageUrl?: string;
+        usedFaceImageUrl?: string;
+        replicateOutputUrl?: string;
+      }>("replicate-face-swap", {
+        referenceImageUrl: refUrl,
+        faceImageUrl,
+        prompt: swapPrompt,
+        subjectKind,
+        designId,
+        sessionKey: getSessionKey(),
+        removeBackgroundStyleId: selectedPreset?.id ?? null,
+        removeBackgroundStylePrompt: selectedPreset?.prompt ?? null,
+        removeBackgroundStyleLabel: selectedPreset?.label ?? null,
+        targetAspectRatio,
+        backdropColor: layer.defaults.backdropColor ?? null,
+        fillFrame: layer.defaults.fillFrame ?? null,
+        preserveSubjectColors: layer.defaults.preserveSubjectColors ?? null,
+        fluxStylePrompt: layer.defaults.fluxStylePrompt ?? null,
+        simpleStyleMode,
+        styleInstruction: selectedPreset?.styleInstruction ?? null,
       });
+      if (res.handled) return;
+      const { data, error } = res;
       if (error) throw error;
       setStage(t("ai.stageFetch"));
       updateAiJobStage(jobId, t("ai.stageFetch"));
@@ -354,6 +363,7 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
       });
       setAiPhotoResult(layer.id, printFileUrl);
       if (hash) addFaceSwapToCache(layer.id, hash, cacheRefSlot, printFileUrl);
+      markFreeGenerationUsed();
       toast.success(t("aiPhoto.ready"));
     } catch (e) {
       const msg = e instanceof Error ? e.message : t("common.unknownError");

@@ -31,6 +31,7 @@ import { resolveShopifyVariantId } from "@/lib/shopify-variant-resolver";
 import { hangerColorFromVariant } from "@/lib/mockup-scenes";
 import { mutateActiveLayoutBlock } from "@/lib/freeform-layers";
 import { ensureSession, getSessionKey, track } from "@/lib/analytics";
+import { SubscriberGateDialog } from "@/components/editor/SubscriberGateDialog";
 import { toast } from "sonner";
 
 const FRAME_COLORS: Record<string, string> = {
@@ -512,6 +513,9 @@ export default function EditorPage() {
 
       {/* Mockup gallery */}
       <MockupGallery />
+
+      {/* Prenumerant-gate (Fas 4): e-postdialog efter första gratisgenereringen */}
+      <SubscriberGateDialog />
     </div>
   );
 }

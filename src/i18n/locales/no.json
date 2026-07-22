@@ -171,6 +171,20 @@
   "watermark": {
     "notice": "Arthena-vannmerket vises bare i forhåndsvisningen – det kommer ikke med på trykket."
   },
+  "subGate": {
+    "title": "Fortsett å skape med AI",
+    "body": "Ditt første AI-bilde var på oss! Oppgi e-posten din for å fortsette å skape og komme tilbake til designene dine senere.",
+    "emailLabel": "E-postadresse",
+    "emailPlaceholder": "din@epost.no",
+    "newsletterLabel": "Ja takk, send meg nyheter og tilbud fra Arthena (valgfritt).",
+    "submit": "Fortsett",
+    "working": "Lagrer…",
+    "privacyNote": "Vi bruker e-posten din til å lagre designene dine og sender nyhetsbrev bare hvis du takker ja. Vi deler aldri e-posten din med tredjepart.",
+    "errorInvalid": "Oppgi en gyldig e-postadresse.",
+    "errorGeneric": "Noe gikk galt. Prøv igjen.",
+    "rateLimited": "Du har nådd dagens grense for AI-genereringer. Prøv igjen i morgen.",
+    "successToast": "Ferdig! Fortsett å skape."
+  },
   "cartAdd": {
     "blockedGeneration": "Last opp bildet ditt og trykk Skap nå før du bestiller",
     "blockedPhoto": "Last opp bildet ditt før du bestiller",
