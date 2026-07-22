@@ -18,7 +18,12 @@
 //     tillbaka på den pixelbevarade referensen.
 //   3–4 personer: `google/nano-banana-2` (prompt-baserad omritning) med
 //     image 1 = reference, image 2..N+1 = portraits i slot-ordning.
-//   ?engine=nano|cdingram = explicit override för test/rollback.
+//   ?engine=nano|cdingram|hybrid = explicit override för test/rollback.
+//   hybrid (experiment 2026-07-22): som cdingram, men varje person-crop får
+//   FÖRST ett nano-likhets-pass (hår + ansiktsform målas om i referensens
+//   stil att matcha porträttet — krona/kläder/pose skyddade i prompten),
+//   DÄREFTER cdingram-ansiktsbytet. `likenessPrompt` i body överstyr
+//   standardprompten (snabb iteration utan omdeploy).
 //
 // Always returns HTTP 200. On recoverable errors the body is
 // { error, fallback: true, userMessage } so the client can show a friendly
@@ -42,6 +47,24 @@ const FACE_DETECT_MODEL_NAME = "adirik/grounding-dino";
 const FACE_DETECT_MODEL_VERSION = "efd10a8ddc57ea28773327e881ce95e20cc1d734c589f7dd01d2036921ed78aa";
 const CDINGRAM_PROVIDER = `${FACE_SWAP_MODEL_NAME} x2 (crop-composite)`;
 const CROP_FEATHER_PX = 24;
+const HYBRID_PROVIDER = `hybrid: nano-likeness + ${FACE_SWAP_MODEL_NAME} x2 (crop-composite)`;
+
+// Likhets-passets standardprompt (hybrid-motorn). Bild 1 = person-croppen ur
+// referensen (stilkälla), bild 2 = kundens porträtt (ENDAST likhetsfacit).
+// Kron-/kläd-/pose-skydd och stiltrohet är godkännandekriterier — trimma via
+// `likenessPrompt` i requesten tills beslut, inte genom att ändra här.
+const DEFAULT_LIKENESS_PROMPT =
+  "Image 1 is a cropped section of a painted artwork showing one person. " +
+  "Image 2 is a photograph of a different person. Repaint the person in image 1 " +
+  "so that their hair color, hairstyle, hair length and face shape (cheek fullness, " +
+  "jawline, neck) match the person in image 2. Render everything strictly in the " +
+  "same painting style, brushwork and color palette as image 1 — image 2 is only " +
+  "the likeness reference, never a style or texture source; no photographic textures. " +
+  "Keep any crown, tiara or headwear from image 1 EXACTLY unchanged and in the exact " +
+  "same position — paint the hair around and under it. Keep the pose, clothing, " +
+  "jewelry, background and lighting of image 1 EXACTLY unchanged. Do not move or " +
+  "rescale the person. Return one image with exactly the same aspect ratio and " +
+  "framing as image 1.";
 
 // ---------- analytics: generations-logg (Fas 2) ----------
 // Loggar varje generering till `generations`-tabellen (service role). Får
@@ -143,9 +166,10 @@ async function callNanoBanana(params: { promptText: string; imageUrls: string[] 
   };
 }
 
-// ---------- Engine: cdingram crop-composite (Steg 1 — testflagga) ----------
-// Aktiveras ENDAST via ?engine=cdingram (ingen klient skickar den ännu —
-// nano-banana-2 förblir default). Flöde: detektera ansiktslådor i referensen
+// ---------- Engine: cdingram crop-composite (default för 2 personer) ----------
+// Hybrid-varianten bor i samma flöde: ett valfritt nano-likhets-pass körs på
+// varje crop FÖRE ansiktsbytet (likeness-param, satt av ?engine=hybrid) —
+// utan den är vägen exakt cdingram-default. Flöde: detektera ansiktslådor
 // (grounding-dino, cachas i reference_face_boxes per referens-URL) → beskär
 // en generös men EXKLUSIV crop per person → 2× cdingram/face-swap parallellt
 // → feather-komposit tillbaka på den orörda referensen. Slot-ordningen
@@ -267,6 +291,9 @@ async function runCdingramTwoFaceSwap(params: {
   /** I slot-ordning; mappas mot ansikten sorterade vänster→höger. */
   portraitUrls: string[];
   designId: string;
+  /** Hybrid-motorn: nano-likhets-pass (hår + ansiktsform) per crop före
+   *  ansiktsbytet. Utelämnad = ren cdingram (produktionsdefault, orörd väg). */
+  likeness?: { prompt: string };
 }): Promise<
   { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
 > {
@@ -302,12 +329,43 @@ async function runCdingramTwoFaceSwap(params: {
     cropUrls.push(db.storage.from("cart-previews").getPublicUrl(path).data.publicUrl);
   }
 
+  // Hybrid: likhets-pass FÖRE ansiktsbytet — nano målar om hår/ansiktsform i
+  // referensens stil efter porträttet. Ordningen är poängen: ansiktet byts
+  // SIST så likhets-passet aldrig kan rita om cdingrams ansikte.
+  let swapInputUrls = cropUrls;
+  if (params.likeness) {
+    const prompt = params.likeness.prompt;
+    const likenessResults = await Promise.all(
+      cropUrls.map((cropUrl, i) =>
+        callNanoBanana({ promptText: prompt, imageUrls: [cropUrl, params.portraitUrls[i]] }),
+      ),
+    );
+    const hairUrls: string[] = [];
+    for (let i = 0; i < likenessResults.length; i++) {
+      const r = likenessResults[i];
+      if (!r.ok) return { ok: false as const, response: r.response };
+      let img = await Image.decode(r.bytes);
+      const c = crops[i];
+      if (img.width !== c.w || img.height !== c.h) img = img.resize(c.w, c.h);
+      const bytes = await img.encode();
+      const path = `mfhair-${params.designId}-${i}.png`;
+      const { error } = await db.storage
+        .from("cart-previews")
+        .upload(path, bytes, { contentType: "image/png", upsert: true });
+      if (error) {
+        return fail("Vi kunde inte förbereda bilden. Försök igen.", `likeness upload failed: ${error.message}`);
+      }
+      hairUrls.push(db.storage.from("cart-previews").getPublicUrl(path).data.publicUrl);
+    }
+    swapInputUrls = hairUrls;
+  }
+
   // Två cdingram-swappar PARALLELLT — en per person.
   const swaps = await Promise.all(
-    cropUrls.map((cropUrl, i) =>
+    swapInputUrls.map((swapInputUrl, i) =>
       runReplicateModel({
         version: FACE_SWAP_MODEL_VERSION,
-        input: { input_image: cropUrl, swap_image: params.portraitUrls[i] },
+        input: { input_image: swapInputUrl, swap_image: params.portraitUrls[i] },
         timeoutMs: 120_000,
       }),
     ),
@@ -343,7 +401,8 @@ Deno.serve(async (req) => {
   // ritade om hela referensen medan cdingram bevarar den pixelexakt):
   //   2 personer  → cdingram crop-composite (default)
   //   3–4 personer → nano-banana-2 (enda motorn för fler än 2 ansikten)
-  //   ?engine=nano / ?engine=cdingram = explicit override för test/rollback.
+  //   ?engine=nano|cdingram|hybrid = explicit override för test/rollback.
+  //   hybrid = cdingram-flödet + nano-likhets-pass per crop (experiment).
   const engineParam = new URL(req.url).searchParams.get("engine");
 
   let genId: string | null = null;
@@ -390,20 +449,32 @@ Deno.serve(async (req) => {
     ).replace(/\{\{SLOTS\}\}/g, slotMappingText);
 
     const engine =
-      engineParam === "nano" || engineParam === "cdingram"
+      engineParam === "nano" || engineParam === "cdingram" || engineParam === "hybrid"
         ? engineParam
         : normalisedSlots.length === 2
           ? "cdingram"
           : "nano";
 
-    if (engine === "cdingram" && normalisedSlots.length !== 2) {
+    if (engine !== "nano" && normalisedSlots.length !== 2) {
       return fallbackResponse(
         "Den här varianten stödjer exakt två personer.",
-        `cdingram engine requires exactly 2 slots, got ${normalisedSlots.length}`,
+        `${engine} engine requires exactly 2 slots, got ${normalisedSlots.length}`,
       );
     }
 
-    const provider = engine === "cdingram" ? CDINGRAM_PROVIDER : NANO_BANANA_MODEL;
+    // Hybrid: likhets-passets prompt kan överstyras per request → snabb
+    // iteration utan omdeploy. Ignoreras av övriga motorer.
+    const likenessPrompt: string =
+      typeof body?.likenessPrompt === "string" && body.likenessPrompt.trim().length > 0
+        ? body.likenessPrompt.trim().slice(0, 4000)
+        : DEFAULT_LIKENESS_PROMPT;
+
+    const provider =
+      engine === "cdingram"
+        ? CDINGRAM_PROVIDER
+        : engine === "hybrid"
+          ? HYBRID_PROVIDER
+          : NANO_BANANA_MODEL;
     console.log(
       `[multi-face-swap] start engine=${engine} layerId=${layerId} designId=${designId} ` +
       `slots=${normalisedSlots.length} referenceImage=${referenceImageUrl} ` +
@@ -423,11 +494,16 @@ Deno.serve(async (req) => {
     });
 
     const result =
-      engine === "cdingram"
-        ? await runCdingramTwoFaceSwap({ referenceImageUrl, portraitUrls, designId })
-        : await callNanoBanana({
+      engine === "nano"
+        ? await callNanoBanana({
             promptText,
             imageUrls: [referenceImageUrl, ...portraitUrls],
+          })
+        : await runCdingramTwoFaceSwap({
+            referenceImageUrl,
+            portraitUrls,
+            designId,
+            likeness: engine === "hybrid" ? { prompt: likenessPrompt } : undefined,
           });
     if (!result.ok) {
       await genLogEnd(genId, {
