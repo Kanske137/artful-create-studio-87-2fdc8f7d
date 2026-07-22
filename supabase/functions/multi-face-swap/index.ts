@@ -240,7 +240,7 @@ function cropsFromBoxes(
   boxes: FaceBox[],
   imgW: number,
   imgH: number,
-): Array<{ x: number; y: number; w: number; h: number }> {
+): Array<{ x: number; y: number; w: number; h: number; box: FaceBox }> {
   const two = [...boxes]
     .sort((a, b) => (b.x2 - b.x1) * (b.y2 - b.y1) - (a.x2 - a.x1) * (a.y2 - a.y1))
     .slice(0, 2)
@@ -261,7 +261,7 @@ function cropsFromBoxes(
     y1 = Math.max(0, y1);
     x2 = Math.min(imgW, x2);
     y2 = Math.min(imgH, y2);
-    return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+    return { x: x1, y: y1, w: x2 - x1, h: y2 - y1, box: b };
   };
   return [expand(left, "left"), expand(right, "right")];
 }
@@ -271,7 +271,7 @@ function cropsFromBoxes(
  *  Nanos oundvikliga mikro-drift i kläder/smycken/bakgrund (den återsyntetiserar
  *  varje pixel) återställs till originalet — annars syns en skarv där croppens
  *  omritade textur möter den orörda referensen utanför kanten. */
-function deltaMaskComposite(orig: Image, edited: Image, threshold: number): Image {
+function deltaMaskComposite(orig: Image, edited: Image, threshold: number, faceBox: FaceBox): Image {
   const w = orig.width;
   const h = orig.height;
   const n = w * h;
@@ -291,6 +291,31 @@ function deltaMaskComposite(orig: Image, edited: Image, threshold: number): Imag
   // 2) Städa: blur + omtröskling tar bort speckle och fyller småhål.
   mask = boxBlurMask(mask, w, h, 8);
   for (let i = 0; i < n; i++) mask[i] = mask[i] > 0.35 ? 1 : 0;
+  // 2b) Spatial prior: adoption tillåts bara i hår/ansikts-regionen kring
+  // ansiktslådan. Nano kan tonskifta hela croppen (särskilt mörka barock-
+  // bakgrunder) — utan detta adopteras bakgrundspartier och crop-rektangeln
+  // syns som band. Adoption får heller aldrig nå croppens kant (border guard).
+  const fw = faceBox.x2 - faceBox.x1;
+  const fh = faceBox.y2 - faceBox.y1;
+  const coreX1 = faceBox.x1 - fw * 1.2;
+  const coreX2 = faceBox.x2 + fw * 1.2;
+  const coreY1 = Math.max(0, faceBox.y1 - fh * 2.4);
+  const coreY2 = faceBox.y2 + fh * 1.7;
+  const margin = Math.max(fw, fh) * 0.7;
+  const borderGuard = 20;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = y * w + x;
+      if (mask[i] <= 0) continue;
+      const dx = x < coreX1 ? coreX1 - x : x > coreX2 ? x - coreX2 : 0;
+      const dy = y < coreY1 ? coreY1 - y : y > coreY2 ? y - coreY2 : 0;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      let f = d >= margin ? 0 : 1 - d / margin;
+      const be = Math.min(x, y, w - 1 - x, h - 1 - y);
+      if (be < borderGuard) f *= be / borderGuard;
+      mask[i] *= f;
+    }
+  }
   // 3) Mjuk kant så adopterade områden tonar in i originalet.
   mask = boxBlurMask(mask, w, h, 12);
   const out = orig.clone();
@@ -417,7 +442,13 @@ async function runCdingramTwoFaceSwap(params: {
       // Delta-mask: adoptera bara nanos STORA ändringar (hår/ansikte); kläder
       // och bakgrund återställs pixel-exakt → ingen skarv vid crop-kanten.
       const origCrop = reference.clone().crop(c.x, c.y, c.w, c.h);
-      const masked = deltaMaskComposite(origCrop, img, params.likeness.deltaThreshold);
+      const boxInCrop: FaceBox = {
+        x1: c.box.x1 - c.x,
+        y1: c.box.y1 - c.y,
+        x2: c.box.x2 - c.x,
+        y2: c.box.y2 - c.y,
+      };
+      const masked = deltaMaskComposite(origCrop, img, params.likeness.deltaThreshold, boxInCrop);
       const bytes = await masked.encode();
       const path = `mfhair-${params.designId}-${i}.png`;
       const { error } = await db.storage
