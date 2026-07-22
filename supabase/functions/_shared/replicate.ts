@@ -53,23 +53,36 @@ async function createAndPoll(
     : "https://api.replicate.com/v1/predictions";
   const body = opts.model ? { input: opts.input } : { version: opts.version, input: opts.input };
 
-  const start = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      Prefer: "wait=30",
-    },
-    body: JSON.stringify(body),
-  });
-  let prediction = await start.json().catch(() => null);
-  if (!start.ok) {
-    return {
-      ok: false,
-      retriable: start.status === 429 || start.status >= 500,
-      status: start.status,
-      reason: `Replicate start failed ${start.status}: ${JSON.stringify(prediction ?? "").slice(0, 200)}`,
-    };
+  // Skapandet retry:as vid 429/5xx (upp till 3 försök, 6s/12s backoff).
+  // Viktigt vid Replicates lågkredit-throttling (burst=1) där parallella
+  // anrop annars fäller varandra — t.ex. multiface-motorns två swappar.
+  const CREATE_ATTEMPTS = 3;
+  let prediction: { status?: string; error?: unknown; output?: unknown; urls?: { get: string } } | null = null;
+  for (let attempt = 1; attempt <= CREATE_ATTEMPTS; attempt++) {
+    const start = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Prefer: "wait=30",
+      },
+      body: JSON.stringify(body),
+    });
+    prediction = await start.json().catch(() => null);
+    if (start.ok) break;
+
+    const retriable = start.status === 429 || start.status >= 500;
+    if (!retriable || attempt === CREATE_ATTEMPTS) {
+      return {
+        ok: false,
+        retriable,
+        status: start.status,
+        reason: `Replicate start failed ${start.status}: ${JSON.stringify(prediction ?? "").slice(0, 200)}`,
+      };
+    }
+    const wait = attempt * 6000;
+    console.log(`[replicate] start ${start.status} — backar av ${wait}ms (försök ${attempt}/${CREATE_ATTEMPTS})`);
+    await new Promise((r) => setTimeout(r, wait));
   }
 
   const deadline = Date.now() + (opts.timeoutMs ?? 120_000);
