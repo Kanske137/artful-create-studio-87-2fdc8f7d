@@ -379,6 +379,39 @@ export type Database = {
           },
         ]
       }
+      subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          locale: string | null
+          newsletter_consent: boolean
+          newsletter_consent_at: string | null
+          shopify_customer_id: string | null
+          shopify_synced_at: string | null
+          source_session_key: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          locale?: string | null
+          newsletter_consent?: boolean
+          newsletter_consent_at?: string | null
+          shopify_customer_id?: string | null
+          shopify_synced_at?: string | null
+          source_session_key?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          locale?: string | null
+          newsletter_consent?: boolean
+          newsletter_consent_at?: string | null
+          shopify_customer_id?: string | null
+          shopify_synced_at?: string | null
+          source_session_key?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
