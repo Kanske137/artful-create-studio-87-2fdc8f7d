@@ -18,12 +18,7 @@
 //     tillbaka på den pixelbevarade referensen.
 //   3–4 personer: `google/nano-banana-2` (prompt-baserad omritning) med
 //     image 1 = reference, image 2..N+1 = portraits i slot-ordning.
-//   ?engine=nano|cdingram|hybrid = explicit override för test/rollback.
-//   hybrid (experiment 2026-07-22): som cdingram, men varje person-crop får
-//   FÖRST ett nano-likhets-pass (hår + ansiktsform målas om i referensens
-//   stil att matcha porträttet — krona/kläder/pose skyddade i prompten),
-//   DÄREFTER cdingram-ansiktsbytet. `likenessPrompt` i body överstyr
-//   standardprompten (snabb iteration utan omdeploy).
+//   ?engine=nano|cdingram = explicit override för test/rollback.
 //
 // Always returns HTTP 200. On recoverable errors the body is
 // { error, fallback: true, userMessage } so the client can show a friendly
@@ -47,26 +42,6 @@ const FACE_DETECT_MODEL_NAME = "adirik/grounding-dino";
 const FACE_DETECT_MODEL_VERSION = "efd10a8ddc57ea28773327e881ce95e20cc1d734c589f7dd01d2036921ed78aa";
 const CDINGRAM_PROVIDER = `${FACE_SWAP_MODEL_NAME} x2 (crop-composite)`;
 const CROP_FEATHER_PX = 24;
-const HYBRID_PROVIDER = `hybrid: nano-likeness + ${FACE_SWAP_MODEL_NAME} x2 (crop-composite)`;
-
-// Likhets-passets standardprompt (hybrid-motorn). Bild 1 = person-croppen ur
-// referensen (stilkälla), bild 2 = kundens porträtt (ENDAST likhetsfacit).
-// Kron-/kläd-/pose-skydd och stiltrohet är godkännandekriterier — trimma via
-// `likenessPrompt` i requesten tills beslut, inte genom att ändra här.
-const DEFAULT_LIKENESS_PROMPT =
-  "Image 1 is a cropped section of a painted artwork showing one person. " +
-  "Image 2 is a photograph of a different person. Your task: repaint ONLY the " +
-  "person's hair and face in image 1 so that hair color, hairstyle, hair length, " +
-  "face shape (cheek fullness, jawline, neck) and facial hair match the person in " +
-  "image 2. Everything else in image 1 — all clothing, fur, collars, jewelry, " +
-  "chains, medals, fabric, the background and the lighting — must remain EXACTLY " +
-  "as in image 1, completely unchanged and unedited. Render the new hair and face " +
-  "strictly in the same painting style, brushwork and color palette as image 1 — " +
-  "image 2 is only the likeness reference, never a style or texture source; no " +
-  "photographic textures. Keep any crown, tiara or headwear EXACTLY unchanged in " +
-  "the exact same position — paint the hair around and under it. Do not move or " +
-  "rescale the person. Return one image with exactly the same aspect ratio and " +
-  "framing as image 1.";
 
 // ---------- analytics: generations-logg (Fas 2) ----------
 // Loggar varje generering till `generations`-tabellen (service role). Får
@@ -168,10 +143,9 @@ async function callNanoBanana(params: { promptText: string; imageUrls: string[] 
   };
 }
 
-// ---------- Engine: cdingram crop-composite (default för 2 personer) ----------
-// Hybrid-varianten bor i samma flöde: ett valfritt nano-likhets-pass körs på
-// varje crop FÖRE ansiktsbytet (likeness-param, satt av ?engine=hybrid) —
-// utan den är vägen exakt cdingram-default. Flöde: detektera ansiktslådor
+// ---------- Engine: cdingram crop-composite (Steg 1 — testflagga) ----------
+// Aktiveras ENDAST via ?engine=cdingram (ingen klient skickar den ännu —
+// nano-banana-2 förblir default). Flöde: detektera ansiktslådor i referensen
 // (grounding-dino, cachas i reference_face_boxes per referens-URL) → beskär
 // en generös men EXKLUSIV crop per person → 2× cdingram/face-swap parallellt
 // → feather-komposit tillbaka på den orörda referensen. Slot-ordningen
@@ -240,7 +214,7 @@ function cropsFromBoxes(
   boxes: FaceBox[],
   imgW: number,
   imgH: number,
-): Array<{ x: number; y: number; w: number; h: number; box: FaceBox }> {
+): Array<{ x: number; y: number; w: number; h: number }> {
   const two = [...boxes]
     .sort((a, b) => (b.x2 - b.x1) * (b.y2 - b.y1) - (a.x2 - a.x1) * (a.y2 - a.y1))
     .slice(0, 2)
@@ -261,99 +235,9 @@ function cropsFromBoxes(
     y1 = Math.max(0, y1);
     x2 = Math.min(imgW, x2);
     y2 = Math.min(imgH, y2);
-    return { x: x1, y: y1, w: x2 - x1, h: y2 - y1, box: b };
+    return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
   };
   return [expand(left, "left"), expand(right, "right")];
-}
-
-/** Delta-maskerad komposit (hybrid-motorn): behåll nanos pixlar BARA där de
- *  skiljer sig tydligt från originalcroppen (nytt hår/ansikte = stora deltan).
- *  Nanos oundvikliga mikro-drift i kläder/smycken/bakgrund (den återsyntetiserar
- *  varje pixel) återställs till originalet — annars syns en skarv där croppens
- *  omritade textur möter den orörda referensen utanför kanten. */
-function deltaMaskComposite(orig: Image, edited: Image, threshold: number, faceBox: FaceBox): Image {
-  const w = orig.width;
-  const h = orig.height;
-  const n = w * h;
-  const a = orig.bitmap;
-  const b = edited.bitmap;
-  // 1) Binär delta-mask per pixel (största kanalskillnaden).
-  let mask = new Float32Array(n);
-  for (let i = 0; i < n; i++) {
-    const o = i * 4;
-    const d = Math.max(
-      Math.abs(a[o] - b[o]),
-      Math.abs(a[o + 1] - b[o + 1]),
-      Math.abs(a[o + 2] - b[o + 2]),
-    );
-    mask[i] = d > threshold ? 1 : 0;
-  }
-  // 2) Städa: blur + omtröskling tar bort speckle och fyller småhål.
-  mask = boxBlurMask(mask, w, h, 8);
-  for (let i = 0; i < n; i++) mask[i] = mask[i] > 0.35 ? 1 : 0;
-  // 2b) Spatial prior: adoption tillåts bara i hår/ansikts-regionen kring
-  // ansiktslådan. Nano kan tonskifta hela croppen (särskilt mörka barock-
-  // bakgrunder) — utan detta adopteras bakgrundspartier och crop-rektangeln
-  // syns som band. Adoption får heller aldrig nå croppens kant (border guard).
-  const fw = faceBox.x2 - faceBox.x1;
-  const fh = faceBox.y2 - faceBox.y1;
-  const coreX1 = faceBox.x1 - fw * 1.2;
-  const coreX2 = faceBox.x2 + fw * 1.2;
-  const coreY1 = Math.max(0, faceBox.y1 - fh * 2.4);
-  const coreY2 = faceBox.y2 + fh * 1.7;
-  const margin = Math.max(fw, fh) * 0.7;
-  const borderGuard = 20;
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const i = y * w + x;
-      if (mask[i] <= 0) continue;
-      const dx = x < coreX1 ? coreX1 - x : x > coreX2 ? x - coreX2 : 0;
-      const dy = y < coreY1 ? coreY1 - y : y > coreY2 ? y - coreY2 : 0;
-      const d = Math.sqrt(dx * dx + dy * dy);
-      let f = d >= margin ? 0 : 1 - d / margin;
-      const be = Math.min(x, y, w - 1 - x, h - 1 - y);
-      if (be < borderGuard) f *= be / borderGuard;
-      mask[i] *= f;
-    }
-  }
-  // 3) Mjuk kant så adopterade områden tonar in i originalet.
-  mask = boxBlurMask(mask, w, h, 12);
-  const out = orig.clone();
-  const ob = out.bitmap;
-  for (let i = 0; i < n; i++) {
-    const t = mask[i];
-    if (t <= 0) continue;
-    const o = i * 4;
-    ob[o] = Math.round(a[o] * (1 - t) + b[o] * t);
-    ob[o + 1] = Math.round(a[o + 1] * (1 - t) + b[o + 1] * t);
-    ob[o + 2] = Math.round(a[o + 2] * (1 - t) + b[o + 2] * t);
-  }
-  return out;
-}
-
-/** Separabel box-blur (två pass, löpande summa) för delta-masken. */
-function boxBlurMask(src: Float32Array, w: number, h: number, r: number): Float32Array {
-  const tmp = new Float32Array(src.length);
-  const dst = new Float32Array(src.length);
-  const win = 2 * r + 1;
-  for (let y = 0; y < h; y++) {
-    const row = y * w;
-    let sum = 0;
-    for (let x = -r; x <= r; x++) sum += src[row + Math.min(w - 1, Math.max(0, x))];
-    for (let x = 0; x < w; x++) {
-      tmp[row + x] = sum / win;
-      sum += src[row + Math.min(w - 1, x + r + 1)] - src[row + Math.max(0, x - r)];
-    }
-  }
-  for (let x = 0; x < w; x++) {
-    let sum = 0;
-    for (let y = -r; y <= r; y++) sum += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
-    for (let y = 0; y < h; y++) {
-      dst[y * w + x] = sum / win;
-      sum += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x];
-    }
-  }
-  return dst;
 }
 
 /** Linjär alfa-ramp runt croppens kant så kompositen smälter in utan skarv. */
@@ -383,9 +267,6 @@ async function runCdingramTwoFaceSwap(params: {
   /** I slot-ordning; mappas mot ansikten sorterade vänster→höger. */
   portraitUrls: string[];
   designId: string;
-  /** Hybrid-motorn: nano-likhets-pass (hår + ansiktsform) per crop före
-   *  ansiktsbytet. Utelämnad = ren cdingram (produktionsdefault, orörd väg). */
-  likeness?: { prompt: string; deltaThreshold: number };
 }): Promise<
   { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
 > {
@@ -421,53 +302,12 @@ async function runCdingramTwoFaceSwap(params: {
     cropUrls.push(db.storage.from("cart-previews").getPublicUrl(path).data.publicUrl);
   }
 
-  // Hybrid: likhets-pass FÖRE ansiktsbytet — nano målar om hår/ansiktsform i
-  // referensens stil efter porträttet. Ordningen är poängen: ansiktet byts
-  // SIST så likhets-passet aldrig kan rita om cdingrams ansikte.
-  let swapInputUrls = cropUrls;
-  if (params.likeness) {
-    const prompt = params.likeness.prompt;
-    const likenessResults = await Promise.all(
-      cropUrls.map((cropUrl, i) =>
-        callNanoBanana({ promptText: prompt, imageUrls: [cropUrl, params.portraitUrls[i]] }),
-      ),
-    );
-    const hairUrls: string[] = [];
-    for (let i = 0; i < likenessResults.length; i++) {
-      const r = likenessResults[i];
-      if (!r.ok) return { ok: false as const, response: r.response };
-      let img = await Image.decode(r.bytes);
-      const c = crops[i];
-      if (img.width !== c.w || img.height !== c.h) img = img.resize(c.w, c.h);
-      // Delta-mask: adoptera bara nanos STORA ändringar (hår/ansikte); kläder
-      // och bakgrund återställs pixel-exakt → ingen skarv vid crop-kanten.
-      const origCrop = reference.clone().crop(c.x, c.y, c.w, c.h);
-      const boxInCrop: FaceBox = {
-        x1: c.box.x1 - c.x,
-        y1: c.box.y1 - c.y,
-        x2: c.box.x2 - c.x,
-        y2: c.box.y2 - c.y,
-      };
-      const masked = deltaMaskComposite(origCrop, img, params.likeness.deltaThreshold, boxInCrop);
-      const bytes = await masked.encode();
-      const path = `mfhair-${params.designId}-${i}.png`;
-      const { error } = await db.storage
-        .from("cart-previews")
-        .upload(path, bytes, { contentType: "image/png", upsert: true });
-      if (error) {
-        return fail("Vi kunde inte förbereda bilden. Försök igen.", `likeness upload failed: ${error.message}`);
-      }
-      hairUrls.push(db.storage.from("cart-previews").getPublicUrl(path).data.publicUrl);
-    }
-    swapInputUrls = hairUrls;
-  }
-
   // Två cdingram-swappar PARALLELLT — en per person.
   const swaps = await Promise.all(
-    swapInputUrls.map((swapInputUrl, i) =>
+    cropUrls.map((cropUrl, i) =>
       runReplicateModel({
         version: FACE_SWAP_MODEL_VERSION,
-        input: { input_image: swapInputUrl, swap_image: params.portraitUrls[i] },
+        input: { input_image: cropUrl, swap_image: params.portraitUrls[i] },
         timeoutMs: 120_000,
       }),
     ),
@@ -503,8 +343,7 @@ Deno.serve(async (req) => {
   // ritade om hela referensen medan cdingram bevarar den pixelexakt):
   //   2 personer  → cdingram crop-composite (default)
   //   3–4 personer → nano-banana-2 (enda motorn för fler än 2 ansikten)
-  //   ?engine=nano|cdingram|hybrid = explicit override för test/rollback.
-  //   hybrid = cdingram-flödet + nano-likhets-pass per crop (experiment).
+  //   ?engine=nano / ?engine=cdingram = explicit override för test/rollback.
   const engineParam = new URL(req.url).searchParams.get("engine");
 
   let genId: string | null = null;
@@ -551,36 +390,20 @@ Deno.serve(async (req) => {
     ).replace(/\{\{SLOTS\}\}/g, slotMappingText);
 
     const engine =
-      engineParam === "nano" || engineParam === "cdingram" || engineParam === "hybrid"
+      engineParam === "nano" || engineParam === "cdingram"
         ? engineParam
         : normalisedSlots.length === 2
           ? "cdingram"
           : "nano";
 
-    if (engine !== "nano" && normalisedSlots.length !== 2) {
+    if (engine === "cdingram" && normalisedSlots.length !== 2) {
       return fallbackResponse(
         "Den här varianten stödjer exakt två personer.",
-        `${engine} engine requires exactly 2 slots, got ${normalisedSlots.length}`,
+        `cdingram engine requires exactly 2 slots, got ${normalisedSlots.length}`,
       );
     }
 
-    // Hybrid: likhets-passets prompt och delta-tröskel kan överstyras per
-    // request → snabb iteration utan omdeploy. Ignoreras av övriga motorer.
-    const likenessPrompt: string =
-      typeof body?.likenessPrompt === "string" && body.likenessPrompt.trim().length > 0
-        ? body.likenessPrompt.trim().slice(0, 4000)
-        : DEFAULT_LIKENESS_PROMPT;
-    const likenessDelta: number =
-      typeof body?.likenessDelta === "number" && isFinite(body.likenessDelta)
-        ? Math.min(200, Math.max(5, Math.round(body.likenessDelta)))
-        : 40;
-
-    const provider =
-      engine === "cdingram"
-        ? CDINGRAM_PROVIDER
-        : engine === "hybrid"
-          ? HYBRID_PROVIDER
-          : NANO_BANANA_MODEL;
+    const provider = engine === "cdingram" ? CDINGRAM_PROVIDER : NANO_BANANA_MODEL;
     console.log(
       `[multi-face-swap] start engine=${engine} layerId=${layerId} designId=${designId} ` +
       `slots=${normalisedSlots.length} referenceImage=${referenceImageUrl} ` +
@@ -600,19 +423,11 @@ Deno.serve(async (req) => {
     });
 
     const result =
-      engine === "nano"
-        ? await callNanoBanana({
+      engine === "cdingram"
+        ? await runCdingramTwoFaceSwap({ referenceImageUrl, portraitUrls, designId })
+        : await callNanoBanana({
             promptText,
             imageUrls: [referenceImageUrl, ...portraitUrls],
-          })
-        : await runCdingramTwoFaceSwap({
-            referenceImageUrl,
-            portraitUrls,
-            designId,
-            likeness:
-              engine === "hybrid"
-                ? { prompt: likenessPrompt, deltaThreshold: likenessDelta }
-                : undefined,
           });
     if (!result.ok) {
       await genLogEnd(genId, {
