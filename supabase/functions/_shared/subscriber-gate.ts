@@ -11,8 +11,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 /** Antal gratisgenereringar per session/enhet innan e-post krävs. */
 const FREE_GENERATIONS_PER_SESSION = 1;
-/** Tak per registrerad e-post per rullande dygn (missbruks-/kostnadsskydd). */
-const MAX_GENERATIONS_PER_EMAIL_24H = 30;
+/** Tak per registrerad e-post per rullande dygn (missbruks-/kostnadsskydd).
+ *  Akrams beslut 2026-07-22: 10/dygn. */
+const MAX_GENERATIONS_PER_EMAIL_24H = 10;
 
 /** Visas ordagrant av GAMLA cachade klientbundlar (fallback-vägen). Nya
  *  bundlar känner igen `code` och visar i18n-text + e-postdialogen i stället. */
