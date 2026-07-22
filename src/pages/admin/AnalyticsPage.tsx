@@ -209,6 +209,11 @@ export default function AnalyticsPage() {
       }
     }
     for (const g of gens) {
+      // Multiface loggar alla porträtt i input_image_urls; äldre rader och
+      // enbildslägen har bara singularen — visa vad som finns.
+      const inputUrls = (
+        g.input_image_urls && g.input_image_urls.length > 0 ? g.input_image_urls : [g.input_image_url]
+      ).filter((u): u is string => !!u);
       items.push({
         ts: g.created_at,
         node: (
@@ -228,8 +233,14 @@ export default function AnalyticsPage() {
               {g.error && <span className="text-destructive"> — {g.error}</span>}
             </span>
             <div className="flex items-center gap-1.5">
-              {g.input_image_url && <Thumb url={g.input_image_url} label="Uppladdad bild" />}
-              {(g.input_image_url && g.output_image_url) && <span className="text-muted-foreground">→</span>}
+              {inputUrls.map((u, idx) => (
+                <Thumb
+                  key={u}
+                  url={u}
+                  label={inputUrls.length > 1 ? `Uppladdad bild ${idx + 1}` : "Uppladdad bild"}
+                />
+              ))}
+              {inputUrls.length > 0 && g.output_image_url && <span className="text-muted-foreground">→</span>}
               {g.output_image_url && <Thumb url={g.output_image_url} label="Genererad bild" />}
             </div>
           </div>

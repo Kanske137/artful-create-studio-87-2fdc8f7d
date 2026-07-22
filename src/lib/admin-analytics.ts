@@ -46,6 +46,8 @@ export interface GenerationRow {
   error: string | null;
   duration_ms: number | null;
   input_image_url: string | null;
+  /** Alla uppladdade bilder (multiface) — äldre rader har bara singularen. */
+  input_image_urls: string[] | null;
   reference_image_url: string | null;
   output_image_url: string | null;
 }

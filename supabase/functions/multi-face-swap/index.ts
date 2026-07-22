@@ -417,6 +417,8 @@ Deno.serve(async (req) => {
       subject_kind: "multiFace",
       provider,
       input_image_url: portraitUrls[0] ?? null,
+      // Alla kundens porträtt (slot-ordning) så Analytics visar samtliga.
+      input_image_urls: portraitUrls,
       reference_image_url: referenceImageUrl,
     });
 
