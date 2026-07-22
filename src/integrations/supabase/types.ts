@@ -162,6 +162,7 @@ export type Database = {
           handle: string | null
           id: string
           input_image_url: string | null
+          input_image_urls: Json | null
           layer_id: string | null
           output_image_url: string | null
           provider: string | null
@@ -181,6 +182,7 @@ export type Database = {
           handle?: string | null
           id?: string
           input_image_url?: string | null
+          input_image_urls?: Json | null
           layer_id?: string | null
           output_image_url?: string | null
           provider?: string | null
@@ -200,6 +202,7 @@ export type Database = {
           handle?: string | null
           id?: string
           input_image_url?: string | null
+          input_image_urls?: Json | null
           layer_id?: string | null
           output_image_url?: string | null
           provider?: string | null
