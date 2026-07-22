@@ -55,14 +55,16 @@ const HYBRID_PROVIDER = `hybrid: nano-likeness + ${FACE_SWAP_MODEL_NAME} x2 (cro
 // `likenessPrompt` i requesten tills beslut, inte genom att ändra här.
 const DEFAULT_LIKENESS_PROMPT =
   "Image 1 is a cropped section of a painted artwork showing one person. " +
-  "Image 2 is a photograph of a different person. Repaint the person in image 1 " +
-  "so that their hair color, hairstyle, hair length and face shape (cheek fullness, " +
-  "jawline, neck) match the person in image 2. Render everything strictly in the " +
-  "same painting style, brushwork and color palette as image 1 — image 2 is only " +
-  "the likeness reference, never a style or texture source; no photographic textures. " +
-  "Keep any crown, tiara or headwear from image 1 EXACTLY unchanged and in the exact " +
-  "same position — paint the hair around and under it. Keep the pose, clothing, " +
-  "jewelry, background and lighting of image 1 EXACTLY unchanged. Do not move or " +
+  "Image 2 is a photograph of a different person. Your task: repaint ONLY the " +
+  "person's hair and face in image 1 so that hair color, hairstyle, hair length, " +
+  "face shape (cheek fullness, jawline, neck) and facial hair match the person in " +
+  "image 2. Everything else in image 1 — all clothing, fur, collars, jewelry, " +
+  "chains, medals, fabric, the background and the lighting — must remain EXACTLY " +
+  "as in image 1, completely unchanged and unedited. Render the new hair and face " +
+  "strictly in the same painting style, brushwork and color palette as image 1 — " +
+  "image 2 is only the likeness reference, never a style or texture source; no " +
+  "photographic textures. Keep any crown, tiara or headwear EXACTLY unchanged in " +
+  "the exact same position — paint the hair around and under it. Do not move or " +
   "rescale the person. Return one image with exactly the same aspect ratio and " +
   "framing as image 1.";
 
@@ -264,6 +266,71 @@ function cropsFromBoxes(
   return [expand(left, "left"), expand(right, "right")];
 }
 
+/** Delta-maskerad komposit (hybrid-motorn): behåll nanos pixlar BARA där de
+ *  skiljer sig tydligt från originalcroppen (nytt hår/ansikte = stora deltan).
+ *  Nanos oundvikliga mikro-drift i kläder/smycken/bakgrund (den återsyntetiserar
+ *  varje pixel) återställs till originalet — annars syns en skarv där croppens
+ *  omritade textur möter den orörda referensen utanför kanten. */
+function deltaMaskComposite(orig: Image, edited: Image, threshold: number): Image {
+  const w = orig.width;
+  const h = orig.height;
+  const n = w * h;
+  const a = orig.bitmap;
+  const b = edited.bitmap;
+  // 1) Binär delta-mask per pixel (största kanalskillnaden).
+  let mask = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const o = i * 4;
+    const d = Math.max(
+      Math.abs(a[o] - b[o]),
+      Math.abs(a[o + 1] - b[o + 1]),
+      Math.abs(a[o + 2] - b[o + 2]),
+    );
+    mask[i] = d > threshold ? 1 : 0;
+  }
+  // 2) Städa: blur + omtröskling tar bort speckle och fyller småhål.
+  mask = boxBlurMask(mask, w, h, 8);
+  for (let i = 0; i < n; i++) mask[i] = mask[i] > 0.35 ? 1 : 0;
+  // 3) Mjuk kant så adopterade områden tonar in i originalet.
+  mask = boxBlurMask(mask, w, h, 12);
+  const out = orig.clone();
+  const ob = out.bitmap;
+  for (let i = 0; i < n; i++) {
+    const t = mask[i];
+    if (t <= 0) continue;
+    const o = i * 4;
+    ob[o] = Math.round(a[o] * (1 - t) + b[o] * t);
+    ob[o + 1] = Math.round(a[o + 1] * (1 - t) + b[o + 1] * t);
+    ob[o + 2] = Math.round(a[o + 2] * (1 - t) + b[o + 2] * t);
+  }
+  return out;
+}
+
+/** Separabel box-blur (två pass, löpande summa) för delta-masken. */
+function boxBlurMask(src: Float32Array, w: number, h: number, r: number): Float32Array {
+  const tmp = new Float32Array(src.length);
+  const dst = new Float32Array(src.length);
+  const win = 2 * r + 1;
+  for (let y = 0; y < h; y++) {
+    const row = y * w;
+    let sum = 0;
+    for (let x = -r; x <= r; x++) sum += src[row + Math.min(w - 1, Math.max(0, x))];
+    for (let x = 0; x < w; x++) {
+      tmp[row + x] = sum / win;
+      sum += src[row + Math.min(w - 1, x + r + 1)] - src[row + Math.max(0, x - r)];
+    }
+  }
+  for (let x = 0; x < w; x++) {
+    let sum = 0;
+    for (let y = -r; y <= r; y++) sum += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
+    for (let y = 0; y < h; y++) {
+      dst[y * w + x] = sum / win;
+      sum += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x];
+    }
+  }
+  return dst;
+}
+
 /** Linjär alfa-ramp runt croppens kant så kompositen smälter in utan skarv. */
 function applyFeather(img: Image, feather: number): void {
   const w = img.width;
@@ -293,7 +360,7 @@ async function runCdingramTwoFaceSwap(params: {
   designId: string;
   /** Hybrid-motorn: nano-likhets-pass (hår + ansiktsform) per crop före
    *  ansiktsbytet. Utelämnad = ren cdingram (produktionsdefault, orörd väg). */
-  likeness?: { prompt: string };
+  likeness?: { prompt: string; deltaThreshold: number };
 }): Promise<
   { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
 > {
@@ -347,7 +414,11 @@ async function runCdingramTwoFaceSwap(params: {
       let img = await Image.decode(r.bytes);
       const c = crops[i];
       if (img.width !== c.w || img.height !== c.h) img = img.resize(c.w, c.h);
-      const bytes = await img.encode();
+      // Delta-mask: adoptera bara nanos STORA ändringar (hår/ansikte); kläder
+      // och bakgrund återställs pixel-exakt → ingen skarv vid crop-kanten.
+      const origCrop = reference.clone().crop(c.x, c.y, c.w, c.h);
+      const masked = deltaMaskComposite(origCrop, img, params.likeness.deltaThreshold);
+      const bytes = await masked.encode();
       const path = `mfhair-${params.designId}-${i}.png`;
       const { error } = await db.storage
         .from("cart-previews")
@@ -462,12 +533,16 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Hybrid: likhets-passets prompt kan överstyras per request → snabb
-    // iteration utan omdeploy. Ignoreras av övriga motorer.
+    // Hybrid: likhets-passets prompt och delta-tröskel kan överstyras per
+    // request → snabb iteration utan omdeploy. Ignoreras av övriga motorer.
     const likenessPrompt: string =
       typeof body?.likenessPrompt === "string" && body.likenessPrompt.trim().length > 0
         ? body.likenessPrompt.trim().slice(0, 4000)
         : DEFAULT_LIKENESS_PROMPT;
+    const likenessDelta: number =
+      typeof body?.likenessDelta === "number" && isFinite(body.likenessDelta)
+        ? Math.min(200, Math.max(5, Math.round(body.likenessDelta)))
+        : 40;
 
     const provider =
       engine === "cdingram"
@@ -503,7 +578,10 @@ Deno.serve(async (req) => {
             referenceImageUrl,
             portraitUrls,
             designId,
-            likeness: engine === "hybrid" ? { prompt: likenessPrompt } : undefined,
+            likeness:
+              engine === "hybrid"
+                ? { prompt: likenessPrompt, deltaThreshold: likenessDelta }
+                : undefined,
           });
     if (!result.ok) {
       await genLogEnd(genId, {
