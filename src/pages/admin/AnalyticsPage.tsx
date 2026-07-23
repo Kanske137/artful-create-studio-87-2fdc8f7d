@@ -23,10 +23,12 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   cartPreviewUrl,
   fetchEvents,
+  fetchFeedback,
   fetchGenerations,
   fetchSessions,
   shopifyOrderAdminUrl,
   type EventRow,
+  type FeedbackRow,
   type GenerationRow,
   type SessionRow,
 } from "@/lib/admin-analytics";
@@ -81,6 +83,7 @@ export default function AnalyticsPage() {
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [generations, setGenerations] = useState<GenerationRow[]>([]);
+  const [feedback, setFeedback] = useState<FeedbackRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -89,10 +92,17 @@ export default function AnalyticsPage() {
     setLoading(true);
     setError(null);
     try {
-      const [s, e, g] = await Promise.all([fetchSessions(), fetchEvents(), fetchGenerations()]);
+      const [s, e, g, f] = await Promise.all([
+        fetchSessions(),
+        fetchEvents(),
+        fetchGenerations(),
+        // Feedback-tabellen kan saknas tills migrationen körts — svälj felet.
+        fetchFeedback().catch(() => [] as FeedbackRow[]),
+      ]);
       setSessions(s);
       setEvents(e);
       setGenerations(g);
+      setFeedback(f);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Okänt fel");
     } finally {
@@ -129,6 +139,15 @@ export default function AnalyticsPage() {
     }
     return map;
   }, [events, generations]);
+
+  // Senaste feedbacken per design-id (raderna kommer nyast först).
+  const feedbackByDesign = useMemo(() => {
+    const map = new Map<string, FeedbackRow>();
+    for (const f of feedback) {
+      if (f.design_id && !map.has(f.design_id)) map.set(f.design_id, f);
+    }
+    return map;
+  }, [feedback]);
 
   const summary = useMemo(() => {
     const cutoff = Date.now() - WEEK_MS;
@@ -232,6 +251,25 @@ export default function AnalyticsPage() {
               {typeof g.duration_ms === "number" && ` på ${(g.duration_ms / 1000).toFixed(1)} s`}
               {g.error && <span className="text-destructive"> — {g.error}</span>}
             </span>
+            {(() => {
+              const fb = g.design_id ? feedbackByDesign.get(g.design_id) : undefined;
+              if (!fb) return null;
+              return (
+                <span
+                  className={
+                    fb.rating === "up"
+                      ? "text-emerald-700 dark:text-emerald-400"
+                      : "text-destructive"
+                  }
+                  title={`Kundfeedback ${new Date(fb.created_at).toLocaleString("sv-SE")}`}
+                >
+                  {fb.rating === "up" ? "👍" : "👎"}
+                  {fb.comment && (
+                    <span className="text-muted-foreground"> ”{fb.comment}”</span>
+                  )}
+                </span>
+              );
+            })()}
             <div className="flex items-center gap-1.5">
               {inputUrls.map((u, idx) => (
                 <Thumb

@@ -34,6 +34,7 @@ import type { TemplateLayer, AiStylePreset } from "@/lib/template-schema";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AiProgress } from "./AiProgress";
+import { GenerationFeedback } from "./GenerationFeedback";
 
 type AiPhotoLayer = Extract<TemplateLayer, { type: "aiPhoto" }>;
 
@@ -572,6 +573,8 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
           </>
         )}
       </Button>
+
+      {result && !busy && <GenerationFeedback resultUrl={result} />}
 
       <AiProgress
         active={busy}

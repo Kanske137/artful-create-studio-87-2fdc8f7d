@@ -185,6 +185,15 @@
     "rateLimited": "Du hast das Tageslimit für KI-Generierungen erreicht. Versuche es morgen erneut.",
     "successToast": "Fertig! Gestalte weiter."
   },
+  "feedback": {
+    "question": "Zufrieden mit dem Ergebnis?",
+    "up": "Daumen hoch",
+    "down": "Daumen runter",
+    "thanks": "Danke für dein Feedback!",
+    "placeholder": "Was ist schiefgelaufen? (optional)",
+    "send": "Senden",
+    "skip": "Überspringen"
+  },
   "cartAdd": {
     "blockedGeneration": "Lade dein Foto hoch und drücke Jetzt erstellen, bevor du bestellst",
     "blockedPhoto": "Lade dein Foto hoch, bevor du bestellst",

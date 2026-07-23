@@ -185,6 +185,15 @@
     "rateLimited": "Osiągnięto dzienny limit generacji AI. Spróbuj ponownie jutro.",
     "successToast": "Gotowe! Twórz dalej."
   },
+  "feedback": {
+    "question": "Zadowolony z efektu?",
+    "up": "Kciuk w górę",
+    "down": "Kciuk w dół",
+    "thanks": "Dziękujemy za opinię!",
+    "placeholder": "Co poszło nie tak? (opcjonalnie)",
+    "send": "Wyślij",
+    "skip": "Pomiń"
+  },
   "cartAdd": {
     "blockedGeneration": "Prześlij zdjęcie i naciśnij Utwórz teraz przed zamówieniem",
     "blockedPhoto": "Prześlij zdjęcie przed zamówieniem",

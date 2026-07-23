@@ -185,6 +185,15 @@
     "rateLimited": "Du har nået dagens grænse for AI-genereringer. Prøv igen i morgen.",
     "successToast": "Færdig! Fortsæt med at skabe."
   },
+  "feedback": {
+    "question": "Blev resultatet godt?",
+    "up": "Tommel op",
+    "down": "Tommel ned",
+    "thanks": "Tak for din feedback!",
+    "placeholder": "Hvad gik galt? (valgfrit)",
+    "send": "Send",
+    "skip": "Spring over"
+  },
   "cartAdd": {
     "blockedGeneration": "Upload dit billede og tryk på Skab nu, før du bestiller",
     "blockedPhoto": "Upload dit billede, før du bestiller",

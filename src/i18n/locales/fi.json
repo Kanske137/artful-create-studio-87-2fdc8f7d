@@ -185,6 +185,15 @@
     "rateLimited": "Olet saavuttanut päivän tekoälygenerointien rajan. Yritä uudelleen huomenna.",
     "successToast": "Valmis! Jatka luomista."
   },
+  "feedback": {
+    "question": "Oliko tulos hyvä?",
+    "up": "Peukku ylös",
+    "down": "Peukku alas",
+    "thanks": "Kiitos palautteestasi!",
+    "placeholder": "Mikä meni vikaan? (valinnainen)",
+    "send": "Lähetä",
+    "skip": "Ohita"
+  },
   "cartAdd": {
     "blockedGeneration": "Lataa kuvasi ja paina Luo nyt ennen tilaamista",
     "blockedPhoto": "Lataa kuvasi ennen tilaamista",

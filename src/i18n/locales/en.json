@@ -185,6 +185,15 @@
     "rateLimited": "You've reached today's limit for AI generations. Please try again tomorrow.",
     "successToast": "Done! Keep creating."
   },
+  "feedback": {
+    "question": "Happy with the result?",
+    "up": "Thumbs up",
+    "down": "Thumbs down",
+    "thanks": "Thanks for your feedback!",
+    "placeholder": "What went wrong? (optional)",
+    "send": "Send",
+    "skip": "Skip"
+  },
   "cartAdd": {
     "blockedGeneration": "Upload your photo and press Create now before ordering",
     "blockedPhoto": "Upload your photo before ordering",

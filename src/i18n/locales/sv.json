@@ -185,6 +185,15 @@
     "rateLimited": "Du har nått dagens gräns för AI-genereringar. Försök igen imorgon.",
     "successToast": "Klart! Fortsätt skapa."
   },
+  "feedback": {
+    "question": "Blev resultatet bra?",
+    "up": "Tumme upp",
+    "down": "Tumme ner",
+    "thanks": "Tack för din feedback!",
+    "placeholder": "Vad blev fel? (frivilligt)",
+    "send": "Skicka",
+    "skip": "Hoppa över"
+  },
   "cartAdd": {
     "blockedGeneration": "Ladda upp din bild och tryck Skapa nu innan du beställer",
     "blockedPhoto": "Ladda upp din bild innan du beställer",

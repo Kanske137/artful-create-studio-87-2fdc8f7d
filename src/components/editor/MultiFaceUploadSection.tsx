@@ -11,6 +11,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2, Sparkles, Trash2, Upload } from "lucide-react";
+import { GenerationFeedback } from "./GenerationFeedback";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useEditorStore } from "@/stores/editorStore";
@@ -376,6 +377,8 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
           </>
         )}
       </Button>
+
+      {result && !busy && <GenerationFeedback resultUrl={result} />}
 
       {(() => {
         const history = Object.values(cacheRef.current)

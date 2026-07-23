@@ -85,6 +85,27 @@ export async function fetchGenerations(limit = 500): Promise<GenerationRow[]> {
   return (data ?? []) as GenerationRow[];
 }
 
+export interface FeedbackRow {
+  id: string;
+  created_at: string;
+  design_id: string;
+  session_key: string | null;
+  handle: string | null;
+  provider: string | null;
+  rating: "up" | "down";
+  comment: string | null;
+}
+
+/** Kundfeedback per generering (Paket B), nyast först. */
+export async function fetchFeedback(limit = 1000): Promise<FeedbackRow[]> {
+  const { data, error } = await anyFrom("generation_feedback")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as FeedbackRow[];
+}
+
 /** Publik URL till kundvagnsminiatyren för ett design-id. */
 export function cartPreviewUrl(designId: string): string {
   return supabase.storage.from("cart-previews").getPublicUrl(`${designId}.jpg`).data.publicUrl;

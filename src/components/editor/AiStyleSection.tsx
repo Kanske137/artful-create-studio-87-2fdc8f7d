@@ -26,6 +26,7 @@ import type { AiStylePreset } from "@/lib/template-schema";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AiProgress } from "./AiProgress";
+import { GenerationFeedback } from "./GenerationFeedback";
 
 interface Props {
   presets: AiStylePreset[];
@@ -327,16 +328,19 @@ export function AiStyleSection({ presets, layerId }: Props) {
       )}
 
       {aiPrintFileUrl && (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={undoAi}
-          className="w-full"
-        >
-          <Undo2 className="h-3.5 w-3.5 mr-1.5" />
-          Återgå till foto utan stil
-        </Button>
+        <>
+          <GenerationFeedback resultUrl={aiPrintFileUrl} />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={undoAi}
+            className="w-full"
+          >
+            <Undo2 className="h-3.5 w-3.5 mr-1.5" />
+            Återgå till foto utan stil
+          </Button>
+        </>
       )}
     </div>
   );

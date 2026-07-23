@@ -185,6 +185,15 @@
     "rateLimited": "Vous avez atteint la limite quotidienne de générations IA. Réessayez demain.",
     "successToast": "C'est fait ! Continuez à créer."
   },
+  "feedback": {
+    "question": "Satisfait du résultat ?",
+    "up": "Pouce levé",
+    "down": "Pouce baissé",
+    "thanks": "Merci pour votre retour !",
+    "placeholder": "Qu'est-ce qui n'a pas marché ? (facultatif)",
+    "send": "Envoyer",
+    "skip": "Passer"
+  },
   "cartAdd": {
     "blockedGeneration": "Téléchargez votre photo et appuyez sur Créer avant de commander",
     "blockedPhoto": "Téléchargez votre photo avant de commander",

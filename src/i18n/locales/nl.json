@@ -185,6 +185,15 @@
     "rateLimited": "Je hebt de daglimiet voor AI-generaties bereikt. Probeer het morgen opnieuw.",
     "successToast": "Klaar! Ga door met creëren."
   },
+  "feedback": {
+    "question": "Tevreden met het resultaat?",
+    "up": "Duim omhoog",
+    "down": "Duim omlaag",
+    "thanks": "Bedankt voor je feedback!",
+    "placeholder": "Wat ging er mis? (optioneel)",
+    "send": "Versturen",
+    "skip": "Overslaan"
+  },
   "cartAdd": {
     "blockedGeneration": "Upload je foto en druk op Nu maken voordat je bestelt",
     "blockedPhoto": "Upload je foto voordat je bestelt",
