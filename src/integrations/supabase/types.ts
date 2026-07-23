@@ -152,6 +152,39 @@ export type Database = {
         }
         Relationships: []
       }
+      generation_feedback: {
+        Row: {
+          comment: string | null
+          created_at: string
+          design_id: string
+          handle: string | null
+          id: string
+          provider: string | null
+          rating: string
+          session_key: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          design_id: string
+          handle?: string | null
+          id?: string
+          provider?: string | null
+          rating: string
+          session_key?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          design_id?: string
+          handle?: string | null
+          id?: string
+          provider?: string | null
+          rating?: string
+          session_key?: string | null
+        }
+        Relationships: []
+      }
       generations: {
         Row: {
           completed_at: string | null
