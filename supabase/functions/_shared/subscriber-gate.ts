@@ -20,7 +20,7 @@ const MAX_GENERATIONS_PER_EMAIL_24H = 10;
 /** Visas ordagrant av GAMLA cachade klientbundlar (fallback-vägen). Nya
  *  bundlar känner igen `code` och visar i18n-text + e-postdialogen i stället. */
 const MSG_EMAIL_REQUIRED =
-  "Du har använt din kostnadsfria AI-generering. Ladda om sidan och ange din e-post för att fortsätta skapa.";
+  "Du har använt dina kostnadsfria AI-genereringar. Ladda om sidan och ange din e-post för att fortsätta skapa.";
 const MSG_RATE_LIMITED =
   "Du har nått dagens gräns för AI-genereringar. Försök igen imorgon.";
 

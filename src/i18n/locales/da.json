@@ -150,7 +150,7 @@
     "friendlyFailed": "Vi kunne ikke skabe billedet. Prøv et andet foto med tydeligt ansigt og godt lys.",
     "chooseStyleOptional": "Vælg stil (valgfri)",
     "styleHintBackgroundOnly": "Baggrunden fjernes altid — stilen påvirker kun motivet.",
-    "subjectHintHuman": "Billedet skal vise ansigtet lige forfra, godt belyst.",
+    "subjectHintHuman": "Ansigtet set lige forfra, godt belyst — og kun én person på billedet.",
     "subjectHintPet": "Billedet skal vise dyrets ansigt tydeligt, gerne forfra.",
     "subjectHintRemoveBg": "Upload et billede hvor motivet er tydeligt — vi fjerner baggrunden for dig.",
     "chooseSubject": "Vælg motiv",
@@ -173,7 +173,7 @@
   },
   "subGate": {
     "title": "Fortsæt med at skabe med AI",
-    "body": "Dit første AI-billede var på os! Indtast din e-mail for at fortsætte med at skabe og vende tilbage til dine designs senere.",
+    "body": "Dine første AI-billeder var på os! Indtast din e-mail for at fortsætte med at skabe og vende tilbage til dine designs senere.",
     "emailLabel": "E-mailadresse",
     "emailPlaceholder": "din@email.dk",
     "newsletterLabel": "Ja tak, send mig nyheder og tilbud fra Arthena (valgfrit).",
@@ -330,8 +330,8 @@
   "onboarding": {
     "bild": "Upload et billede for at komme i gang.",
     "forvandling": {
-      "faceSingle": "Upload et billede, hvor ansigtet er tydeligt og lige forfra.",
-      "multiFace": "Upload ét portræt pr. ansigt – hver plads er separat. Tydelige ansigter forfra giver det bedste resultat.",
+      "faceSingle": "Upload et billede, hvor ansigtet ses tydeligt lige forfra — kun én person på billedet.",
+      "multiFace": "Upload ét portræt pr. ansigt – hvert felt er separat. Én person pr. billede, set lige forfra, giver det bedste resultat.",
       "aiPhoto": "Upload et billede og vælg en stil – tryk derefter Opret."
     },
     "karta": "Søg en adresse eller flyt kortet til det rigtige sted.",

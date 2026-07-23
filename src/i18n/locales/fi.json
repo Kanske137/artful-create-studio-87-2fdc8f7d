@@ -150,7 +150,7 @@
     "friendlyFailed": "Emme voineet luoda kuvaa. Kokeile toista kuvaa, jossa kasvot näkyvät selvästi.",
     "chooseStyleOptional": "Valitse tyyli (valinnainen)",
     "styleHintBackgroundOnly": "Tausta poistetaan aina — tyyli vaikuttaa vain aiheeseen.",
-    "subjectHintHuman": "Kuvassa kasvojen tulee näkyä suoraan edestä, hyvin valaistuna.",
+    "subjectHintHuman": "Kasvot suoraan edestä, hyvin valaistuna — ja vain yksi henkilö kuvassa.",
     "subjectHintPet": "Kuvan tulee näyttää eläimen kasvot selvästi, mieluiten edestä.",
     "subjectHintRemoveBg": "Lataa kuva, jossa aihe näkyy selvästi — poistamme taustan puolestasi.",
     "chooseSubject": "Valitse aihe",
@@ -173,7 +173,7 @@
   },
   "subGate": {
     "title": "Jatka luomista tekoälyllä",
-    "body": "Ensimmäinen tekoälykuvasi oli talon puolesta! Anna sähköpostiosoitteesi jatkaaksesi luomista ja palataksesi töihisi myöhemmin.",
+    "body": "Ensimmäiset tekoälykuvasi olivat talon puolesta! Anna sähköpostiosoitteesi jatkaaksesi luomista ja palataksesi töihisi myöhemmin.",
     "emailLabel": "Sähköpostiosoite",
     "emailPlaceholder": "sinun@sahkoposti.fi",
     "newsletterLabel": "Kyllä kiitos, lähettäkää minulle Arthenan uutisia ja tarjouksia (valinnainen).",
@@ -330,8 +330,8 @@
   "onboarding": {
     "bild": "Lataa kuva aloittaaksesi.",
     "forvandling": {
-      "faceSingle": "Lataa kuva, jossa kasvot näkyvät selvästi suoraan edestä.",
-      "multiFace": "Lataa yksi muotokuva kasvoa kohden – jokainen paikka on erillinen. Selkeät, edestä otetut kasvot antavat parhaan tuloksen.",
+      "faceSingle": "Lataa kuva, jossa kasvot näkyvät selvästi suoraan edestä — vain yksi henkilö kuvassa.",
+      "multiFace": "Lataa yksi muotokuva kasvoja kohden – jokainen paikka on erillinen. Yksi henkilö per kuva, suoraan edestä, antaa parhaan tuloksen.",
       "aiPhoto": "Lataa kuva ja valitse tyyli – paina sitten Luo."
     },
     "karta": "Hae osoite tai siirrä kartta oikeaan kohtaan.",

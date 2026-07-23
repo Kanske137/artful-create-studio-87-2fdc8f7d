@@ -150,7 +150,7 @@
     "friendlyFailed": "We couldn't create the image. Try another photo with a clear face and good lighting.",
     "chooseStyleOptional": "Choose style (optional)",
     "styleHintBackgroundOnly": "The background is always removed — the style only affects the subject.",
-    "subjectHintHuman": "The image should show the face straight on, well lit.",
+    "subjectHintHuman": "Face straight on, well lit — and only one person in the photo.",
     "subjectHintPet": "The image should clearly show the animal's face, preferably from the front.",
     "subjectHintRemoveBg": "Upload an image where the subject is clearly visible — we'll remove the background for you.",
     "chooseSubject": "Choose subject",
@@ -173,7 +173,7 @@
   },
   "subGate": {
     "title": "Keep creating with AI",
-    "body": "Your first AI image was on us! Enter your email to keep creating and to return to your designs later.",
+    "body": "Your first AI images were on us! Enter your email to keep creating and to return to your designs later.",
     "emailLabel": "Email address",
     "emailPlaceholder": "you@email.com",
     "newsletterLabel": "Yes please, send me news and offers from Arthena (optional).",
@@ -330,8 +330,8 @@
   "onboarding": {
     "bild": "Upload a photo to get started.",
     "forvandling": {
-      "faceSingle": "Upload a photo where the face is clearly visible, facing the camera.",
-      "multiFace": "Upload one portrait per face – each slot is separate. Clear, front-facing faces give the best result.",
+      "faceSingle": "Upload a photo where the face is clearly visible straight on — only one person in the photo.",
+      "multiFace": "Upload one portrait per face – each slot is separate. One person per photo, facing straight ahead, gives the best result.",
       "aiPhoto": "Upload a photo and pick a style – then press Create."
     },
     "karta": "Search an address or move the map to the right spot.",

@@ -150,7 +150,7 @@
     "friendlyFailed": "Vi kunne ikke lage bildet. Prøv et annet bilde med tydelig ansikt og godt lys.",
     "chooseStyleOptional": "Velg stil (valgfritt)",
     "styleHintBackgroundOnly": "Bakgrunnen fjernes alltid — stilen påvirker bare motivet.",
-    "subjectHintHuman": "Bildet skal vise ansiktet rett forfra, godt belyst.",
+    "subjectHintHuman": "Ansiktet rett forfra, godt belyst — og kun én person på bildet.",
     "subjectHintPet": "Bildet skal vise dyrets ansikt tydelig, gjerne forfra.",
     "subjectHintRemoveBg": "Last opp et bilde der motivet er tydelig — vi fjerner bakgrunnen for deg.",
     "chooseSubject": "Velg motiv",
@@ -173,7 +173,7 @@
   },
   "subGate": {
     "title": "Fortsett å skape med AI",
-    "body": "Ditt første AI-bilde var på oss! Oppgi e-posten din for å fortsette å skape og komme tilbake til designene dine senere.",
+    "body": "Dine første AI-bilder var på oss! Oppgi e-posten din for å fortsette å skape og komme tilbake til designene dine senere.",
     "emailLabel": "E-postadresse",
     "emailPlaceholder": "din@epost.no",
     "newsletterLabel": "Ja takk, send meg nyheter og tilbud fra Arthena (valgfritt).",
@@ -330,8 +330,8 @@
   "onboarding": {
     "bild": "Last opp et bilde for å komme i gang.",
     "forvandling": {
-      "faceSingle": "Last opp et bilde der ansiktet er tydelig og rett forfra.",
-      "multiFace": "Last opp ett portrett per ansikt – hver plass er separat. Tydelige ansikter rett forfra gir best resultat.",
+      "faceSingle": "Last opp et bilde der ansiktet vises tydelig rett forfra — kun én person på bildet.",
+      "multiFace": "Last opp ett portrett per ansikt – hvert felt er separat. Én person per bilde, rett forfra, gir best resultat.",
       "aiPhoto": "Last opp et bilde og velg en stil – trykk så Lag."
     },
     "karta": "Søk en adresse eller flytt kartet til riktig sted.",

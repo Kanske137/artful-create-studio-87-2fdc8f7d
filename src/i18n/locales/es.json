@@ -150,7 +150,7 @@
     "friendlyFailed": "No pudimos crear la imagen. Prueba con otra foto con cara clara y buena iluminación.",
     "chooseStyleOptional": "Elige estilo (opcional)",
     "styleHintBackgroundOnly": "El fondo siempre se elimina — el estilo solo afecta al sujeto.",
-    "subjectHintHuman": "La imagen debe mostrar el rostro de frente, bien iluminado.",
+    "subjectHintHuman": "Rostro de frente, bien iluminado — y solo una persona en la foto.",
     "subjectHintPet": "La imagen debe mostrar la cara del animal claramente, preferiblemente de frente.",
     "subjectHintRemoveBg": "Sube una imagen donde el sujeto se vea claramente — nosotros eliminamos el fondo.",
     "chooseSubject": "Elige el motivo",
@@ -173,7 +173,7 @@
   },
   "subGate": {
     "title": "Sigue creando con IA",
-    "body": "¡Tu primera imagen con IA fue cortesía nuestra! Introduce tu correo para seguir creando y volver a tus diseños más tarde.",
+    "body": "¡Tus primeras imágenes con IA fueron cortesía nuestra! Introduce tu correo para seguir creando y volver a tus diseños más tarde.",
     "emailLabel": "Correo electrónico",
     "emailPlaceholder": "tu@email.es",
     "newsletterLabel": "Sí, quiero recibir novedades y ofertas de Arthena (opcional).",
@@ -330,8 +330,8 @@
   "onboarding": {
     "bild": "Sube una foto para empezar.",
     "forvandling": {
-      "faceSingle": "Sube una foto donde el rostro se vea claramente, de frente.",
-      "multiFace": "Sube un retrato por cara – cada espacio es separado. Caras claras y de frente dan el mejor resultado.",
+      "faceSingle": "Sube una foto donde el rostro se vea claramente de frente — solo una persona en la foto.",
+      "multiFace": "Sube un retrato por rostro – cada espacio es independiente. Una persona por foto, de frente, da el mejor resultado.",
       "aiPhoto": "Sube una foto y elige un estilo, luego pulsa Crear."
     },
     "karta": "Busca una dirección o mueve el mapa al lugar correcto.",

@@ -150,7 +150,7 @@
     "friendlyFailed": "Wir konnten das Bild nicht erstellen. Versuche es mit einem Foto mit klarem Gesicht und guter Beleuchtung.",
     "chooseStyleOptional": "Stil wählen (optional)",
     "styleHintBackgroundOnly": "Der Hintergrund wird immer entfernt — der Stil betrifft nur das Motiv.",
-    "subjectHintHuman": "Das Bild sollte das Gesicht von vorne zeigen, gut beleuchtet.",
+    "subjectHintHuman": "Gesicht frontal, gut beleuchtet — und nur eine Person auf dem Bild.",
     "subjectHintPet": "Das Bild sollte das Gesicht des Tieres deutlich zeigen, am besten von vorne.",
     "subjectHintRemoveBg": "Lade ein Bild hoch, auf dem das Motiv klar sichtbar ist — wir entfernen den Hintergrund für dich.",
     "chooseSubject": "Motiv wählen",
@@ -173,7 +173,7 @@
   },
   "subGate": {
     "title": "Weiter mit KI gestalten",
-    "body": "Dein erstes KI-Bild ging auf uns! Gib deine E-Mail-Adresse ein, um weiter zu gestalten und später zu deinen Designs zurückzukehren.",
+    "body": "Deine ersten KI-Bilder gingen auf uns! Gib deine E-Mail-Adresse ein, um weiter zu gestalten und später zu deinen Designs zurückzukehren.",
     "emailLabel": "E-Mail-Adresse",
     "emailPlaceholder": "du@email.de",
     "newsletterLabel": "Ja bitte, schickt mir Neuigkeiten und Angebote von Arthena (optional).",
@@ -330,8 +330,8 @@
   "onboarding": {
     "bild": "Lade ein Foto hoch, um zu beginnen.",
     "forvandling": {
-      "faceSingle": "Lade ein Foto hoch, auf dem das Gesicht klar und frontal zu sehen ist.",
-      "multiFace": "Lade ein Porträt pro Gesicht hoch – jeder Slot ist separat. Klare, frontale Gesichter geben das beste Ergebnis.",
+      "faceSingle": "Lade ein Foto hoch, auf dem das Gesicht frontal klar zu sehen ist — nur eine Person auf dem Bild.",
+      "multiFace": "Lade ein Porträt pro Gesicht hoch – jeder Platz ist separat. Eine Person pro Bild, frontal aufgenommen, ergibt das beste Ergebnis.",
       "aiPhoto": "Lade ein Foto hoch und wähle einen Stil – dann auf Erstellen tippen."
     },
     "karta": "Suche eine Adresse oder verschiebe die Karte an die richtige Stelle.",

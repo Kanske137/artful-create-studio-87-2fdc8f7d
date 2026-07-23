@@ -150,7 +150,7 @@
     "friendlyFailed": "Nous n'avons pas pu créer l'image. Essayez une autre photo avec un visage net et un bon éclairage.",
     "chooseStyleOptional": "Choisir un style (optionnel)",
     "styleHintBackgroundOnly": "L'arrière-plan est toujours supprimé — le style n'affecte que le sujet.",
-    "subjectHintHuman": "L'image doit montrer le visage de face, bien éclairé.",
+    "subjectHintHuman": "Visage de face, bien éclairé — et une seule personne sur la photo.",
     "subjectHintPet": "L'image doit montrer clairement le visage de l'animal, de préférence de face.",
     "subjectHintRemoveBg": "Téléchargez une image où le sujet est clairement visible — nous supprimerons l'arrière-plan.",
     "chooseSubject": "Choisir le sujet",
@@ -173,7 +173,7 @@
   },
   "subGate": {
     "title": "Continuez à créer avec l'IA",
-    "body": "Votre première image IA était offerte ! Saisissez votre e-mail pour continuer à créer et retrouver vos créations plus tard.",
+    "body": "Vos premières images IA étaient offertes ! Saisissez votre e-mail pour continuer à créer et retrouver vos créations plus tard.",
     "emailLabel": "Adresse e-mail",
     "emailPlaceholder": "vous@email.fr",
     "newsletterLabel": "Oui, envoyez-moi les nouveautés et offres d'Arthena (facultatif).",
@@ -330,8 +330,8 @@
   "onboarding": {
     "bild": "Téléchargez une photo pour commencer.",
     "forvandling": {
-      "faceSingle": "Téléchargez une photo où le visage est clairement visible, de face.",
-      "multiFace": "Téléchargez un portrait par visage – chaque emplacement est séparé. Des visages clairs et de face donnent le meilleur résultat.",
+      "faceSingle": "Téléchargez une photo où le visage est bien visible de face — une seule personne sur la photo.",
+      "multiFace": "Téléchargez un portrait par visage – chaque emplacement est séparé. Une personne par photo, de face, donne le meilleur résultat.",
       "aiPhoto": "Téléchargez une photo et choisissez un style, puis appuyez sur Créer."
     },
     "karta": "Cherchez une adresse ou déplacez la carte au bon endroit.",

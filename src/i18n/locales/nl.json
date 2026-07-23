@@ -150,7 +150,7 @@
     "friendlyFailed": "We konden de afbeelding niet maken. Probeer een andere foto met duidelijk gezicht en goede belichting.",
     "chooseStyleOptional": "Kies stijl (optioneel)",
     "styleHintBackgroundOnly": "De achtergrond wordt altijd verwijderd — de stijl beïnvloedt alleen het onderwerp.",
-    "subjectHintHuman": "De afbeelding moet het gezicht recht van voren tonen, goed verlicht.",
+    "subjectHintHuman": "Gezicht recht van voren, goed belicht — en slechts één persoon op de foto.",
     "subjectHintPet": "De afbeelding moet het gezicht van het dier duidelijk tonen, bij voorkeur van voren.",
     "subjectHintRemoveBg": "Upload een afbeelding waar het onderwerp duidelijk zichtbaar is — wij verwijderen de achtergrond voor je.",
     "chooseSubject": "Kies onderwerp",
@@ -173,7 +173,7 @@
   },
   "subGate": {
     "title": "Blijf creëren met AI",
-    "body": "Je eerste AI-afbeelding was van ons! Vul je e-mailadres in om verder te creëren en later naar je ontwerpen terug te keren.",
+    "body": "Je eerste AI-afbeeldingen waren van ons! Vul je e-mailadres in om verder te creëren en later naar je ontwerpen terug te keren.",
     "emailLabel": "E-mailadres",
     "emailPlaceholder": "jij@email.nl",
     "newsletterLabel": "Ja graag, stuur mij nieuws en aanbiedingen van Arthena (optioneel).",
@@ -330,8 +330,8 @@
   "onboarding": {
     "bild": "Upload een foto om te beginnen.",
     "forvandling": {
-      "faceSingle": "Upload een foto waarop het gezicht duidelijk en recht van voren zichtbaar is.",
-      "multiFace": "Upload één portret per gezicht – elke plek is apart. Duidelijke gezichten recht van voren geven het beste resultaat.",
+      "faceSingle": "Upload een foto waarop het gezicht duidelijk recht van voren te zien is — slechts één persoon op de foto.",
+      "multiFace": "Upload één portret per gezicht – elk vak is apart. Eén persoon per foto, recht van voren, geeft het beste resultaat.",
       "aiPhoto": "Upload een foto en kies een stijl – druk daarna op Maken."
     },
     "karta": "Zoek een adres of verplaats de kaart naar de juiste plek.",

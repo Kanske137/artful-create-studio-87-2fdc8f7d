@@ -150,7 +150,7 @@
     "friendlyFailed": "Non siamo riusciti a creare l'immagine. Prova un'altra foto con viso chiaro e buona illuminazione.",
     "chooseStyleOptional": "Scegli stile (opzionale)",
     "styleHintBackgroundOnly": "Lo sfondo viene sempre rimosso — lo stile influenza solo il soggetto.",
-    "subjectHintHuman": "L'immagine deve mostrare il viso di fronte, ben illuminato.",
+    "subjectHintHuman": "Viso frontale, ben illuminato — e una sola persona nella foto.",
     "subjectHintPet": "L'immagine deve mostrare chiaramente il viso dell'animale, preferibilmente di fronte.",
     "subjectHintRemoveBg": "Carica un'immagine dove il soggetto è chiaramente visibile — rimuoviamo lo sfondo per te.",
     "chooseSubject": "Scegli il soggetto",
@@ -173,7 +173,7 @@
   },
   "subGate": {
     "title": "Continua a creare con l'IA",
-    "body": "La tua prima immagine IA l'abbiamo offerta noi! Inserisci la tua email per continuare a creare e ritrovare i tuoi design più tardi.",
+    "body": "Le tue prime immagini IA le abbiamo offerte noi! Inserisci la tua email per continuare a creare e ritrovare i tuoi design più tardi.",
     "emailLabel": "Indirizzo email",
     "emailPlaceholder": "tua@email.it",
     "newsletterLabel": "Sì, inviatemi novità e offerte di Arthena (facoltativo).",
@@ -330,8 +330,8 @@
   "onboarding": {
     "bild": "Carica una foto per iniziare.",
     "forvandling": {
-      "faceSingle": "Carica una foto in cui il volto sia chiaramente visibile, di fronte.",
-      "multiFace": "Carica un ritratto per ogni volto – ogni slot è separato. Volti chiari e frontali danno il miglior risultato.",
+      "faceSingle": "Carica una foto in cui il viso sia ben visibile frontalmente — una sola persona nella foto.",
+      "multiFace": "Carica un ritratto per viso – ogni spazio è separato. Una persona per foto, frontale, dà il risultato migliore.",
       "aiPhoto": "Carica una foto e scegli uno stile, poi premi Crea."
     },
     "karta": "Cerca un indirizzo o sposta la mappa nel punto giusto.",

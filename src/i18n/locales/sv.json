@@ -150,7 +150,7 @@
     "friendlyFailed": "Vi kunde inte skapa bilden. Prova en annan bild med tydligt ansikte och bra ljus.",
     "chooseStyleOptional": "Välj stil (valfritt)",
     "styleHintBackgroundOnly": "Bakgrunden tas alltid bort — stilen påverkar bara själva motivet.",
-    "subjectHintHuman": "Bilden ska visa ansiktet rakt framifrån, väl belyst.",
+    "subjectHintHuman": "Ansiktet rakt framifrån, väl belyst — och endast en person på bilden.",
     "subjectHintPet": "Bilden ska visa djurets ansikte tydligt, gärna framifrån.",
     "subjectHintRemoveBg": "Ladda upp bilden där motivet syns tydligt — vi tar bort bakgrunden åt dig.",
     "chooseSubject": "Välj motiv",
@@ -173,7 +173,7 @@
   },
   "subGate": {
     "title": "Fortsätt skapa med AI",
-    "body": "Din första AI-bild var på oss! Ange din e-post för att fortsätta skapa och kunna återkomma till dina designer.",
+    "body": "Dina första AI-bilder var på oss! Ange din e-post för att fortsätta skapa och kunna återkomma till dina designer.",
     "emailLabel": "E-postadress",
     "emailPlaceholder": "din@epost.se",
     "newsletterLabel": "Ja tack, skicka mig nyheter och erbjudanden från Arthena (frivilligt).",
@@ -330,8 +330,8 @@
   "onboarding": {
     "bild": "Ladda upp en bild för att komma igång.",
     "forvandling": {
-      "faceSingle": "Ladda upp en bild där ansiktet syns tydligt rakt framifrån.",
-      "multiFace": "Ladda upp ett porträtt per ansikte – varje slot är separat. Tydligt ansikte rakt framifrån ger bäst resultat.",
+      "faceSingle": "Ladda upp en bild där ansiktet syns tydligt rakt framifrån — endast en person på bilden.",
+      "multiFace": "Ladda upp ett porträtt per ansikte – varje slot är separat. En person per bild, rakt framifrån, ger bäst resultat.",
       "aiPhoto": "Ladda upp en bild och välj en stil – tryck sedan Skapa."
     },
     "karta": "Sök en adress eller flytta kartan till rätt plats.",

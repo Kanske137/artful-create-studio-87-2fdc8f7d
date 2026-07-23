@@ -150,7 +150,7 @@
     "friendlyFailed": "Nie mogliśmy utworzyć obrazu. Spróbuj innego zdjęcia z wyraźną twarzą i dobrym oświetleniem.",
     "chooseStyleOptional": "Wybierz styl (opcjonalnie)",
     "styleHintBackgroundOnly": "Tło jest zawsze usuwane — styl wpływa tylko na motyw.",
-    "subjectHintHuman": "Zdjęcie powinno pokazywać twarz prosto z przodu, dobrze oświetloną.",
+    "subjectHintHuman": "Twarz na wprost, dobrze oświetlona — i tylko jedna osoba na zdjęciu.",
     "subjectHintPet": "Zdjęcie powinno wyraźnie pokazywać pysk zwierzęcia, najlepiej z przodu.",
     "subjectHintRemoveBg": "Prześlij zdjęcie, na którym motyw jest wyraźnie widoczny — usuniemy tło za Ciebie.",
     "chooseSubject": "Wybierz motyw",
@@ -173,7 +173,7 @@
   },
   "subGate": {
     "title": "Twórz dalej z AI",
-    "body": "Pierwszy obraz AI był na nasz koszt! Podaj swój e-mail, aby tworzyć dalej i wracać do swoich projektów.",
+    "body": "Pierwsze obrazy AI były na nasz koszt! Podaj swój e-mail, aby tworzyć dalej i wracać do swoich projektów.",
     "emailLabel": "Adres e-mail",
     "emailPlaceholder": "ty@email.pl",
     "newsletterLabel": "Tak, chcę otrzymywać nowości i oferty od Arthena (opcjonalnie).",
@@ -330,8 +330,8 @@
   "onboarding": {
     "bild": "Wgraj zdjęcie, aby zacząć.",
     "forvandling": {
-      "faceSingle": "Wgraj zdjęcie, na którym twarz jest wyraźna i skierowana na wprost.",
-      "multiFace": "Wgraj jeden portret na twarz – każde miejsce jest osobne. Wyraźne twarze na wprost dają najlepszy efekt.",
+      "faceSingle": "Prześlij zdjęcie, na którym twarz jest wyraźnie widoczna na wprost — tylko jedna osoba na zdjęciu.",
+      "multiFace": "Prześlij jeden portret na twarz – każde pole jest osobne. Jedna osoba na zdjęciu, na wprost, daje najlepszy efekt.",
       "aiPhoto": "Wgraj zdjęcie i wybierz styl – następnie naciśnij Stwórz."
     },
     "karta": "Wyszukaj adres lub przesuń mapę w odpowiednie miejsce.",
