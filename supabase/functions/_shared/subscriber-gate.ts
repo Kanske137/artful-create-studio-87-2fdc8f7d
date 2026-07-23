@@ -9,8 +9,10 @@
 // Nödbroms utan omdeploy: sätt secret SUBSCRIBER_GATE_DISABLED=true.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-/** Antal gratisgenereringar per session/enhet innan e-post krävs. */
-const FREE_GENERATIONS_PER_SESSION = 1;
+/** Antal gratisgenereringar per session/enhet innan e-post krävs.
+ *  Akrams beslut 2026-07-24: 3 (höjt från 1). Spegla FREE_GENERATIONS_CLIENT
+ *  i src/lib/subscriber-gate.ts vid ändring. */
+const FREE_GENERATIONS_PER_SESSION = 3;
 /** Tak per registrerad e-post per rullande dygn (missbruks-/kostnadsskydd).
  *  Akrams beslut 2026-07-22: 10/dygn. */
 const MAX_GENERATIONS_PER_EMAIL_24H = 10;

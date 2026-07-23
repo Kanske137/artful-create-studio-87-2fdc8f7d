@@ -15,7 +15,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { getSessionKey } from "@/lib/analytics";
 
 const EMAIL_KEY = "arthena-subscriber-email";
-const FREE_USED_KEY = "arthena-free-gen-used";
+const GEN_COUNT_KEY = "arthena-gen-count";
+/** Spegel av serverns FREE_GENERATIONS_PER_SESSION — håll i synk. */
+const FREE_GENERATIONS_CLIENT = 3;
 
 export function hasRegisteredEmail(): boolean {
   try {
@@ -25,21 +27,32 @@ export function hasRegisteredEmail(): boolean {
   }
 }
 
-/** Anropas vid varje LYCKAD generering — flaggan driver pre-flighten. */
+/** Anropas vid varje LYCKAD generering — räknaren driver pre-flighten.
+ *  Servern är alltid facit (räknar succeeded-rader per session). */
 export function markFreeGenerationUsed(): void {
   try {
-    localStorage.setItem(FREE_USED_KEY, "1");
+    const n = parseInt(localStorage.getItem(GEN_COUNT_KEY) ?? "0", 10) || 0;
+    localStorage.setItem(GEN_COUNT_KEY, String(n + 1));
   } catch {
     /* privat läge utan storage — servern gatar ändå */
   }
 }
 
-function freeGenerationUsed(): boolean {
+function freeAllowanceExhausted(): boolean {
   try {
-    return localStorage.getItem(FREE_USED_KEY) === "1";
+    const n = parseInt(localStorage.getItem(GEN_COUNT_KEY) ?? "0", 10) || 0;
+    return n >= FREE_GENERATIONS_CLIENT;
   } catch {
     return false;
   }
+}
+
+/** Pre-flight för genereringssektionerna: anropas FÖRE busy-overlayen startar
+ *  så dialogen visas utan spinner bakom sig, och flödet fortsätter automatiskt
+ *  in i genereringen när kunden registrerat sig. true = kör vidare. */
+export async function ensureSubscriberGatePassed(): Promise<boolean> {
+  if (!freeAllowanceExhausted() || hasRegisteredEmail()) return true;
+  return requestSubscriberGate();
 }
 
 interface SubscriberGateState {
@@ -103,7 +116,7 @@ export async function invokeWithSubscriberGate<T>(
   fn: string,
   body: Record<string, unknown>,
 ): Promise<GatedInvokeResult<T>> {
-  if (freeGenerationUsed() && !hasRegisteredEmail()) {
+  if (freeAllowanceExhausted() && !hasRegisteredEmail()) {
     const registered = await requestSubscriberGate();
     if (!registered) return { data: null, error: null, handled: true };
   }

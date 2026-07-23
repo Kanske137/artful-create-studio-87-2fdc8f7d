@@ -24,7 +24,11 @@ import { useAiBusyStore } from "@/stores/aiBusyStore";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadCartPreview } from "@/lib/upload-preview";
 import { getSessionKey } from "@/lib/analytics";
-import { invokeWithSubscriberGate, markFreeGenerationUsed } from "@/lib/subscriber-gate";
+import {
+  ensureSubscriberGatePassed,
+  invokeWithSubscriberGate,
+  markFreeGenerationUsed,
+} from "@/lib/subscriber-gate";
 import { hashFile } from "@/lib/ai-cache-storage";
 import type { TemplateLayer, AiStylePreset } from "@/lib/template-schema";
 import { toast } from "sonner";
@@ -238,6 +242,9 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
       toast.error(t("ai.uploadFirstShort"));
       return;
     }
+    // Gate-pre-flight FÖRE busy-overlayen: dialogen ska aldrig tävla med
+    // spinnern, och flödet fortsätter automatiskt efter registrering.
+    if (!(await ensureSubscriberGatePassed())) return;
     setBusy(true);
     setStage(t("ai.stagePrep"));
     const jobId = `ai-photo:${layer.id}`;

@@ -16,7 +16,11 @@ import { useAiBusyStore, useIsAnyAiBusy } from "@/stores/aiBusyStore";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadCartPreview } from "@/lib/upload-preview";
 import { getSessionKey } from "@/lib/analytics";
-import { invokeWithSubscriberGate, markFreeGenerationUsed } from "@/lib/subscriber-gate";
+import {
+  ensureSubscriberGatePassed,
+  invokeWithSubscriberGate,
+  markFreeGenerationUsed,
+} from "@/lib/subscriber-gate";
 import { hashFile } from "@/lib/ai-cache-storage";
 import type { AiStylePreset } from "@/lib/template-schema";
 import { toast } from "sonner";
@@ -112,6 +116,9 @@ export function AiStyleSection({ presets, layerId }: Props) {
       toast.error("Ladda upp en bild först");
       return;
     }
+    // Gate-pre-flight FÖRE busy-overlayen: dialogen ska aldrig tävla med
+    // spinnern, och flödet fortsätter automatiskt efter registrering.
+    if (!(await ensureSubscriberGatePassed())) return;
 
     const jobId = `ai-style:${layerId}:${preset.id}`;
     const { startAiJob, updateAiJobStage, endAiJob } = useAiBusyStore.getState();
