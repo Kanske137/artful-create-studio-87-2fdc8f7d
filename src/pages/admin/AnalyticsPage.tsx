@@ -149,6 +149,51 @@ export default function AnalyticsPage() {
     return map;
   }, [feedback]);
 
+  // Sessioner sorterade på FAKTISK senaste aktivitet (max av last_seen_at,
+  // events, genereringar, feedback) — last_seen_at kan släpa (t.ex. gamla
+  // flikar) och då hamnade aktiva sessioner annars långt ner eller utanför
+  // listan. Sessionsnycklar som bara syns via aktivitet (raden saknas/ej
+  // hämtad) får en syntetisk rad så deras tidslinje aldrig blir osynlig.
+  const sessionsByActivity = useMemo(() => {
+    const activity = new Map<string, number>();
+    const bump = (key: string | null | undefined, ts: string | null | undefined) => {
+      if (!key || !ts) return;
+      const t = new Date(ts).getTime();
+      if (!Number.isFinite(t)) return;
+      const prev = activity.get(key) ?? 0;
+      if (t > prev) activity.set(key, t);
+    };
+    for (const e of events) bump(e.session_key, e.ts);
+    for (const g of generations) bump(g.session_key, g.created_at);
+    for (const f of feedback) bump(f.session_key, f.created_at);
+
+    const known = new Set(sessions.map((s) => s.session_key));
+    const synthetic: SessionRow[] = [];
+    for (const [key, t] of activity) {
+      if (known.has(key)) continue;
+      const iso = new Date(t).toISOString();
+      synthetic.push({
+        id: key,
+        session_key: key,
+        created_at: iso,
+        last_seen_at: iso,
+        locale: null,
+        country: null,
+        device: null,
+        embedded: null,
+        first_handle: null,
+        email: null,
+        email_linked_at: null,
+      });
+    }
+
+    const effective = (s: SessionRow) =>
+      Math.max(new Date(s.last_seen_at).getTime() || 0, activity.get(s.session_key) ?? 0);
+    return [...sessions, ...synthetic]
+      .map((s) => ({ ...s, last_seen_at: new Date(effective(s)).toISOString() }))
+      .sort((a, b) => new Date(b.last_seen_at).getTime() - new Date(a.last_seen_at).getTime());
+  }, [sessions, events, generations, feedback]);
+
   const summary = useMemo(() => {
     const cutoff = Date.now() - WEEK_MS;
     const recentSessions = sessions.filter((s) => new Date(s.last_seen_at).getTime() >= cutoff);
@@ -354,7 +399,7 @@ export default function AnalyticsPage() {
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               Senaste sessionerna
             </h2>
-            {sessions.map((s) => {
+            {sessionsByActivity.map((s) => {
               const a = aggBySession.get(s.session_key) ?? EMPTY_AGG;
               const isOpen = expanded === s.session_key;
               return (
