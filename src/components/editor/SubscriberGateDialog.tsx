@@ -63,7 +63,15 @@ export function SubscriberGateDialog() {
         if (!o && !busy) close(false);
       }}
     >
-      <DialogContent className="sm:max-w-md">
+      {/* z-[80]: AI-overlayen ligger på z-[60] — dialogen MÅSTE ligga över den
+          (gaten kan öppnas medan overlayen är aktiv). Utanförklick stänger
+          inte (annars försvinner dialogen av misstag under pågående flöde);
+          kunden stänger medvetet via X eller Esc. */}
+      <DialogContent
+        className="z-[80] sm:max-w-md"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>{t("subGate.title")}</DialogTitle>
           <DialogDescription>{t("subGate.body")}</DialogDescription>
