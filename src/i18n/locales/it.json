@@ -209,6 +209,12 @@
   "trust": {
     "uploadNote": "Le tue foto vengono usate solo per il tuo quadro e vengono eliminate automaticamente dopo 60 giorni."
   },
+  "exampleBadge": {
+    "label": "Immagine di esempio – sostituita con la tua foto"
+  },
+  "steps": {
+    "flow": "1. Carica · 2. Crea · 3. Ordina"
+  },
   "cartAdd": {
     "blockedGeneration": "Carica la tua foto e premi Crea ora prima di ordinare",
     "blockedPhoto": "Carica la tua foto prima di ordinare",

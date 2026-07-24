@@ -748,6 +748,28 @@ export function MapPreview({
                       />
                       {/* Vattenmärke på AI-bildlagret — endast förhandsvisning. */}
                       <WatermarkOverlay clipPath={clip} />
+                      {/* Referensen visas tills kundens eget resultat finns —
+                          märk den som exempel så ingen tror att personen/djuret
+                          på bilden följer med tavlan. */}
+                      {!aiResultUrl && (
+                        <div
+                          aria-hidden="true"
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            bottom: "4%",
+                            display: "flex",
+                            justifyContent: "center",
+                            pointerEvents: "none",
+                            clipPath: clip,
+                          }}
+                        >
+                          <span className="bg-background/85 text-foreground/90 text-[10px] font-medium px-2 py-0.5 rounded-full ring-1 ring-border">
+                            {t("exampleBadge.label")}
+                          </span>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <div

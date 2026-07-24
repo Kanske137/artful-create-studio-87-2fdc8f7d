@@ -209,6 +209,12 @@
   "trust": {
     "uploadNote": "Kuviasi käytetään vain tauluusi ja ne poistetaan automaattisesti 60 päivän kuluttua."
   },
+  "exampleBadge": {
+    "label": "Esimerkkikuva – korvataan omalla kuvallasi"
+  },
+  "steps": {
+    "flow": "1. Lataa · 2. Luo · 3. Tilaa"
+  },
   "cartAdd": {
     "blockedGeneration": "Lataa kuvasi ja paina Luo nyt ennen tilaamista",
     "blockedPhoto": "Lataa kuvasi ennen tilaamista",

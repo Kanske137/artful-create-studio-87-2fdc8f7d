@@ -209,6 +209,12 @@
   "trust": {
     "uploadNote": "Je foto's worden alleen voor je kunstwerk gebruikt en na 60 dagen automatisch verwijderd."
   },
+  "exampleBadge": {
+    "label": "Voorbeeldafbeelding – wordt vervangen door jouw foto"
+  },
+  "steps": {
+    "flow": "1. Upload · 2. Creëer · 3. Bestel"
+  },
   "cartAdd": {
     "blockedGeneration": "Upload je foto en druk op Nu maken voordat je bestelt",
     "blockedPhoto": "Upload je foto voordat je bestelt",

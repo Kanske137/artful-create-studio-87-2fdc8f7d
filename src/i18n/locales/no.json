@@ -209,6 +209,12 @@
   "trust": {
     "uploadNote": "Bildene dine brukes bare til tavlen din og slettes automatisk etter 60 dager."
   },
+  "exampleBadge": {
+    "label": "Eksempelbilde – byttes med ditt foto"
+  },
+  "steps": {
+    "flow": "1. Last opp · 2. Skap · 3. Bestill"
+  },
   "cartAdd": {
     "blockedGeneration": "Last opp bildet ditt og trykk Skap nå før du bestiller",
     "blockedPhoto": "Last opp bildet ditt før du bestiller",

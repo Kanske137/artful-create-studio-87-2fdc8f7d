@@ -209,6 +209,12 @@
   "trust": {
     "uploadNote": "Vos photos ne servent qu'à votre tableau et sont supprimées automatiquement après 60 jours."
   },
+  "exampleBadge": {
+    "label": "Image d'exemple – remplacée par votre photo"
+  },
+  "steps": {
+    "flow": "1. Téléchargez · 2. Créez · 3. Commandez"
+  },
   "cartAdd": {
     "blockedGeneration": "Téléchargez votre photo et appuyez sur Créer avant de commander",
     "blockedPhoto": "Téléchargez votre photo avant de commander",

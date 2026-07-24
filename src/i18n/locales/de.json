@@ -209,6 +209,12 @@
   "trust": {
     "uploadNote": "Deine Fotos werden nur für dein Bild verwendet und nach 60 Tagen automatisch gelöscht."
   },
+  "exampleBadge": {
+    "label": "Beispielbild – wird durch dein Foto ersetzt"
+  },
+  "steps": {
+    "flow": "1. Hochladen · 2. Erstellen · 3. Bestellen"
+  },
   "cartAdd": {
     "blockedGeneration": "Lade dein Foto hoch und drücke Jetzt erstellen, bevor du bestellst",
     "blockedPhoto": "Lade dein Foto hoch, bevor du bestellst",

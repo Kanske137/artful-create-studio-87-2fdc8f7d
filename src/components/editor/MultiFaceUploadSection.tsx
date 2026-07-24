@@ -19,7 +19,7 @@ import { useEditorStore } from "@/stores/editorStore";
 import { useAiBusyStore } from "@/stores/aiBusyStore";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadCartPreview } from "@/lib/upload-preview";
-import { getSessionKey } from "@/lib/analytics";
+import { getSessionKey, track } from "@/lib/analytics";
 import {
   ensureSubscriberGatePassed,
   invokeWithSubscriberGate,
@@ -313,6 +313,11 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
         </h4>
       )}
 
+      {/* Stegindikator — gör flödet självklart, särskilt på mobil. */}
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+        {t("steps.flow")}
+      </p>
+
       {!refUrl && (
         <p className="text-xs text-destructive">{t("aiPhoto.notConfigured")}</p>
       )}
@@ -473,7 +478,10 @@ function MultiFaceSlot({
       {!entry ? (
         <button
           type="button"
-          onClick={() => inputRef.current?.click()}
+          onClick={() => {
+            track("photo_picker_opened");
+            inputRef.current?.click();
+          }}
           className={cn(
             "w-full h-28 rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-1.5 transition hover:bg-accent/30",
           )}
@@ -491,7 +499,10 @@ function MultiFaceSlot({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => inputRef.current?.click()}
+              onClick={() => {
+            track("photo_picker_opened");
+            inputRef.current?.click();
+          }}
             >
               <Upload className="h-3.5 w-3.5 mr-1.5" />
               {t("photo.swap")}

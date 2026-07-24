@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { Upload, Image as ImageIcon, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEditorStore } from "@/stores/editorStore";
+import { track } from "@/lib/analytics";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -57,7 +58,10 @@ export function PhotoUploadSection({ layerId }: Props) {
       {!photoFile ? (
         <button
           type="button"
-          onClick={() => inputRef.current?.click()}
+          onClick={() => {
+            track("photo_picker_opened");
+            inputRef.current?.click();
+          }}
           onDragOver={(e) => {
             e.preventDefault();
             e.currentTarget.classList.add("ring-primary", "bg-accent/40");
@@ -104,7 +108,10 @@ export function PhotoUploadSection({ layerId }: Props) {
               variant="outline"
               size="sm"
               className="flex-1"
-              onClick={() => inputRef.current?.click()}
+              onClick={() => {
+            track("photo_picker_opened");
+            inputRef.current?.click();
+          }}
             >
               <Upload className="h-3.5 w-3.5 mr-1.5" />
               {t("photo.swap")}

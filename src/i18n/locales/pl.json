@@ -209,6 +209,12 @@
   "trust": {
     "uploadNote": "Twoje zdjęcia są używane tylko do Twojego obrazu i automatycznie usuwane po 60 dniach."
   },
+  "exampleBadge": {
+    "label": "Przykładowy obraz – zostanie zastąpiony Twoim zdjęciem"
+  },
+  "steps": {
+    "flow": "1. Prześlij · 2. Utwórz · 3. Zamów"
+  },
   "cartAdd": {
     "blockedGeneration": "Prześlij zdjęcie i naciśnij Utwórz teraz przed zamówieniem",
     "blockedPhoto": "Prześlij zdjęcie przed zamówieniem",

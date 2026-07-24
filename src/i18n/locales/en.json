@@ -209,6 +209,12 @@
   "trust": {
     "uploadNote": "Your photos are only used for your artwork and are automatically deleted after 60 days."
   },
+  "exampleBadge": {
+    "label": "Example image – replaced with your photo"
+  },
+  "steps": {
+    "flow": "1. Upload · 2. Create · 3. Order"
+  },
   "cartAdd": {
     "blockedGeneration": "Upload your photo and press Create now before ordering",
     "blockedPhoto": "Upload your photo before ordering",

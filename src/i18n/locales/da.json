@@ -209,6 +209,12 @@
   "trust": {
     "uploadNote": "Dine billeder bruges kun til din plakat og slettes automatisk efter 60 dage."
   },
+  "exampleBadge": {
+    "label": "Eksempelbillede – udskiftes med dit foto"
+  },
+  "steps": {
+    "flow": "1. Upload · 2. Skab · 3. Bestil"
+  },
   "cartAdd": {
     "blockedGeneration": "Upload dit billede og tryk på Skab nu, før du bestiller",
     "blockedPhoto": "Upload dit billede, før du bestiller",

@@ -209,6 +209,12 @@
   "trust": {
     "uploadNote": "Dina bilder används bara för din tavla och raderas automatiskt efter 60 dagar."
   },
+  "exampleBadge": {
+    "label": "Exempelbild – byts mot ditt foto"
+  },
+  "steps": {
+    "flow": "1. Ladda upp · 2. Skapa · 3. Beställ"
+  },
   "cartAdd": {
     "blockedGeneration": "Ladda upp din bild och tryck Skapa nu innan du beställer",
     "blockedPhoto": "Ladda upp din bild innan du beställer",
