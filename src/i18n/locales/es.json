@@ -151,7 +151,7 @@
     "chooseStyleOptional": "Elige estilo (opcional)",
     "styleHintBackgroundOnly": "El fondo siempre se elimina — el estilo solo afecta al sujeto.",
     "subjectHintHuman": "Rostro de frente, bien iluminado — y solo una persona en la foto.",
-    "subjectHintPet": "La imagen debe mostrar la cara del animal claramente, preferiblemente de frente.",
+    "subjectHintPet": "La cara del animal claramente de frente — y solo un animal en la foto.",
     "subjectHintRemoveBg": "Sube una imagen donde el sujeto se vea claramente — nosotros eliminamos el fondo.",
     "chooseSubject": "Elige el motivo",
     "previousVersions": "Versiones anteriores",
@@ -287,6 +287,7 @@
     "zap": "Rayo"
   },
   "multiFace": {
+    "uploadRequirements": "Una foto por persona — rostro de frente, solo una persona por foto.",
     "uploadFor": "Sube la cara – {{label}}",
     "create": "Crear imagen",
     "recreate": "Crear de nuevo",

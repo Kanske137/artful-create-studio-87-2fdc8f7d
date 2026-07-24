@@ -151,7 +151,7 @@
     "chooseStyleOptional": "Valitse tyyli (valinnainen)",
     "styleHintBackgroundOnly": "Tausta poistetaan aina — tyyli vaikuttaa vain aiheeseen.",
     "subjectHintHuman": "Kasvot suoraan edestä, hyvin valaistuna — ja vain yksi henkilö kuvassa.",
-    "subjectHintPet": "Kuvan tulee näyttää eläimen kasvot selvästi, mieluiten edestä.",
+    "subjectHintPet": "Eläimen kasvot selvästi edestä — ja vain yksi eläin kuvassa.",
     "subjectHintRemoveBg": "Lataa kuva, jossa aihe näkyy selvästi — poistamme taustan puolestasi.",
     "chooseSubject": "Valitse aihe",
     "previousVersions": "Aiemmat versiot",
@@ -287,6 +287,7 @@
     "zap": "Salama"
   },
   "multiFace": {
+    "uploadRequirements": "Yksi kuva henkilöä kohden — kasvot suoraan edestä, vain yksi henkilö per kuva.",
     "uploadFor": "Lataa kasvot – {{label}}",
     "create": "Luo kuva",
     "recreate": "Luo uudelleen",

@@ -151,7 +151,7 @@
     "chooseStyleOptional": "Kies stijl (optioneel)",
     "styleHintBackgroundOnly": "De achtergrond wordt altijd verwijderd — de stijl beïnvloedt alleen het onderwerp.",
     "subjectHintHuman": "Gezicht recht van voren, goed belicht — en slechts één persoon op de foto.",
-    "subjectHintPet": "De afbeelding moet het gezicht van het dier duidelijk tonen, bij voorkeur van voren.",
+    "subjectHintPet": "De snuit van het dier duidelijk van voren — en slechts één dier op de foto.",
     "subjectHintRemoveBg": "Upload een afbeelding waar het onderwerp duidelijk zichtbaar is — wij verwijderen de achtergrond voor je.",
     "chooseSubject": "Kies onderwerp",
     "previousVersions": "Eerdere versies",
@@ -287,6 +287,7 @@
     "zap": "Bliksem"
   },
   "multiFace": {
+    "uploadRequirements": "Eén foto per persoon — gezicht recht van voren, slechts één persoon per foto.",
     "uploadFor": "Upload gezicht – {{label}}",
     "create": "Afbeelding maken",
     "recreate": "Opnieuw maken",

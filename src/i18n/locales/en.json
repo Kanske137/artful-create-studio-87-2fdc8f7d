@@ -151,7 +151,7 @@
     "chooseStyleOptional": "Choose style (optional)",
     "styleHintBackgroundOnly": "The background is always removed — the style only affects the subject.",
     "subjectHintHuman": "Face straight on, well lit — and only one person in the photo.",
-    "subjectHintPet": "The image should clearly show the animal's face, preferably from the front.",
+    "subjectHintPet": "The animal's face clearly from the front — and only one animal in the photo.",
     "subjectHintRemoveBg": "Upload an image where the subject is clearly visible — we'll remove the background for you.",
     "chooseSubject": "Choose subject",
     "previousVersions": "Previous versions",
@@ -287,6 +287,7 @@
     "zap": "Bolt"
   },
   "multiFace": {
+    "uploadRequirements": "One photo per person — face straight on, only one person per photo.",
     "uploadFor": "Upload face – {{label}}",
     "create": "Create image",
     "recreate": "Create again",

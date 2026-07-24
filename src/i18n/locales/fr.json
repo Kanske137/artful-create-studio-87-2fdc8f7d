@@ -151,7 +151,7 @@
     "chooseStyleOptional": "Choisir un style (optionnel)",
     "styleHintBackgroundOnly": "L'arrière-plan est toujours supprimé — le style n'affecte que le sujet.",
     "subjectHintHuman": "Visage de face, bien éclairé — et une seule personne sur la photo.",
-    "subjectHintPet": "L'image doit montrer clairement le visage de l'animal, de préférence de face.",
+    "subjectHintPet": "Le visage de l'animal bien visible de face — et un seul animal sur la photo.",
     "subjectHintRemoveBg": "Téléchargez une image où le sujet est clairement visible — nous supprimerons l'arrière-plan.",
     "chooseSubject": "Choisir le sujet",
     "previousVersions": "Versions précédentes",
@@ -287,6 +287,7 @@
     "zap": "Éclair"
   },
   "multiFace": {
+    "uploadRequirements": "Une photo par personne — visage de face, une seule personne par photo.",
     "uploadFor": "Téléverser le visage – {{label}}",
     "create": "Créer l’image",
     "recreate": "Créer à nouveau",

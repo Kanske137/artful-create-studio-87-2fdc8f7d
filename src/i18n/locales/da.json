@@ -151,7 +151,7 @@
     "chooseStyleOptional": "Vælg stil (valgfri)",
     "styleHintBackgroundOnly": "Baggrunden fjernes altid — stilen påvirker kun motivet.",
     "subjectHintHuman": "Ansigtet set lige forfra, godt belyst — og kun én person på billedet.",
-    "subjectHintPet": "Billedet skal vise dyrets ansigt tydeligt, gerne forfra.",
+    "subjectHintPet": "Dyrets ansigt tydeligt forfra — og kun ét dyr på billedet.",
     "subjectHintRemoveBg": "Upload et billede hvor motivet er tydeligt — vi fjerner baggrunden for dig.",
     "chooseSubject": "Vælg motiv",
     "previousVersions": "Tidligere versioner",
@@ -287,6 +287,7 @@
     "zap": "Lyn"
   },
   "multiFace": {
+    "uploadRequirements": "Ét foto pr. person — ansigtet lige forfra, kun én person pr. billede.",
     "uploadFor": "Upload ansigt – {{label}}",
     "create": "Skab billede",
     "recreate": "Skab igen",

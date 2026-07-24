@@ -151,7 +151,7 @@
     "chooseStyleOptional": "Wybierz styl (opcjonalnie)",
     "styleHintBackgroundOnly": "Tło jest zawsze usuwane — styl wpływa tylko na motyw.",
     "subjectHintHuman": "Twarz na wprost, dobrze oświetlona — i tylko jedna osoba na zdjęciu.",
-    "subjectHintPet": "Zdjęcie powinno wyraźnie pokazywać pysk zwierzęcia, najlepiej z przodu.",
+    "subjectHintPet": "Pysk zwierzęcia wyraźnie z przodu — i tylko jedno zwierzę na zdjęciu.",
     "subjectHintRemoveBg": "Prześlij zdjęcie, na którym motyw jest wyraźnie widoczny — usuniemy tło za Ciebie.",
     "chooseSubject": "Wybierz motyw",
     "previousVersions": "Poprzednie wersje",
@@ -287,6 +287,7 @@
     "zap": "Błyskawica"
   },
   "multiFace": {
+    "uploadRequirements": "Jedno zdjęcie na osobę — twarz na wprost, tylko jedna osoba na zdjęciu.",
     "uploadFor": "Prześlij twarz – {{label}}",
     "create": "Utwórz obraz",
     "recreate": "Utwórz ponownie",

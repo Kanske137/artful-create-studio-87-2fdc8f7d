@@ -151,7 +151,7 @@
     "chooseStyleOptional": "Scegli stile (opzionale)",
     "styleHintBackgroundOnly": "Lo sfondo viene sempre rimosso — lo stile influenza solo il soggetto.",
     "subjectHintHuman": "Viso frontale, ben illuminato — e una sola persona nella foto.",
-    "subjectHintPet": "L'immagine deve mostrare chiaramente il viso dell'animale, preferibilmente di fronte.",
+    "subjectHintPet": "Il muso dell'animale ben visibile frontalmente — e un solo animale nella foto.",
     "subjectHintRemoveBg": "Carica un'immagine dove il soggetto è chiaramente visibile — rimuoviamo lo sfondo per te.",
     "chooseSubject": "Scegli il soggetto",
     "previousVersions": "Versioni precedenti",
@@ -287,6 +287,7 @@
     "zap": "Fulmine"
   },
   "multiFace": {
+    "uploadRequirements": "Una foto a persona — viso frontale, una sola persona per foto.",
     "uploadFor": "Carica il volto – {{label}}",
     "create": "Crea immagine",
     "recreate": "Crea di nuovo",

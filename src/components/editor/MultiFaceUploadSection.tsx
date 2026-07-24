@@ -348,6 +348,9 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
         </div>
       )}
 
+      {/* Bildkrav — synligt vid själva uppladdningsrutorna, inte bara i guiden. */}
+      <p className="text-[11px] text-muted-foreground">{t("multiFace.uploadRequirements")}</p>
+
       <div className="grid grid-cols-1 gap-3">
         {slots.map((slot) => (
           <MultiFaceSlot

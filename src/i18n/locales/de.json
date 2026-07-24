@@ -151,7 +151,7 @@
     "chooseStyleOptional": "Stil wählen (optional)",
     "styleHintBackgroundOnly": "Der Hintergrund wird immer entfernt — der Stil betrifft nur das Motiv.",
     "subjectHintHuman": "Gesicht frontal, gut beleuchtet — und nur eine Person auf dem Bild.",
-    "subjectHintPet": "Das Bild sollte das Gesicht des Tieres deutlich zeigen, am besten von vorne.",
+    "subjectHintPet": "Das Gesicht des Tieres deutlich von vorn — und nur ein Tier auf dem Bild.",
     "subjectHintRemoveBg": "Lade ein Bild hoch, auf dem das Motiv klar sichtbar ist — wir entfernen den Hintergrund für dich.",
     "chooseSubject": "Motiv wählen",
     "previousVersions": "Frühere Versionen",
@@ -287,6 +287,7 @@
     "zap": "Blitz"
   },
   "multiFace": {
+    "uploadRequirements": "Ein Foto pro Person — Gesicht frontal, nur eine Person pro Bild.",
     "uploadFor": "Gesicht hochladen – {{label}}",
     "create": "Bild erstellen",
     "recreate": "Erneut erstellen",
