@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AiProgress } from "./AiProgress";
 import { GenerationFeedback } from "./GenerationFeedback";
+import { invalidatePreviousResults, PreviousResults, PreviousUploads } from "./PreviousResults";
 
 interface Props {
   presets: AiStylePreset[];
@@ -50,6 +51,7 @@ export function AiStyleSection({ presets, layerId }: Props) {
   const source = useEditorStore((s) => s.photoSources[layerId]);
   const aiPrintFileUrl = useEditorStore((s) => s.photoAiResults[layerId] ?? null);
   const setPhotoHashFor = useEditorStore((s) => s.setPhotoHashFor);
+  const setPhotoSourceFor = useEditorStore((s) => s.setPhotoSourceFor);
   const setOriginalPhotoUrlFor = useEditorStore((s) => s.setOriginalPhotoUrlFor);
   const setAiPrintFileUrlFor = useEditorStore((s) => s.setAiPrintFileUrlFor);
   const clearAiResultOnlyFor = useEditorStore((s) => s.clearAiResultOnlyFor);
@@ -163,6 +165,7 @@ export function AiStyleSection({ presets, layerId }: Props) {
       setAiPrintFileUrlFor(layerId, printFileUrl);
       if (hash) addAiResultToCache(hash, preset.id, preset.label, printFileUrl);
       markFreeGenerationUsed();
+      invalidatePreviousResults();
       toast.success(`Stil "${preset.label}" tillämpad`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Okänt fel";
@@ -181,9 +184,15 @@ export function AiStyleSection({ presets, layerId }: Props) {
 
   if (!photoFile) {
     return (
-      <p className="text-xs text-muted-foreground">
-        Ladda upp en bild först för att kunna välja AI-stil.
-      </p>
+      <div className="space-y-3">
+        <p className="text-xs text-muted-foreground">
+          Ladda upp en bild först för att kunna välja AI-stil.
+        </p>
+        {/* Tidigare uppladdade foton — klick använder fotot här direkt. */}
+        <PreviousUploads
+          onPick={(f) => setPhotoSourceFor(layerId, f, URL.createObjectURL(f))}
+        />
+      </div>
     );
   }
 
@@ -342,6 +351,16 @@ export function AiStyleSection({ presets, layerId }: Props) {
           </Button>
         </>
       )}
+
+      {/* Tidigare AI-stilresultat + uppladdade foton (sparade på servern). */}
+      <PreviousResults
+        subjectKinds={["style"]}
+        activeUrl={aiPrintFileUrl}
+        onPick={(url) => setAiPrintFileUrlFor(layerId, url)}
+      />
+      <PreviousUploads
+        onPick={(f) => setPhotoSourceFor(layerId, f, URL.createObjectURL(f))}
+      />
     </div>
   );
 }

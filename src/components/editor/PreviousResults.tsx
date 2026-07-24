@@ -156,8 +156,12 @@ export function PreviousUploads({ onPick, className }: PreviousUploadsProps) {
 }
 
 interface PreviousResultsProps {
-  /** Referens-URL:er som resultat måste höra till (lagrets alla referenser). */
-  referenceUrls: string[];
+  /** Referens-URL:er som resultat måste höra till (lagrets alla referenser).
+   *  Utelämnas när subjectKinds används i stället. */
+  referenceUrls?: string[];
+  /** Alternativ matchning: visa resultat av dessa subject_kind (t.ex. "style"
+   *  som saknar referensbilder). */
+  subjectKinds?: string[];
   /** Nuvarande valt resultat — markeras med ring. */
   activeUrl?: string | null;
   onPick: (url: string) => void;
@@ -166,6 +170,7 @@ interface PreviousResultsProps {
 
 export function PreviousResults({
   referenceUrls,
+  subjectKinds,
   activeUrl,
   onPick,
   className,
@@ -183,12 +188,13 @@ export function PreviousResults({
     };
   }, []);
 
-  const relevant = rows.filter(
-    (r) =>
-      !!r.output_image_url &&
-      !!r.reference_image_url &&
-      referenceUrls.includes(r.reference_image_url),
-  );
+  const relevant = rows.filter((r) => {
+    if (!r.output_image_url) return false;
+    if (subjectKinds && subjectKinds.length > 0) {
+      return subjectKinds.includes(r.subject_kind ?? "");
+    }
+    return !!r.reference_image_url && !!referenceUrls?.includes(r.reference_image_url);
+  });
   if (relevant.length === 0) return null;
 
   return (
