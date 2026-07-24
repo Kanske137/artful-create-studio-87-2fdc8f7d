@@ -194,6 +194,11 @@
     "send": "Send",
     "skip": "Hopp over"
   },
+  "previous": {
+    "title": "Tidligere bilder",
+    "use": "Bruk dette bildet",
+    "appliedToast": "Tidligere bilde valgt"
+  },
   "cartAdd": {
     "blockedGeneration": "Last opp bildet ditt og trykk Skap nå før du bestiller",
     "blockedPhoto": "Last opp bildet ditt før du bestiller",

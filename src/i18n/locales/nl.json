@@ -194,6 +194,11 @@
     "send": "Versturen",
     "skip": "Overslaan"
   },
+  "previous": {
+    "title": "Eerdere afbeeldingen",
+    "use": "Gebruik deze afbeelding",
+    "appliedToast": "Eerdere afbeelding geselecteerd"
+  },
   "cartAdd": {
     "blockedGeneration": "Upload je foto en druk op Nu maken voordat je bestelt",
     "blockedPhoto": "Upload je foto voordat je bestelt",

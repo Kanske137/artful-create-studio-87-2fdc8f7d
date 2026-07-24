@@ -194,6 +194,11 @@
     "send": "Envoyer",
     "skip": "Passer"
   },
+  "previous": {
+    "title": "Images précédentes",
+    "use": "Utiliser cette image",
+    "appliedToast": "Image précédente sélectionnée"
+  },
   "cartAdd": {
     "blockedGeneration": "Téléchargez votre photo et appuyez sur Créer avant de commander",
     "blockedPhoto": "Téléchargez votre photo avant de commander",

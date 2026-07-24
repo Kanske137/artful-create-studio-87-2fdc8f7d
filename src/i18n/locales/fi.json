@@ -194,6 +194,11 @@
     "send": "Lähetä",
     "skip": "Ohita"
   },
+  "previous": {
+    "title": "Aiemmat kuvat",
+    "use": "Käytä tätä kuvaa",
+    "appliedToast": "Aiempi kuva valittu"
+  },
   "cartAdd": {
     "blockedGeneration": "Lataa kuvasi ja paina Luo nyt ennen tilaamista",
     "blockedPhoto": "Lataa kuvasi ennen tilaamista",
