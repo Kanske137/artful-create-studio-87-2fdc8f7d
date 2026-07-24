@@ -15,10 +15,12 @@ import {
   ShoppingCart,
   Smartphone,
   Sparkles,
+  Users,
   Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import {
   cartPreviewUrl,
@@ -26,11 +28,13 @@ import {
   fetchFeedback,
   fetchGenerations,
   fetchSessions,
+  fetchSummaryCounts,
   shopifyOrderAdminUrl,
   type EventRow,
   type FeedbackRow,
   type GenerationRow,
   type SessionRow,
+  type SummaryCounts,
 } from "@/lib/admin-analytics";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -84,34 +88,60 @@ export default function AnalyticsPage() {
   const [events, setEvents] = useState<EventRow[]>([]);
   const [generations, setGenerations] = useState<GenerationRow[]>([]);
   const [feedback, setFeedback] = useState<FeedbackRow[]>([]);
+  const [counts, setCounts] = useState<SummaryCounts | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [s, e, g, f] = await Promise.all([
-        fetchSessions(),
-        fetchEvents(),
-        fetchGenerations(),
-        // Feedback-tabellen kan saknas tills migrationen körts — svälj felet.
-        fetchFeedback().catch(() => [] as FeedbackRow[]),
-      ]);
-      setSessions(s);
-      setEvents(e);
-      setGenerations(g);
-      setFeedback(f);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Okänt fel");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // Filter (klientsidigt över det inlästa fönstret).
+  const [q, setQ] = useState("");
+  const [handleFilter, setHandleFilter] = useState("alla");
+  const [activityFilter, setActivityFilter] = useState<
+    "alla" | "upload" | "gen" | "cart" | "order" | "feedback"
+  >("alla");
+  const [periodDays, setPeriodDays] = useState(7);
+
+  const load = useCallback(
+    async (silent = false) => {
+      if (!silent) setLoading(true);
+      setError(null);
+      try {
+        const since = new Date(Date.now() - periodDays * 24 * 60 * 60 * 1000).toISOString();
+        const [s, e, g, f, c] = await Promise.all([
+          fetchSessions(),
+          fetchEvents(),
+          fetchGenerations(),
+          // Feedback-tabellen kan saknas tills migrationen körts — svälj felet.
+          fetchFeedback().catch(() => [] as FeedbackRow[]),
+          // Riktiga räknare utan hämtningstak — faller tillbaka på listorna.
+          fetchSummaryCounts(since).catch(() => null),
+        ]);
+        setSessions(s);
+        setEvents(e);
+        setGenerations(g);
+        setFeedback(f);
+        setCounts(c);
+        setLastUpdated(new Date());
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Okänt fel");
+      } finally {
+        if (!silent) setLoading(false);
+      }
+    },
+    [periodDays],
+  );
 
   useEffect(() => {
     void load();
+  }, [load]);
+
+  // Auto-uppdatering varje minut — tyst, utan spinner som stör läsningen.
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      void load(true);
+    }, 60_000);
+    return () => window.clearInterval(id);
   }, [load]);
 
   const aggBySession = useMemo(() => {
@@ -194,21 +224,168 @@ export default function AnalyticsPage() {
       .sort((a, b) => new Date(b.last_seen_at).getTime() - new Date(a.last_seen_at).getTime());
   }, [sessions, events, generations, feedback]);
 
+  const periodMs = periodDays * 24 * 60 * 60 * 1000;
+
   const summary = useMemo(() => {
-    const cutoff = Date.now() - WEEK_MS;
-    const recentSessions = sessions.filter((s) => new Date(s.last_seen_at).getTime() >= cutoff);
+    const cutoff = Date.now() - periodMs;
+    const recentSessions = sessionsByActivity.filter(
+      (s) => new Date(s.last_seen_at).getTime() >= cutoff,
+    );
     const recentEvents = events.filter((e) => new Date(e.ts).getTime() >= cutoff);
     const recentGens = generations.filter((g) => new Date(g.created_at).getTime() >= cutoff);
     const ok = recentGens.filter((g) => g.status === "succeeded").length;
     const done = recentGens.filter((g) => g.status !== "started").length;
+    const up = feedback.filter(
+      (f) => f.rating === "up" && new Date(f.created_at).getTime() >= cutoff,
+    ).length;
+    const down = feedback.filter(
+      (f) => f.rating === "down" && new Date(f.created_at).getTime() >= cutoff,
+    ).length;
     return {
-      sessions: recentSessions.length,
-      gens: recentGens.length,
-      gensRate: done > 0 ? Math.round((ok / done) * 100) : null,
-      cartAdds: recentEvents.filter((e) => e.type === "add_to_cart").length,
-      orders: recentEvents.filter((e) => e.type === "order_placed").length,
+      sessions: counts?.sessions ?? recentSessions.length,
+      gens: counts?.generations ?? recentGens.length,
+      gensRate:
+        counts && counts.generations > 0
+          ? Math.round((counts.generationsOk / counts.generations) * 100)
+          : done > 0
+            ? Math.round((ok / done) * 100)
+            : null,
+      cartAdds: counts?.cartAdds ?? recentEvents.filter((e) => e.type === "add_to_cart").length,
+      orders: counts?.orders ?? recentEvents.filter((e) => e.type === "order_placed").length,
+      feedbackUp: counts?.feedbackUp ?? up,
+      feedbackDown: counts?.feedbackDown ?? down,
     };
+  }, [sessionsByActivity, events, generations, feedback, counts, periodMs]);
+
+  // Tratt inom perioden (från inläst fönster): hur långt sessionerna når.
+  const funnel = useMemo(() => {
+    const cutoff = Date.now() - periodMs;
+    const active = new Set<string>();
+    for (const s of sessionsByActivity) {
+      if (new Date(s.last_seen_at).getTime() >= cutoff) active.add(s.session_key);
+    }
+    const withUpload = new Set<string>();
+    const withCart = new Set<string>();
+    const withOrder = new Set<string>();
+    for (const e of events) {
+      if (new Date(e.ts).getTime() < cutoff) continue;
+      if (e.type === "photo_uploaded") withUpload.add(e.session_key);
+      else if (e.type === "add_to_cart") withCart.add(e.session_key);
+      else if (e.type === "order_placed") withOrder.add(e.session_key);
+    }
+    const withGen = new Set<string>();
+    for (const g of generations) {
+      if (!g.session_key || g.status !== "succeeded") continue;
+      if (new Date(g.created_at).getTime() < cutoff) continue;
+      withGen.add(g.session_key);
+    }
+    const base = active.size;
+    const pct = (n: number) => (base > 0 ? Math.round((n / base) * 100) : 0);
+    return {
+      base,
+      upload: withUpload.size,
+      uploadPct: pct(withUpload.size),
+      gen: withGen.size,
+      genPct: pct(withGen.size),
+      cart: withCart.size,
+      cartPct: pct(withCart.size),
+      order: withOrder.size,
+      orderPct: pct(withOrder.size),
+    };
+  }, [sessionsByActivity, events, generations, periodMs]);
+
+  // Mallar per session (för mallfiltret) + alla kända mallar.
+  const handlesBySession = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    const add = (key: string | null | undefined, handle: string | null | undefined) => {
+      if (!key || !handle) return;
+      let set = map.get(key);
+      if (!set) {
+        set = new Set();
+        map.set(key, set);
+      }
+      set.add(handle);
+    };
+    for (const s of sessions) add(s.session_key, s.first_handle);
+    for (const e of events) add(e.session_key, e.handle);
+    for (const g of generations) add(g.session_key, g.handle);
+    return map;
   }, [sessions, events, generations]);
+
+  const allHandles = useMemo(() => {
+    const set = new Set<string>();
+    for (const handles of handlesBySession.values()) for (const h of handles) set.add(h);
+    return [...set].sort();
+  }, [handlesBySession]);
+
+  const feedbackSessions = useMemo(() => {
+    const set = new Set<string>();
+    for (const f of feedback) if (f.session_key) set.add(f.session_key);
+    return set;
+  }, [feedback]);
+
+  // Filtrerade sessioner (period + aktivitet + mall + fritext).
+  const visibleSessions = useMemo(() => {
+    const cutoff = Date.now() - periodMs;
+    const qq = q.trim().toLowerCase();
+    return sessionsByActivity.filter((s) => {
+      if (new Date(s.last_seen_at).getTime() < cutoff) return false;
+      const a = aggBySession.get(s.session_key) ?? EMPTY_AGG;
+      if (activityFilter === "upload" && a.uploads === 0) return false;
+      if (activityFilter === "gen" && a.gens === 0) return false;
+      if (activityFilter === "cart" && a.cartAdds === 0) return false;
+      if (activityFilter === "order" && a.orders === 0) return false;
+      if (activityFilter === "feedback" && !feedbackSessions.has(s.session_key)) return false;
+      if (handleFilter !== "alla" && !handlesBySession.get(s.session_key)?.has(handleFilter)) {
+        return false;
+      }
+      if (
+        qq &&
+        !s.session_key.toLowerCase().includes(qq) &&
+        !(s.email ?? "").toLowerCase().includes(qq)
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }, [
+    sessionsByActivity,
+    aggBySession,
+    feedbackSessions,
+    handlesBySession,
+    activityFilter,
+    handleFilter,
+    q,
+    periodMs,
+  ]);
+
+  // Gruppera per person när e-post finns — samma kund har ofta flera sessioner
+  // (en per enhet/webbläsarkontext), vilket annars ser ut som "fel datum".
+  const grouped = useMemo(() => {
+    type Item =
+      | { kind: "person"; email: string; sessions: SessionRow[] }
+      | { kind: "anon"; session: SessionRow };
+    const byEmail = new Map<string, SessionRow[]>();
+    for (const s of visibleSessions) {
+      if (!s.email) continue;
+      const list = byEmail.get(s.email);
+      if (list) list.push(s);
+      else byEmail.set(s.email, [s]);
+    }
+    const items: Item[] = [];
+    const seenEmails = new Set<string>();
+    for (const s of visibleSessions) {
+      if (s.email) {
+        if (!seenEmails.has(s.email)) {
+          seenEmails.add(s.email);
+          items.push({ kind: "person", email: s.email, sessions: byEmail.get(s.email)! });
+        }
+      } else {
+        items.push({ kind: "anon", session: s });
+      }
+    }
+    return items;
+  }, [visibleSessions]);
 
   const detailFor = (sessionKey: string) => {
     const evts = events.filter((e) => e.session_key === sessionKey);
@@ -362,22 +539,104 @@ export default function AnalyticsPage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-        {/* Sammanfattning senaste 7 dagarna */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {/* Sammanfattning för vald period — riktiga räknare, ej takade av listgränser */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {[
-            { label: "Sessioner (7 d)", value: String(summary.sessions) },
+            { label: `Sessioner (${periodDays} d)`, value: String(summary.sessions) },
             {
-              label: "Genereringar (7 d)",
+              label: `Genereringar (${periodDays} d)`,
               value: `${summary.gens}${summary.gensRate !== null ? ` · ${summary.gensRate}% ok` : ""}`,
             },
-            { label: "Lagt i varukorg (7 d)", value: String(summary.cartAdds) },
-            { label: "Ordrar (7 d)", value: String(summary.orders) },
+            { label: `Varukorg (${periodDays} d)`, value: String(summary.cartAdds) },
+            { label: `Ordrar (${periodDays} d)`, value: String(summary.orders) },
+            {
+              label: `Feedback (${periodDays} d)`,
+              value: `👍 ${summary.feedbackUp} · 👎 ${summary.feedbackDown}`,
+            },
           ].map((c) => (
             <div key={c.label} className="rounded-lg border bg-card p-4">
               <div className="text-xs uppercase tracking-wider text-muted-foreground">{c.label}</div>
               <div className="text-2xl font-semibold mt-1">{c.value}</div>
             </div>
           ))}
+        </div>
+
+        {/* Tratt: hur långt sessionerna når inom perioden */}
+        <div className="rounded-lg border bg-card p-4 text-sm flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="font-medium">{funnel.base} sessioner</span>
+          <span className="text-muted-foreground">→</span>
+          <span>
+            {funnel.upload} laddade upp <b>({funnel.uploadPct} %)</b>
+          </span>
+          <span className="text-muted-foreground">→</span>
+          <span>
+            {funnel.gen} genererade <b>({funnel.genPct} %)</b>
+          </span>
+          <span className="text-muted-foreground">→</span>
+          <span>
+            {funnel.cart} varukorg <b>({funnel.cartPct} %)</b>
+          </span>
+          <span className="text-muted-foreground">→</span>
+          <span>
+            {funnel.order} köpte <b>({funnel.orderPct} %)</b>
+          </span>
+          {lastUpdated && (
+            <span className="ml-auto text-xs text-muted-foreground">
+              Uppdaterad {lastUpdated.toLocaleTimeString("sv-SE")} · auto varje minut
+            </span>
+          )}
+        </div>
+
+        {/* Filter */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1">
+            {(
+              [
+                ["alla", "Alla"],
+                ["upload", "Uppladdning"],
+                ["gen", "Generering"],
+                ["cart", "Varukorg"],
+                ["order", "Köp"],
+                ["feedback", "Feedback"],
+              ] as const
+            ).map(([key, label]) => (
+              <Button
+                key={key}
+                size="sm"
+                variant={activityFilter === key ? "default" : "outline"}
+                onClick={() => setActivityFilter(key)}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
+          <select
+            value={handleFilter}
+            onChange={(e) => setHandleFilter(e.target.value)}
+            className="h-9 rounded-md border bg-background px-2 text-sm"
+          >
+            <option value="alla">Alla mallar</option>
+            {allHandles.map((h) => (
+              <option key={h} value={h}>
+                {h}
+              </option>
+            ))}
+          </select>
+          <select
+            value={periodDays}
+            onChange={(e) => setPeriodDays(Number(e.target.value))}
+            className="h-9 rounded-md border bg-background px-2 text-sm"
+          >
+            <option value={1}>Idag (24 h)</option>
+            <option value={7}>7 dagar</option>
+            <option value={30}>30 dagar</option>
+          </select>
+          <Input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Sök e-post eller sessions-id…"
+            className="h-9 w-56"
+          />
         </div>
 
         {error && (
@@ -399,7 +658,8 @@ export default function AnalyticsPage() {
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               Senaste sessionerna
             </h2>
-            {sessionsByActivity.map((s) => {
+            {(() => {
+              const renderSession = (s: SessionRow) => {
               const a = aggBySession.get(s.session_key) ?? EMPTY_AGG;
               const isOpen = expanded === s.session_key;
               return (
@@ -475,10 +735,45 @@ export default function AnalyticsPage() {
                   )}
                 </div>
               );
-            })}
+              };
+              if (grouped.length === 0) {
+                return (
+                  <div className="p-6 rounded-lg border border-dashed text-center text-sm text-muted-foreground">
+                    Inga sessioner matchar filtren.
+                  </div>
+                );
+              }
+              return grouped.map((item) =>
+                item.kind === "anon" ? (
+                  renderSession(item.session)
+                ) : (
+                  <div
+                    key={`person:${item.email}`}
+                    className="rounded-lg border-2 border-primary/25 bg-card/60 p-2 space-y-2"
+                  >
+                    <div className="flex items-center gap-2 px-2 pt-1 text-sm flex-wrap">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-semibold">{item.email}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {item.sessions.length}{" "}
+                        {item.sessions.length === 1 ? "session" : "sessioner"} · första besök{" "}
+                        {new Date(
+                          Math.min(...item.sessions.map((x) => new Date(x.created_at).getTime())),
+                        ).toLocaleDateString("sv-SE")}{" "}
+                        · senast aktiv {timeAgo(item.sessions[0].last_seen_at)}
+                      </span>
+                    </div>
+                    {item.sessions.map(renderSession)}
+                  </div>
+                ),
+              );
+            })()}
             <p className="text-[11px] text-muted-foreground pt-1">
-              Visar senaste {sessions.length} sessionerna, {events.length} händelserna och{" "}
-              {generations.length} genereringarna. Kundbilder öppnas i ny flik.
+              Visar {visibleSessions.length} av {sessionsByActivity.length} inlästa sessioner
+              (fönster: {sessions.length} sessioner, {events.length} händelser,{" "}
+              {generations.length} genereringar). En session = en enhet/webbläsarkontext — samma
+              kund kan ha flera, och med registrerad e-post grupperas de till en person.
+              Kundbilder öppnas i ny flik.
             </p>
           </div>
         )}
