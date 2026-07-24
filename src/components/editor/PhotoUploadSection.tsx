@@ -83,9 +83,6 @@ export function PhotoUploadSection({ layerId }: Props) {
           <span className="text-[11px] text-muted-foreground">
             {t("photo.uploadHint")}
           </span>
-          <span className="text-[11px] text-muted-foreground/80">
-            {t("trust.uploadNote")}
-          </span>
         </button>
       ) : (
         <div className="space-y-2">
