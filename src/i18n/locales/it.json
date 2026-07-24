@@ -215,7 +215,12 @@
   "steps": {
     "flow": "1. Carica · 2. Crea · 3. Ordina"
   },
+  "demo": {
+    "tryButton": "Prova con un'immagine di esempio",
+    "remove": "Rimuovi l'immagine di esempio"
+  },
   "cartAdd": {
+    "blockedDemo": "L'immagine di esempio non può essere ordinata – carica prima la tua foto",
     "blockedGeneration": "Carica la tua foto e premi Crea ora prima di ordinare",
     "blockedPhoto": "Carica la tua foto prima di ordinare",
     "blockedPhotoMulti": "Riempi tutti gli spazi foto prima di ordinare",

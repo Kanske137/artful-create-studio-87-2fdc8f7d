@@ -215,7 +215,12 @@
   "steps": {
     "flow": "1. Prześlij · 2. Utwórz · 3. Zamów"
   },
+  "demo": {
+    "tryButton": "Wypróbuj z przykładowym obrazem",
+    "remove": "Usuń przykładowy obraz"
+  },
   "cartAdd": {
+    "blockedDemo": "Przykładowego obrazu nie można zamówić – najpierw prześlij własne zdjęcie",
     "blockedGeneration": "Prześlij zdjęcie i naciśnij Utwórz teraz przed zamówieniem",
     "blockedPhoto": "Prześlij zdjęcie przed zamówieniem",
     "blockedPhotoMulti": "Wypełnij wszystkie miejsca na zdjęcia przed zamówieniem",

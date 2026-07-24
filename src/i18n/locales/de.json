@@ -215,7 +215,12 @@
   "steps": {
     "flow": "1. Hochladen · 2. Erstellen · 3. Bestellen"
   },
+  "demo": {
+    "tryButton": "Mit Beispielbild ausprobieren",
+    "remove": "Beispielbild entfernen"
+  },
   "cartAdd": {
+    "blockedDemo": "Das Beispielbild kann nicht bestellt werden – lade zuerst dein eigenes Foto hoch",
     "blockedGeneration": "Lade dein Foto hoch und drücke Jetzt erstellen, bevor du bestellst",
     "blockedPhoto": "Lade dein Foto hoch, bevor du bestellst",
     "blockedPhotoMulti": "Fülle alle Bildfelder aus, bevor du bestellst",

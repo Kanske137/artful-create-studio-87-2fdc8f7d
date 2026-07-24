@@ -275,7 +275,9 @@ export default function EditorPage() {
     ? t(
         blockReason === "generation"
           ? "cartAdd.blockedGeneration"
-          : blockReason === "photo"
+          : blockReason === "demo"
+            ? "cartAdd.blockedDemo"
+            : blockReason === "photo"
             ? "cartAdd.blockedPhoto"
             : blockReason === "photoMulti"
               ? "cartAdd.blockedPhotoMulti"

@@ -90,6 +90,9 @@ export const photoDefaultsSchema = z.object({
   fit: imageFitSchema,
   /** Optional placeholder image URL the admin can supply for preview only. */
   placeholderUrl: z.string().url().optional(),
+  /** Valfritt förberett demo-resultat ("Prova med exempelbild", Paket D2).
+   *  Visas via demo-knappen i editorn och spärras alltid från beställning. */
+  demoResultUrl: z.string().url().optional(),
 });
 export type PhotoDefaults = z.infer<typeof photoDefaultsSchema>;
 
@@ -113,6 +116,10 @@ export type AiPhotoSubjectKind = z.infer<typeof aiPhotoSubjectKindSchema>;
 export const aiPhotoDefaultsSchema = z.object({
   shape: photoShapeSchema,
   fit: imageFitSchema,
+  /** Valfritt förberett demo-resultat ("Prova med exempelbild", Paket D2) —
+   *  främst för removeBackground-mallar utan referensbild. Spärras alltid
+   *  från beställning. */
+  demoResultUrl: z.string().url().optional(),
   /** Admin-uploaded reference image (the king/princess/etc body+outfit).
    *  Legacy: kept in sync with `referenceImages[0]?.url` when the admin uses
    *  the multi-reference list, so snapshot/print pipelines stay unchanged. */

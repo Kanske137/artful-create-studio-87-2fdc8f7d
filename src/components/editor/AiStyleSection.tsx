@@ -183,11 +183,33 @@ export function AiStyleSection({ presets, layerId }: Props) {
   };
 
   if (!photoFile) {
+    // Demo (Paket D2): förberett exempelresultat när mallen saknar förhands-
+    // bild. Spärras alltid från beställning i orderBlockReason.
+    const demoUrl =
+      (useEditorStore
+        .getState()
+        .templateLayers()
+        .find((l) => l.id === layerId)?.defaults as { demoResultUrl?: string } | undefined)
+        ?.demoResultUrl ?? null;
+    const demoActive = !!demoUrl && aiPrintFileUrl === demoUrl;
     return (
       <div className="space-y-3">
         <p className="text-xs text-muted-foreground">
           Ladda upp en bild först för att kunna välja AI-stil.
         </p>
+        {demoUrl && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() =>
+              demoActive ? clearAiResultOnlyFor(layerId) : setAiPrintFileUrlFor(layerId, demoUrl)
+            }
+          >
+            {demoActive ? t("demo.remove") : t("demo.tryButton")}
+          </Button>
+        )}
         {/* Tidigare uppladdade foton — klick använder fotot här direkt. */}
         <PreviousUploads
           onPick={(f) => setPhotoSourceFor(layerId, f, URL.createObjectURL(f))}

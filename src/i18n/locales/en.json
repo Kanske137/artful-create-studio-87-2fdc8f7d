@@ -215,7 +215,12 @@
   "steps": {
     "flow": "1. Upload · 2. Create · 3. Order"
   },
+  "demo": {
+    "tryButton": "Try with an example image",
+    "remove": "Remove the example image"
+  },
   "cartAdd": {
+    "blockedDemo": "The example image can't be ordered – upload your own photo first",
     "blockedGeneration": "Upload your photo and press Create now before ordering",
     "blockedPhoto": "Upload your photo before ordering",
     "blockedPhotoMulti": "Fill all photo slots before ordering",

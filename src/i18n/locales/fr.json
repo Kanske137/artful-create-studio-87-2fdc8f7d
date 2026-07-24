@@ -215,7 +215,12 @@
   "steps": {
     "flow": "1. Téléchargez · 2. Créez · 3. Commandez"
   },
+  "demo": {
+    "tryButton": "Essayer avec une image d'exemple",
+    "remove": "Retirer l'image d'exemple"
+  },
   "cartAdd": {
+    "blockedDemo": "L'image d'exemple ne peut pas être commandée – téléchargez d'abord votre propre photo",
     "blockedGeneration": "Téléchargez votre photo et appuyez sur Créer avant de commander",
     "blockedPhoto": "Téléchargez votre photo avant de commander",
     "blockedPhotoMulti": "Remplissez tous les emplacements photo avant de commander",

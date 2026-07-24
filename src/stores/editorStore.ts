@@ -339,7 +339,7 @@ interface EditorState {
    *   - "customize": mall utan bildlager (t.ex. karttavla) där kunden inte
    *     ändrat någon parameter alls från default
    *  Freeform-mallar hanteras separat via hasDesignContent(). */
-  orderBlockReason: () => "generation" | "photo" | "photoMulti" | "customize" | null;
+  orderBlockReason: () => "generation" | "photo" | "photoMulti" | "customize" | "demo" | null;
 
   // ---------- legacy globals (derived getters; mutators apply to first layer) ----------
   // These setters/getters keep older code (EditorPage cart payload, snapshot
@@ -1627,6 +1627,16 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (state.config?.is_freeform) return null;
     const layers = state.templateLayers().filter((l) => !state.hiddenLayerIds[l.id]);
     if (layers.length === 0) return null;
+
+    // 0) Demo-resultat ("Prova med exempelbild") får aldrig beställas.
+    const demoActive = layers.some((l) => {
+      const demoUrl = (l.defaults as { demoResultUrl?: string }).demoResultUrl;
+      if (!demoUrl) return false;
+      if (l.type === "aiPhoto") return state.aiPhotoResults[l.id] === demoUrl;
+      if (l.type === "photo") return state.photoAiResults[l.id] === demoUrl;
+      return false;
+    });
+    if (demoActive) return "demo";
 
     // 1) aiPhoto utan resultat skulle trycka admin-referensen som den är.
     if (layers.some((l) => l.type === "aiPhoto" && !state.aiPhotoResults[l.id])) {

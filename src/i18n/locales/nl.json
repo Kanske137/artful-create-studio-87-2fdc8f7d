@@ -215,7 +215,12 @@
   "steps": {
     "flow": "1. Upload · 2. Creëer · 3. Bestel"
   },
+  "demo": {
+    "tryButton": "Probeer met een voorbeeldafbeelding",
+    "remove": "Voorbeeldafbeelding verwijderen"
+  },
   "cartAdd": {
+    "blockedDemo": "De voorbeeldafbeelding kan niet besteld worden – upload eerst je eigen foto",
     "blockedGeneration": "Upload je foto en druk op Nu maken voordat je bestelt",
     "blockedPhoto": "Upload je foto voordat je bestelt",
     "blockedPhotoMulti": "Vul alle fotovakken voordat je bestelt",

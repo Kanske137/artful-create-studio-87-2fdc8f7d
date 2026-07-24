@@ -514,6 +514,26 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
         />
       </div>
 
+      {/* Demo (Paket D2): förberett exempelresultat för mallar utan referens-
+          förhandsbild. Spärras alltid från beställning i orderBlockReason. */}
+      {(() => {
+        const demoUrl = (layer.defaults as { demoResultUrl?: string }).demoResultUrl ?? null;
+        if (!demoUrl || !isRemoveBg || source) return null;
+        const demoActive = result === demoUrl;
+        return (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() => setAiPhotoResult(layer.id, demoActive ? "" : demoUrl)}
+          >
+            <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+            {demoActive ? t("demo.remove") : t("demo.tryButton")}
+          </Button>
+        );
+      })()}
+
       {/* Style picker — only for removeBackground when the template has presets. */}
       {isRemoveBg && visibleStyles.length > 1 && (
         <div className="space-y-2">

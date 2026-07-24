@@ -215,7 +215,12 @@
   "steps": {
     "flow": "1. Lataa · 2. Luo · 3. Tilaa"
   },
+  "demo": {
+    "tryButton": "Kokeile esimerkkikuvalla",
+    "remove": "Poista esimerkkikuva"
+  },
   "cartAdd": {
+    "blockedDemo": "Esimerkkikuvaa ei voi tilata – lataa ensin oma kuvasi",
     "blockedGeneration": "Lataa kuvasi ja paina Luo nyt ennen tilaamista",
     "blockedPhoto": "Lataa kuvasi ennen tilaamista",
     "blockedPhotoMulti": "Täytä kaikki kuvapaikat ennen tilaamista",

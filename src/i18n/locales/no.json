@@ -215,7 +215,12 @@
   "steps": {
     "flow": "1. Last opp · 2. Skap · 3. Bestill"
   },
+  "demo": {
+    "tryButton": "Prøv med eksempelbilde",
+    "remove": "Fjern eksempelbildet"
+  },
   "cartAdd": {
+    "blockedDemo": "Eksempelbildet kan ikke bestilles – last opp ditt eget foto først",
     "blockedGeneration": "Last opp bildet ditt og trykk Skap nå før du bestiller",
     "blockedPhoto": "Last opp bildet ditt før du bestiller",
     "blockedPhotoMulti": "Fyll alle bildeplassene før du bestiller",

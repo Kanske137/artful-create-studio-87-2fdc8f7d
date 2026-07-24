@@ -215,7 +215,12 @@
   "steps": {
     "flow": "1. Sube · 2. Crea · 3. Pide"
   },
+  "demo": {
+    "tryButton": "Probar con una imagen de ejemplo",
+    "remove": "Quitar la imagen de ejemplo"
+  },
   "cartAdd": {
+    "blockedDemo": "La imagen de ejemplo no se puede pedir – sube primero tu propia foto",
     "blockedGeneration": "Sube tu foto y pulsa Crear ahora antes de pedir",
     "blockedPhoto": "Sube tu foto antes de pedir",
     "blockedPhotoMulti": "Rellena todos los espacios de foto antes de pedir",
