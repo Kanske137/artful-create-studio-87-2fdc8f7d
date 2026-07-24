@@ -655,10 +655,12 @@ export function MapPreview({
                     />
                     {/* Vattenmärke på bildlagret — endast förhandsvisning. */}
                     {src ? <WatermarkOverlay clipPath={clip} /> : null}
-                    {/* Exempelpill när demo-resultatet visas (Paket D2). */}
-                    {!!photoAiResults[l.id] &&
-                      photoAiResults[l.id] ===
-                        (l.defaults as { demoResultUrl?: string }).demoResultUrl && (
+                    {/* Exempelpill när placeholder/demo visas (Paket D2) —
+                        även vanliga bildlager märker sina exempelbilder. */}
+                    {!!src &&
+                      (src === (l.defaults.placeholderUrl ?? null) ||
+                        src ===
+                          ((l.defaults as { demoResultUrl?: string }).demoResultUrl ?? null)) && (
                         <div
                           aria-hidden="true"
                           style={{
@@ -707,7 +709,12 @@ export function MapPreview({
               ?? orientationMatches[0]?.url
               ?? l.defaults.referenceImageUrl
               ?? null;
-            const src = aiResultUrl ?? activeRefUrl;
+            // Demo-exemplet visas AUTOMATISKT när lagret saknar både resultat
+            // och referens (Paket D2, Akrams design: inget knapptryck) —
+            // beställningsspärren utgår från att resultat saknas.
+            const demoFallbackUrl =
+              (l.defaults as { demoResultUrl?: string }).demoResultUrl ?? null;
+            const src = aiResultUrl ?? activeRefUrl ?? demoFallbackUrl;
             const activeRef = activeRefUrl ? (refList.find((r) => r.url === activeRefUrl) ?? null) : null;
             const refFocalX = activeRef?.focalX ?? 0;
             const refFocalY = activeRef?.focalY ?? 0;
