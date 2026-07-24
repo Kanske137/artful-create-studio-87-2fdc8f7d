@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     const { data, error } = await db
       .from("generations")
       .select(
-        "design_id, subject_kind, handle, layer_id, reference_image_url, output_image_url, style_id, style_label, created_at",
+        "design_id, subject_kind, handle, layer_id, reference_image_url, input_image_url, input_image_urls, output_image_url, style_id, style_label, created_at",
       )
       .eq("session_key", sessionKey)
       .eq("status", "succeeded")

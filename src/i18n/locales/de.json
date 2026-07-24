@@ -199,6 +199,13 @@
     "use": "Dieses Bild verwenden",
     "appliedToast": "Früheres Bild ausgewählt"
   },
+  "previousUploads": {
+    "title": "Deine hochgeladenen Fotos",
+    "use": "Dieses Foto verwenden",
+    "appliedToast": "Foto ausgewählt — drücke Erstellen",
+    "failedToast": "Foto konnte nicht geladen werden. Bitte erneut versuchen.",
+    "allSlotsFull": "Alle Plätze sind belegt — entferne zuerst ein Porträt."
+  },
   "cartAdd": {
     "blockedGeneration": "Lade dein Foto hoch und drücke Jetzt erstellen, bevor du bestellst",
     "blockedPhoto": "Lade dein Foto hoch, bevor du bestellst",

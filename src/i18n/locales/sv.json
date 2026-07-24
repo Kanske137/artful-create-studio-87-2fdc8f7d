@@ -199,6 +199,13 @@
     "use": "Använd denna bild",
     "appliedToast": "Tidigare bild vald"
   },
+  "previousUploads": {
+    "title": "Dina uppladdade foton",
+    "use": "Använd detta foto",
+    "appliedToast": "Foto valt — tryck Skapa",
+    "failedToast": "Kunde inte hämta fotot. Försök igen.",
+    "allSlotsFull": "Alla platser är fyllda — ta bort ett porträtt först."
+  },
   "cartAdd": {
     "blockedGeneration": "Ladda upp din bild och tryck Skapa nu innan du beställer",
     "blockedPhoto": "Ladda upp din bild innan du beställer",

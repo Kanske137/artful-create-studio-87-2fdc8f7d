@@ -199,6 +199,13 @@
     "use": "Käytä tätä kuvaa",
     "appliedToast": "Aiempi kuva valittu"
   },
+  "previousUploads": {
+    "title": "Lataamasi kuvat",
+    "use": "Käytä tätä kuvaa",
+    "appliedToast": "Kuva valittu — paina Luo",
+    "failedToast": "Kuvaa ei voitu hakea. Yritä uudelleen.",
+    "allSlotsFull": "Kaikki paikat ovat täynnä — poista ensin yksi muotokuva."
+  },
   "cartAdd": {
     "blockedGeneration": "Lataa kuvasi ja paina Luo nyt ennen tilaamista",
     "blockedPhoto": "Lataa kuvasi ennen tilaamista",

@@ -199,6 +199,13 @@
     "use": "Use this image",
     "appliedToast": "Previous image selected"
   },
+  "previousUploads": {
+    "title": "Your uploaded photos",
+    "use": "Use this photo",
+    "appliedToast": "Photo selected — press Create",
+    "failedToast": "Couldn't fetch the photo. Please try again.",
+    "allSlotsFull": "All slots are filled — remove a portrait first."
+  },
   "cartAdd": {
     "blockedGeneration": "Upload your photo and press Create now before ordering",
     "blockedPhoto": "Upload your photo before ordering",

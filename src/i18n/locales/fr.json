@@ -199,6 +199,13 @@
     "use": "Utiliser cette image",
     "appliedToast": "Image précédente sélectionnée"
   },
+  "previousUploads": {
+    "title": "Vos photos téléchargées",
+    "use": "Utiliser cette photo",
+    "appliedToast": "Photo sélectionnée — appuyez sur Créer",
+    "failedToast": "Impossible de récupérer la photo. Veuillez réessayer.",
+    "allSlotsFull": "Tous les emplacements sont remplis — retirez d'abord un portrait."
+  },
   "cartAdd": {
     "blockedGeneration": "Téléchargez votre photo et appuyez sur Créer avant de commander",
     "blockedPhoto": "Téléchargez votre photo avant de commander",

@@ -35,7 +35,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AiProgress } from "./AiProgress";
 import { GenerationFeedback } from "./GenerationFeedback";
-import { invalidatePreviousResults, PreviousResults } from "./PreviousResults";
+import { invalidatePreviousResults, PreviousResults, PreviousUploads } from "./PreviousResults";
 
 type AiPhotoLayer = Extract<TemplateLayer, { type: "aiPhoto" }>;
 
@@ -584,6 +584,9 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
         activeUrl={result}
         onPick={(url) => setAiPhotoResult(layer.id, url)}
       />
+
+      {/* Tidigare uppladdade foton — klick använder fotot i denna mall. */}
+      <PreviousUploads onPick={(f) => setAiPhotoSource(layer.id, f, URL.createObjectURL(f))} />
 
       <AiProgress
         active={busy}

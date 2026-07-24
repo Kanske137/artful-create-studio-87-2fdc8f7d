@@ -199,6 +199,13 @@
     "use": "Użyj tego obrazu",
     "appliedToast": "Wybrano poprzedni obraz"
   },
+  "previousUploads": {
+    "title": "Twoje przesłane zdjęcia",
+    "use": "Użyj tego zdjęcia",
+    "appliedToast": "Zdjęcie wybrane — naciśnij Utwórz",
+    "failedToast": "Nie udało się pobrać zdjęcia. Spróbuj ponownie.",
+    "allSlotsFull": "Wszystkie pola są zapełnione — najpierw usuń portret."
+  },
   "cartAdd": {
     "blockedGeneration": "Prześlij zdjęcie i naciśnij Utwórz teraz przed zamówieniem",
     "blockedPhoto": "Prześlij zdjęcie przed zamówieniem",

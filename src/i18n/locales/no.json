@@ -199,6 +199,13 @@
     "use": "Bruk dette bildet",
     "appliedToast": "Tidligere bilde valgt"
   },
+  "previousUploads": {
+    "title": "Dine opplastede bilder",
+    "use": "Bruk dette bildet",
+    "appliedToast": "Bilde valgt — trykk Skap",
+    "failedToast": "Kunne ikke hente bildet. Prøv igjen.",
+    "allSlotsFull": "Alle feltene er fylt — fjern et portrett først."
+  },
   "cartAdd": {
     "blockedGeneration": "Last opp bildet ditt og trykk Skap nå før du bestiller",
     "blockedPhoto": "Last opp bildet ditt før du bestiller",

@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2, Sparkles, Trash2, Upload } from "lucide-react";
 import { GenerationFeedback } from "./GenerationFeedback";
-import { invalidatePreviousResults, PreviousResults } from "./PreviousResults";
+import { invalidatePreviousResults, PreviousResults, PreviousUploads } from "./PreviousResults";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useEditorStore } from "@/stores/editorStore";
@@ -387,6 +387,18 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
         referenceUrls={[...referenceImages.map((r) => r.url), ...(refUrl ? [refUrl] : [])]}
         activeUrl={result}
         onPick={(url) => setAiPhotoResult(layer.id, url)}
+      />
+
+      {/* Tidigare uppladdade foton — fyller första lediga porträttplatsen. */}
+      <PreviousUploads
+        onPick={(f) => {
+          const empty = slots.find((s) => !layerPortraits[s.id]?.file);
+          if (!empty) {
+            toast.info(t("previousUploads.allSlotsFull"));
+            return;
+          }
+          setMultiFacePortrait(layer.id, empty.id, f, URL.createObjectURL(f));
+        }}
       />
 
       {(() => {

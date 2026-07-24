@@ -199,6 +199,13 @@
     "use": "Brug dette billede",
     "appliedToast": "Tidligere billede valgt"
   },
+  "previousUploads": {
+    "title": "Dine uploadede fotos",
+    "use": "Brug dette foto",
+    "appliedToast": "Foto valgt — tryk Skab",
+    "failedToast": "Kunne ikke hente fotoet. Prøv igen.",
+    "allSlotsFull": "Alle felter er udfyldt — fjern et portræt først."
+  },
   "cartAdd": {
     "blockedGeneration": "Upload dit billede og tryk på Skab nu, før du bestiller",
     "blockedPhoto": "Upload dit billede, før du bestiller",

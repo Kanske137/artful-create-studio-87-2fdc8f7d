@@ -199,6 +199,13 @@
     "use": "Gebruik deze afbeelding",
     "appliedToast": "Eerdere afbeelding geselecteerd"
   },
+  "previousUploads": {
+    "title": "Je geüploade foto's",
+    "use": "Gebruik deze foto",
+    "appliedToast": "Foto geselecteerd — druk op Creëren",
+    "failedToast": "Kon de foto niet ophalen. Probeer het opnieuw.",
+    "allSlotsFull": "Alle vakken zijn gevuld — verwijder eerst een portret."
+  },
   "cartAdd": {
     "blockedGeneration": "Upload je foto en druk op Nu maken voordat je bestelt",
     "blockedPhoto": "Upload je foto voordat je bestelt",
