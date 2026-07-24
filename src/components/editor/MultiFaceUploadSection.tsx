@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2, Sparkles, Trash2, Upload } from "lucide-react";
 import { GenerationFeedback } from "./GenerationFeedback";
+import { invalidatePreviousResults, PreviousResults } from "./PreviousResults";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useEditorStore } from "@/stores/editorStore";
@@ -292,6 +293,7 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
       };
       saveMultiFaceCache(cacheRef.current);
       markFreeGenerationUsed();
+      invalidatePreviousResults();
       toast.success(t("aiPhoto.ready"));
     } catch (e) {
       const msg = e instanceof Error ? e.message : t("common.unknownError");
@@ -379,6 +381,13 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
       </Button>
 
       {result && !busy && <GenerationFeedback resultUrl={result} />}
+
+      {/* Tidigare bilder för samma referenser — klick återanvänder gratis. */}
+      <PreviousResults
+        referenceUrls={[...referenceImages.map((r) => r.url), ...(refUrl ? [refUrl] : [])]}
+        activeUrl={result}
+        onPick={(url) => setAiPhotoResult(layer.id, url)}
+      />
 
       {(() => {
         const history = Object.values(cacheRef.current)

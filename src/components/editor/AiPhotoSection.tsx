@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AiProgress } from "./AiProgress";
 import { GenerationFeedback } from "./GenerationFeedback";
+import { invalidatePreviousResults, PreviousResults } from "./PreviousResults";
 
 type AiPhotoLayer = Extract<TemplateLayer, { type: "aiPhoto" }>;
 
@@ -372,6 +373,7 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
       setAiPhotoResult(layer.id, printFileUrl);
       if (hash) addFaceSwapToCache(layer.id, hash, cacheRefSlot, printFileUrl);
       markFreeGenerationUsed();
+      invalidatePreviousResults();
       toast.success(t("aiPhoto.ready"));
     } catch (e) {
       const msg = e instanceof Error ? e.message : t("common.unknownError");
@@ -575,6 +577,13 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
       </Button>
 
       {result && !busy && <GenerationFeedback resultUrl={result} />}
+
+      {/* Tidigare bilder för samma referenser — klick återanvänder gratis. */}
+      <PreviousResults
+        referenceUrls={[...referenceImages.map((r) => r.url), ...(refUrl ? [refUrl] : [])]}
+        activeUrl={result}
+        onPick={(url) => setAiPhotoResult(layer.id, url)}
+      />
 
       <AiProgress
         active={busy}
