@@ -465,6 +465,9 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
                   ? t("aiPhoto.subjectHintRemoveBg")
                   : t("aiPhoto.subjectHintHuman")}
             </span>
+            <span className="text-[10px] text-muted-foreground/80 px-3 text-center">
+              {t("trust.uploadNote")}
+            </span>
           </button>
         ) : (
           <div className="space-y-2">

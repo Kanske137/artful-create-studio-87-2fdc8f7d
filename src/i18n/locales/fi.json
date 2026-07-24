@@ -206,6 +206,9 @@
     "failedToast": "Kuvaa ei voitu hakea. Yritä uudelleen.",
     "allSlotsFull": "Kaikki paikat ovat täynnä — poista ensin yksi muotokuva."
   },
+  "trust": {
+    "uploadNote": "Kuviasi käytetään vain tauluusi ja ne poistetaan automaattisesti 60 päivän kuluttua."
+  },
   "cartAdd": {
     "blockedGeneration": "Lataa kuvasi ja paina Luo nyt ennen tilaamista",
     "blockedPhoto": "Lataa kuvasi ennen tilaamista",

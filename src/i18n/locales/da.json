@@ -206,6 +206,9 @@
     "failedToast": "Kunne ikke hente fotoet. Prøv igen.",
     "allSlotsFull": "Alle felter er udfyldt — fjern et portræt først."
   },
+  "trust": {
+    "uploadNote": "Dine billeder bruges kun til din plakat og slettes automatisk efter 60 dage."
+  },
   "cartAdd": {
     "blockedGeneration": "Upload dit billede og tryk på Skab nu, før du bestiller",
     "blockedPhoto": "Upload dit billede, før du bestiller",

@@ -206,6 +206,9 @@
     "failedToast": "Kunne ikke hente bildet. Prøv igjen.",
     "allSlotsFull": "Alle feltene er fylt — fjern et portrett først."
   },
+  "trust": {
+    "uploadNote": "Bildene dine brukes bare til tavlen din og slettes automatisk etter 60 dager."
+  },
   "cartAdd": {
     "blockedGeneration": "Last opp bildet ditt og trykk Skap nå før du bestiller",
     "blockedPhoto": "Last opp bildet ditt før du bestiller",

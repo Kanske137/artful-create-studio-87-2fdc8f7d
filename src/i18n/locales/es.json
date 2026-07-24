@@ -206,6 +206,9 @@
     "failedToast": "No se pudo obtener la foto. Inténtalo de nuevo.",
     "allSlotsFull": "Todos los espacios están llenos — quita primero un retrato."
   },
+  "trust": {
+    "uploadNote": "Tus fotos solo se usan para tu cuadro y se eliminan automáticamente después de 60 días."
+  },
   "cartAdd": {
     "blockedGeneration": "Sube tu foto y pulsa Crear ahora antes de pedir",
     "blockedPhoto": "Sube tu foto antes de pedir",

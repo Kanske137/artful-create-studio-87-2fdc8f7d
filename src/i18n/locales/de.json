@@ -206,6 +206,9 @@
     "failedToast": "Foto konnte nicht geladen werden. Bitte erneut versuchen.",
     "allSlotsFull": "Alle Plätze sind belegt — entferne zuerst ein Porträt."
   },
+  "trust": {
+    "uploadNote": "Deine Fotos werden nur für dein Bild verwendet und nach 60 Tagen automatisch gelöscht."
+  },
   "cartAdd": {
     "blockedGeneration": "Lade dein Foto hoch und drücke Jetzt erstellen, bevor du bestellst",
     "blockedPhoto": "Lade dein Foto hoch, bevor du bestellst",

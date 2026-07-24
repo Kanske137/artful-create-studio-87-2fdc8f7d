@@ -361,6 +361,8 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
         ))}
       </div>
 
+      <p className="text-[11px] text-muted-foreground/80">{t("trust.uploadNote")}</p>
+
       <Button
         type="button"
         onClick={() => runSwap({ force: !!result })}

@@ -206,6 +206,9 @@
     "failedToast": "Nie udało się pobrać zdjęcia. Spróbuj ponownie.",
     "allSlotsFull": "Wszystkie pola są zapełnione — najpierw usuń portret."
   },
+  "trust": {
+    "uploadNote": "Twoje zdjęcia są używane tylko do Twojego obrazu i automatycznie usuwane po 60 dniach."
+  },
   "cartAdd": {
     "blockedGeneration": "Prześlij zdjęcie i naciśnij Utwórz teraz przed zamówieniem",
     "blockedPhoto": "Prześlij zdjęcie przed zamówieniem",

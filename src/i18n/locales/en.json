@@ -206,6 +206,9 @@
     "failedToast": "Couldn't fetch the photo. Please try again.",
     "allSlotsFull": "All slots are filled — remove a portrait first."
   },
+  "trust": {
+    "uploadNote": "Your photos are only used for your artwork and are automatically deleted after 60 days."
+  },
   "cartAdd": {
     "blockedGeneration": "Upload your photo and press Create now before ordering",
     "blockedPhoto": "Upload your photo before ordering",

@@ -206,6 +206,9 @@
     "failedToast": "Impossibile recuperare la foto. Riprova.",
     "allSlotsFull": "Tutti gli spazi sono pieni — rimuovi prima un ritratto."
   },
+  "trust": {
+    "uploadNote": "Le tue foto vengono usate solo per il tuo quadro e vengono eliminate automaticamente dopo 60 giorni."
+  },
   "cartAdd": {
     "blockedGeneration": "Carica la tua foto e premi Crea ora prima di ordinare",
     "blockedPhoto": "Carica la tua foto prima di ordinare",
