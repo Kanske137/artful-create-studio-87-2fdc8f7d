@@ -276,14 +276,72 @@ export async function compositeMockup({
     ctx.fill("evenodd");
     ctx.restore();
 
+    // Profil i Gelato-klass: yttre kantlinje, mitre-sömmar i hörnen och en
+    // fasad innerläpp (highlight + steg) — det som skiljer en "platt remsa"
+    // från en riktig ramprofil.
+    ctx.strokeStyle = "rgba(0,0,0,0.35)";
+    ctx.lineWidth = Math.max(1, frameWpx * 0.05);
+    ctx.strokeRect(ox + 0.5, oy + 0.5, outerW - 1, outerH - 1);
+
+    ctx.save();
+    ctx.strokeStyle = "rgba(0,0,0,0.16)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(ox, oy);
+    ctx.lineTo(ox + frameWpx, oy + frameWpx);
+    ctx.moveTo(ox + outerW, oy);
+    ctx.lineTo(ox + outerW - frameWpx, oy + frameWpx);
+    ctx.moveTo(ox, oy + outerH);
+    ctx.lineTo(ox + frameWpx, oy + outerH - frameWpx);
+    ctx.moveTo(ox + outerW, oy + outerH);
+    ctx.lineTo(ox + outerW - frameWpx, oy + outerH - frameWpx);
+    ctx.stroke();
+    ctx.restore();
+
+    const lip = Math.max(1, frameWpx * 0.14);
+    ctx.strokeStyle = "rgba(255,255,255,0.28)";
+    ctx.lineWidth = Math.max(1, lip * 0.6);
+    ctx.strokeRect(px - lip * 0.7, py - lip * 0.7, innerW + lip * 1.4, innerH + lip * 1.4);
+
     // Inner rim shadow where print meets frame
-    ctx.strokeStyle = "rgba(0,0,0,0.4)";
+    ctx.strokeStyle = "rgba(0,0,0,0.45)";
     ctx.lineWidth = Math.max(1, frameWpx * 0.08);
     ctx.strokeRect(px - 0.5, py - 0.5, innerW + 1, innerH + 1);
   }
 
   // 7. Front: postern själv — RAKT, ingen skew (innehåll ska aldrig förvrängas)
   ctx.drawImage(fg, px, py, posterW, posterH);
+
+  // 7b. Inramad poster: ramens innerskugga faller på trycket (topp+vänster)
+  // och glaset ger en diskret diagonal reflex — utan detta ser ramen
+  // "pålagd" ut i stället för att trycket sitter I den.
+  if (frameColor && frameWpx > 0 && productType !== "canvas") {
+    const inset = frameWpx * 0.9;
+    const shTop = ctx.createLinearGradient(0, py, 0, py + inset);
+    shTop.addColorStop(0, "rgba(0,0,0,0.22)");
+    shTop.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = shTop;
+    ctx.fillRect(px, py, innerW, inset);
+    const shLeft = ctx.createLinearGradient(px, 0, px + inset, 0);
+    shLeft.addColorStop(0, "rgba(0,0,0,0.16)");
+    shLeft.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = shLeft;
+    ctx.fillRect(px, py, inset, innerH);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(px, py, innerW, innerH);
+    ctx.clip();
+    const glass = ctx.createLinearGradient(px, py, px + innerW, py + innerH);
+    glass.addColorStop(0, "rgba(255,255,255,0)");
+    glass.addColorStop(0.42, "rgba(255,255,255,0)");
+    glass.addColorStop(0.5, "rgba(255,255,255,0.07)");
+    glass.addColorStop(0.58, "rgba(255,255,255,0)");
+    glass.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = glass;
+    ctx.fillRect(px, py, innerW, innerH);
+    ctx.restore();
+  }
 
   // 8. Diskret skugga i hörnen för att binda postern mot väggen
   if (productType !== "canvas") {
@@ -297,6 +355,61 @@ export async function compositeMockup({
     ctx.fillStyle = cornerGrad;
     ctx.fillRect(px, py, posterW, posterH);
     ctx.restore();
+  }
+
+  // 8b. Akryl/plexiglas: glansig yta, kantglöd (materialtjocklek) och fyra
+  // metalldistanser i hörnen — matchar Gelatos produktrendering.
+  if (productType === "acrylic") {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(px, py, posterW, posterH);
+    ctx.clip();
+    const gloss = ctx.createLinearGradient(px, py, px + posterW, py + posterH);
+    gloss.addColorStop(0, "rgba(255,255,255,0.14)");
+    gloss.addColorStop(0.25, "rgba(255,255,255,0.02)");
+    gloss.addColorStop(0.45, "rgba(255,255,255,0.10)");
+    gloss.addColorStop(0.6, "rgba(255,255,255,0)");
+    gloss.addColorStop(1, "rgba(255,255,255,0.04)");
+    ctx.fillStyle = gloss;
+    ctx.fillRect(px, py, posterW, posterH);
+    ctx.restore();
+
+    ctx.strokeStyle = "rgba(255,255,255,0.55)";
+    ctx.lineWidth = Math.max(1.5, posterW * 0.004);
+    ctx.strokeRect(px + 0.75, py + 0.75, posterW - 1.5, posterH - 1.5);
+    ctx.strokeStyle = "rgba(0,0,0,0.18)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(px - 0.5, py - 0.5, posterW + 1, posterH + 1);
+
+    const studR = Math.max(3, posterW * 0.012);
+    const insetS = studR * 3.2;
+    const studAt = (cx: number, cy: number) => {
+      const g = ctx.createRadialGradient(
+        cx - studR * 0.35, cy - studR * 0.35, studR * 0.15,
+        cx, cy, studR,
+      );
+      g.addColorStop(0, "#f2f4f6");
+      g.addColorStop(0.55, "#b9bfc6");
+      g.addColorStop(1, "#6c737b");
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.35)";
+      ctx.shadowBlur = studR * 0.9;
+      ctx.shadowOffsetY = studR * 0.35;
+      ctx.beginPath();
+      ctx.arc(cx, cy, studR, 0, Math.PI * 2);
+      ctx.fillStyle = g;
+      ctx.fill();
+      ctx.restore();
+      ctx.strokeStyle = "rgba(0,0,0,0.25)";
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.arc(cx, cy, studR, 0, Math.PI * 2);
+      ctx.stroke();
+    };
+    studAt(px + insetS, py + insetS);
+    studAt(px + posterW - insetS, py + insetS);
+    studAt(px + insetS, py + posterH - insetS);
+    studAt(px + posterW - insetS, py + posterH - insetS);
   }
 
   // 9. Posterhängare (trälist topp+botten + snöre)
@@ -332,6 +445,14 @@ export async function compositeMockup({
       grad.addColorStop(1, "rgba(0,0,0,0.28)");
       ctx.fillStyle = grad;
       ctx.fillRect(x0, yTop, x1 - x0, slatH);
+      // Ändträ-kapsyler + markerad underkant ger listen tjocklek — utan dem
+      // ser den ut som en platt målad remsa i stället för en trälist.
+      const cap = Math.max(1, slatH * 0.12);
+      ctx.fillStyle = "rgba(0,0,0,0.22)";
+      ctx.fillRect(x0, yTop, cap, slatH);
+      ctx.fillRect(x1 - cap, yTop, cap, slatH);
+      ctx.fillStyle = "rgba(0,0,0,0.30)";
+      ctx.fillRect(x0, yTop + slatH - Math.max(1, slatH * 0.1), x1 - x0, Math.max(1, slatH * 0.1));
       if (hangerColor.toLowerCase() === "#f5f5f2") {
         ctx.strokeStyle = "rgba(0,0,0,0.2)";
         ctx.lineWidth = 1;
@@ -357,11 +478,19 @@ export async function compositeMockup({
     ctx.moveTo(cordLeftX, cordBaseY);
     ctx.lineTo((cordLeftX + cordRightX) / 2, cordPeakY);
     ctx.lineTo(cordRightX, cordBaseY);
-    ctx.lineWidth = Math.max(1.5, slatH * 0.22);
-    ctx.strokeStyle = "rgba(40,30,20,0.82)";
+    // Tunnare lädersnöre + fästpunkter — tjockt snöre läser som "ritat".
+    ctx.lineWidth = Math.max(1.2, slatH * 0.14);
+    ctx.strokeStyle = "rgba(55,42,30,0.9)";
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.stroke();
+    // Små knutar vid fästena
+    ctx.fillStyle = "rgba(45,34,24,0.95)";
+    const knotR = Math.max(1.2, slatH * 0.16);
+    ctx.beginPath();
+    ctx.arc(cordLeftX, cordBaseY, knotR, 0, Math.PI * 2);
+    ctx.arc(cordRightX, cordBaseY, knotR, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
   }
 

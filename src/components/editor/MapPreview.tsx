@@ -160,12 +160,41 @@ function FrameBorder({
           mixBlendMode: "overlay",
         }}
       />
-      {/* Inner shadow rim where frame meets the print */}
+      {/* Yttre kantlinje + mitre-sömmar (45°-diagonaler i hörnen) — profilkänsla */}
+      <div
+        style={{
+          position: "absolute",
+          inset: -bp,
+          boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.32)",
+        }}
+      />
+      <svg
+        style={{ position: "absolute", inset: -bp, width: outerW, height: outerH }}
+        viewBox={`0 0 ${outerW} ${outerH}`}
+        preserveAspectRatio="none"
+      >
+        <path
+          d={`M0 0 L${bp} ${bp} M${outerW} 0 L${outerW - bp} ${bp} M0 ${outerH} L${bp} ${outerH - bp} M${outerW} ${outerH} L${outerW - bp} ${outerH - bp}`}
+          stroke="rgba(0,0,0,0.16)"
+          strokeWidth="1"
+        />
+      </svg>
+      {/* Fasad innerläpp: ljus highlight runt tryckytan */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.28), inset 0 2px 6px -2px rgba(0,0,0,0.38)",
+          boxShadow: `0 0 0 ${Math.max(1, bp * 0.12)}px rgba(255,255,255,0.25)`,
+        }}
+      />
+      {/* Glasreflex + ramens innerskugga på trycket (topp/vänster) */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(135deg, rgba(255,255,255,0) 42%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 58%)",
+          boxShadow: `inset 0 0 0 1px rgba(0,0,0,0.3), inset 0 ${Math.max(2, bp * 0.5)}px ${Math.max(4, bp * 0.9)}px -${Math.max(1, bp * 0.35)}px rgba(0,0,0,0.28), inset ${Math.max(2, bp * 0.4)}px 0 ${Math.max(4, bp * 0.9)}px -${Math.max(1, bp * 0.35)}px rgba(0,0,0,0.2)`,
         }}
       />
     </div>
@@ -195,11 +224,13 @@ function HangerOverlay({ color, textureUrl, motifHeightCm }: { color: string; te
     right: "-2%",
     height: `${slatPct}%`,
     background: color,
+    // Ändträ-kapsyler (vänster/höger) + markerad underkant ger listen
+    // tjocklek — matchar Gelatos rendering av trälisten.
     backgroundImage: textureUrl
-      ? `linear-gradient(to bottom, rgba(255,255,255,0.18), rgba(255,255,255,0) 50%, rgba(0,0,0,0.28)), url(${textureUrl})`
-      : "linear-gradient(to bottom, rgba(255,255,255,0.22), rgba(255,255,255,0) 50%, rgba(0,0,0,0.28))",
-    backgroundSize: textureUrl ? "auto, cover" : undefined,
-    backgroundRepeat: textureUrl ? "repeat, no-repeat" : undefined,
+      ? `linear-gradient(to right, rgba(0,0,0,0.22) 0, rgba(0,0,0,0.22) 1.2%, rgba(0,0,0,0) 1.2%, rgba(0,0,0,0) 98.8%, rgba(0,0,0,0.22) 98.8%), linear-gradient(to top, rgba(0,0,0,0.3) 0, rgba(0,0,0,0.3) 10%, rgba(0,0,0,0) 10%), linear-gradient(to bottom, rgba(255,255,255,0.18), rgba(255,255,255,0) 50%, rgba(0,0,0,0.28)), url(${textureUrl})`
+      : "linear-gradient(to right, rgba(0,0,0,0.22) 0, rgba(0,0,0,0.22) 1.2%, rgba(0,0,0,0) 1.2%, rgba(0,0,0,0) 98.8%, rgba(0,0,0,0.22) 98.8%), linear-gradient(to top, rgba(0,0,0,0.3) 0, rgba(0,0,0,0.3) 10%, rgba(0,0,0,0) 10%), linear-gradient(to bottom, rgba(255,255,255,0.22), rgba(255,255,255,0) 50%, rgba(0,0,0,0.28))",
+    backgroundSize: textureUrl ? "auto, auto, auto, cover" : undefined,
+    backgroundRepeat: textureUrl ? "no-repeat, no-repeat, repeat, no-repeat" : undefined,
     boxShadow: "0 4px 8px rgba(0,0,0,0.28)",
     border: isWhite ? "1px solid rgba(0,0,0,0.18)" : undefined,
   };
@@ -221,12 +252,15 @@ function HangerOverlay({ color, textureUrl, motifHeightCm }: { color: string; te
         <path
           d={`M ${anchorXPct} 100 L 50 0 L ${100 - anchorXPct} 100`}
           fill="none"
-          stroke="rgba(40,30,20,0.82)"
+          stroke="rgba(55,42,30,0.9)"
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: Math.max(1.5, slatPct * 1.2) }}
+          style={{ strokeWidth: Math.max(1.2, slatPct * 0.8) }}
         />
+        {/* Knutar vid fästpunkterna */}
+        <circle cx={anchorXPct} cy="100" r={Math.max(1.4, slatPct * 0.9)} fill="rgba(45,34,24,0.95)" vectorEffect="non-scaling-stroke" />
+        <circle cx={100 - anchorXPct} cy="100" r={Math.max(1.4, slatPct * 0.9)} fill="rgba(45,34,24,0.95)" vectorEffect="non-scaling-stroke" />
       </svg>
       {/* Trälist OVANPÅ motivets topp (täcker översta 21mm av tryckytan) */}
       <div style={{ ...slatStyle, top: 0 }} />
