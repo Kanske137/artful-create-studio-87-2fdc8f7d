@@ -319,11 +319,14 @@ function CanvasMesh({
   }, []);
 
   const barU = Math.min(u(3.5), Math.min(w, h) * 0.24); // ~3,5 cm breda lister
-  const barD = d * 0.94;
-  const inset = 0.012;
+  const barD = d * 0.9;
   const zBack = -d / 2;
-  // Listerna FLUSH mot bakplanet så viken ligger an mot träet (som IRL).
+  // Listerna flush mot bakplanet så viken ligger an mot träet (som IRL).
   const barZ = zBack + barD / 2 + 0.004;
+  // Listerna dras in bakom vikbandet: från flacka sidovinklar träffar blicken
+  // då dukbaksidan (tyg) i stället för trä — och bakifrån börjar träet precis
+  // vid vikens innerkant, som i Gelatos foto.
+  const barGap = foldU * 0.9;
 
   return (
     <group>
@@ -334,21 +337,36 @@ function CanvasMesh({
 
       {/* Dukens baksida, försänkt ända in vid frontens insida */}
       <mesh position={[0, 0, d / 2 - 0.006]} rotation={[0, Math.PI, 0]} material={fabricBack}>
-        <planeGeometry args={[w - inset, h - inset]} />
+        <planeGeometry args={[w - 0.006, h - 0.006]} />
+      </mesh>
+
+      {/* Tygfoder innanför väggarna: blockerar trä-genomsyn vid flacka vinklar
+          (enkelsidiga, vända MOT väggen — osynliga från baksidan/kant-i-kant) */}
+      <mesh position={[-w / 2 + 0.003, 0, 0]} rotation={[0, -Math.PI / 2, 0]} material={fabricBack}>
+        <planeGeometry args={[d, h]} />
+      </mesh>
+      <mesh position={[w / 2 - 0.003, 0, 0]} rotation={[0, Math.PI / 2, 0]} material={fabricBack}>
+        <planeGeometry args={[d, h]} />
+      </mesh>
+      <mesh position={[0, h / 2 - 0.003, 0]} rotation={[-Math.PI / 2, 0, 0]} material={fabricBack}>
+        <planeGeometry args={[w, d]} />
+      </mesh>
+      <mesh position={[0, -h / 2 + 0.003, 0]} rotation={[Math.PI / 2, 0, 0]} material={fabricBack}>
+        <planeGeometry args={[w, d]} />
       </mesh>
 
       {/* Spännram: topp/botten + vänster/höger, ådring längs listen */}
-      <mesh position={[0, h / 2 - barU / 2 - inset / 2, barZ]} material={woodMatH}>
-        <boxGeometry args={[w - 2 * inset, barU, barD]} />
+      <mesh position={[0, h / 2 - barGap - barU / 2, barZ]} material={woodMatH}>
+        <boxGeometry args={[w - 2 * barGap, barU, barD]} />
       </mesh>
-      <mesh position={[0, -(h / 2 - barU / 2 - inset / 2), barZ]} material={woodMatH}>
-        <boxGeometry args={[w - 2 * inset, barU, barD]} />
+      <mesh position={[0, -(h / 2 - barGap - barU / 2), barZ]} material={woodMatH}>
+        <boxGeometry args={[w - 2 * barGap, barU, barD]} />
       </mesh>
-      <mesh position={[w / 2 - barU / 2 - inset / 2, 0, barZ]} material={woodMatV}>
-        <boxGeometry args={[barU, h - 2 * inset - 2 * barU, barD]} />
+      <mesh position={[w / 2 - barGap - barU / 2, 0, barZ]} material={woodMatV}>
+        <boxGeometry args={[barU, h - 2 * barGap - 2 * barU, barD]} />
       </mesh>
-      <mesh position={[-(w / 2 - barU / 2 - inset / 2), 0, barZ]} material={woodMatV}>
-        <boxGeometry args={[barU, h - 2 * inset - 2 * barU, barD]} />
+      <mesh position={[-(w / 2 - barGap - barU / 2), 0, barZ]} material={woodMatV}>
+        <boxGeometry args={[barU, h - 2 * barGap - 2 * barU, barD]} />
       </mesh>
 
       {/* Vikta dukkanter på baksidan (tryckets fortsättning, speglad) */}
