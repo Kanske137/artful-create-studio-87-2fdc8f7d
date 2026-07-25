@@ -34,12 +34,15 @@ import { ensureSession, getSessionKey, track } from "@/lib/analytics";
 import { SubscriberGateDialog } from "@/components/editor/SubscriberGateDialog";
 import { toast } from "sonner";
 
+// OBS: värdena är identitetsnycklar för textureForHex (lib/frame-textures) —
+// samma hex som frameColorFromVariant i mockup-scenes. Ändras de tappar
+// editor-preview och cart-snapshot sina trätexturer.
 const FRAME_COLORS: Record<string, string> = {
   Ingen: "",
-  Vit: "hsl(0 0% 98%)",
-  Svart: "hsl(0 0% 8%)",
-  Ek: "hsl(30 35% 55%)",
-  Valnöt: "hsl(20 25% 25%)",
+  Vit: "#f5f5f2",
+  Svart: "#1a1a1a",
+  Ek: "#c8a371",
+  Valnöt: "#5a3a26",
 };
 const FRAME_WIDTH_CM = 1.2; // matchar Gelato frp_w12xt22-mm (12mm front)
 

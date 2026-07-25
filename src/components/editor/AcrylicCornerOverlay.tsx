@@ -1,17 +1,17 @@
-// Visar de fyra silverskruvarna som finns IRL i hörnen på Gelatos akrylglas-print.
-// Skruvarna sitter ~1.4 cm in från varje hörn (centrum) och har ~1.5 cm
-// silverdisk diameter. Vi renderar dem som % av posterstorleken så proportioner
-// stämmer i alla format. Använd ENDAST i preview/cart-bild, ALDRIG i tryckfil.
-//
-// Försök matcha utseendet IRL: borstad silver med liten skugga och en mörkare
-// inre cirkel som antyder skruvhuvudet.
+// Visar de fyra metalldistanserna som finns IRL i hörnen på Gelatos akrylprint.
+// Utseende och mått delas med canvas-renderarna via lib/acrylic-stud:
+// spunnen metall-cap (~18 mm) med konisk borstning, mörk bezelring och
+// centrum ~26 mm från panelkanterna. Vi renderar i % av posterstorleken så
+// proportionerna stämmer i alla format. ENDAST preview/cart — ALDRIG tryckfil.
+import { STUD_DIAMETER_CM, STUD_INSET_CM, studBackgroundCss } from "@/lib/acrylic-stud";
+
 interface Props {
   /** Front-storlek (cm) för respektive sida — används för att räkna ut % */
   frontWcm: number;
   frontHcm: number;
-  /** Avstånd från kant till diskens CENTRUM (cm). Default 1.4 cm. */
+  /** Avstånd från kant till diskens CENTRUM (cm). Default enligt Gelato-mått. */
   insetCm?: number;
-  /** Diskens diameter (cm). Default 1.5 cm. */
+  /** Diskens diameter (cm). Default enligt Gelato-mått. */
   diameterCm?: number;
   /** Z-index (default 50 — över allt utom guides). */
   zIndex?: number;
@@ -20,8 +20,8 @@ interface Props {
 export function AcrylicCornerOverlay({
   frontWcm,
   frontHcm,
-  insetCm = 1.4,
-  diameterCm = 1.5,
+  insetCm = STUD_INSET_CM,
+  diameterCm = STUD_DIAMETER_CM,
   zIndex = 50,
 }: Props) {
   const dxPct = (insetCm / frontWcm) * 100;
@@ -50,26 +50,15 @@ export function AcrylicCornerOverlay({
             width: `${dwPct}%`,
             height: `${dhPct}%`,
             ...pos,
-            // Borstad silver-radial gradient + subtil rim & skugga
-            background:
-              "radial-gradient(circle at 35% 30%, #f5f5f5 0%, #d8d8d8 35%, #b8b8b8 60%, #9a9a9a 85%, #7a7a7a 100%)",
+            background: studBackgroundCss(),
             borderRadius: "50%",
+            // Mjuk skugga på akrylen + mörk bezelring vid capens ytterkant
             boxShadow:
-              "0 1px 2px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.35), inset 0 -1px 2px rgba(0,0,0,0.25)",
+              "0 1px 3px rgba(0,0,0,0.35), inset 0 0 0 1.5px rgba(28,31,34,0.8)",
+            outline: "0.5px solid rgba(255,255,255,0.3)",
+            outlineOffset: "-0.5px",
           }}
-        >
-          {/* Inre skruvhuvud-skiva för att antyda metallisk djup */}
-          <div
-            style={{
-              position: "absolute",
-              inset: "22%",
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle at 40% 35%, #c8c8c8 0%, #a8a8a8 50%, #888 100%)",
-              boxShadow: "inset 0 0 0 0.5px rgba(0,0,0,0.2)",
-            }}
-          />
-        </div>
+        />
       ))}
     </div>
   );

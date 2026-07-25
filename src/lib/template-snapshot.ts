@@ -13,6 +13,8 @@
 // (mapCenter/mapZoom/mapStyleId/etc.) override the LIVE layer's defaults; all
 // other map layers stay locked to their template defaults.
 import mapboxgl from "mapbox-gl";
+import { drawAcrylicStud, STUD_DIAMETER_CM, STUD_INSET_CM } from "./acrylic-stud";
+import { textureForHex, preloadTexture } from "./frame-textures";
 import { drawShapeOnCanvas, type ClipShape } from "./shape-clip";
 import { getMapboxToken, styleUrl } from "./mapbox";
 import type { Template, TemplateLayer, TextSpan } from "./template-schema";
@@ -911,18 +913,70 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
   }
 
   // Frame / canvas-wrap overlay (preview/cart only — never on hires print).
+  // Trätextur + geringar så cart-bilden matchar editorns FrameBorder.
   const hasFrame = !!input.frameColor && input.frameColor.trim() !== "";
   if (!input.hires && extraCm === 0 && hasFrame && (input.frameWidthCm ?? 0) > 0) {
     const fw = Math.max(1, Math.round((input.frameWidthCm ?? 1.2) * PX_PER_CM * scale));
+    const texUrl = textureForHex(input.frameColor);
+    let tex: HTMLImageElement | null = null;
+    if (texUrl) {
+      try { tex = await preloadTexture(texUrl); } catch { tex = null; }
+    }
     ctx.save();
-    ctx.fillStyle = input.frameColor!;
-    ctx.fillRect(0, 0, w, fw);
-    ctx.fillRect(0, h - fw, w, fw);
-    ctx.fillRect(0, 0, fw, h);
-    ctx.fillRect(w - fw, 0, fw, h);
-    ctx.strokeStyle = "rgba(0,0,0,0.18)";
-    ctx.lineWidth = Math.max(1, Math.round(fw * 0.06));
-    ctx.strokeRect(fw, fw, w - 2 * fw, h - 2 * fw);
+    const paintSide = (poly: Array<[number, number]>, rotate: boolean, sx: number, sy: number, sw: number, sh: number) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(poly[0][0], poly[0][1]);
+      for (let i = 1; i < poly.length; i++) ctx.lineTo(poly[i][0], poly[i][1]);
+      ctx.closePath();
+      ctx.clip();
+      if (tex) {
+        if (rotate) {
+          ctx.translate(sx + sw, sy);
+          ctx.rotate(Math.PI / 2);
+          ctx.drawImage(tex, 0, 0, sh, sw);
+        } else {
+          ctx.drawImage(tex, sx, sy, sw, sh);
+        }
+      } else {
+        ctx.fillStyle = input.frameColor!;
+        ctx.fillRect(sx, sy, sw, sh);
+      }
+      ctx.restore();
+    };
+    paintSide([[0, 0], [w, 0], [w - fw, fw], [fw, fw]], false, 0, 0, w, fw);
+    paintSide([[fw, h - fw], [w - fw, h - fw], [w, h], [0, h]], false, 0, h - fw, w, fw);
+    paintSide([[0, 0], [fw, fw], [fw, h - fw], [0, h]], true, 0, 0, fw, h);
+    paintSide([[w - fw, fw], [w, 0], [w, h], [w - fw, h - fw]], true, w - fw, 0, fw, h);
+    // 45°-ljusgradient över ramen för djup
+    const fgrad = ctx.createLinearGradient(0, 0, w, h);
+    fgrad.addColorStop(0, "rgba(255,255,255,0.20)");
+    fgrad.addColorStop(0.5, "rgba(0,0,0,0)");
+    fgrad.addColorStop(1, "rgba(0,0,0,0.24)");
+    ctx.fillStyle = fgrad;
+    ctx.beginPath();
+    ctx.rect(0, 0, w, h);
+    ctx.rect(fw + (w - 2 * fw), fw, -(w - 2 * fw), h - 2 * fw); // inre urklipp
+    ctx.fill("evenodd");
+    // Mitre-sömmar + ytterkant + innerläpp (matchar mockup-composite)
+    ctx.strokeStyle = "rgba(0,0,0,0.16)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, 0); ctx.lineTo(fw, fw);
+    ctx.moveTo(w, 0); ctx.lineTo(w - fw, fw);
+    ctx.moveTo(0, h); ctx.lineTo(fw, h - fw);
+    ctx.moveTo(w, h); ctx.lineTo(w - fw, h - fw);
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(0,0,0,0.35)";
+    ctx.lineWidth = Math.max(1, fw * 0.05);
+    ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
+    const lip = Math.max(1, fw * 0.14);
+    ctx.strokeStyle = "rgba(255,255,255,0.28)";
+    ctx.lineWidth = Math.max(1, lip * 0.6);
+    ctx.strokeRect(fw - lip * 0.7, fw - lip * 0.7, w - 2 * fw + lip * 1.4, h - 2 * fw + lip * 1.4);
+    ctx.strokeStyle = "rgba(0,0,0,0.45)";
+    ctx.lineWidth = Math.max(1, fw * 0.08);
+    ctx.strokeRect(fw - 0.5, fw - 0.5, w - 2 * fw + 1, h - 2 * fw + 1);
     ctx.restore();
   } else if (!input.hires && input.canvasWrap && extraCm === 0) {
     const edge = Math.max(2, Math.round(0.25 * PX_PER_CM * scale));
@@ -944,11 +998,11 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
     ctx.restore();
   }
 
-  // Akryl-skruvar i hörnen (preview/cart only).
+  // Akryl-distanser i hörnen (preview/cart only) — spunnen metall, Gelato-mått.
   if (!input.hires && input.acrylicCorners && extraCm === 0) {
-    const insetX = 1.4 * PX_PER_CM * scale;
-    const insetY = 1.4 * PX_PER_CM * scale;
-    const r = (1.5 / 2) * PX_PER_CM * scale;
+    const insetX = STUD_INSET_CM * PX_PER_CM * scale;
+    const insetY = STUD_INSET_CM * PX_PER_CM * scale;
+    const r = (STUD_DIAMETER_CM / 2) * PX_PER_CM * scale;
     const centers: [number, number][] = [
       [insetX, insetY],
       [w - insetX, insetY],
@@ -956,23 +1010,7 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
       [w - insetX, h - insetY],
     ];
     for (const [cx, cy] of centers) {
-      const grad = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.4, r * 0.1, cx, cy, r);
-      grad.addColorStop(0, "#f5f5f5");
-      grad.addColorStop(0.35, "#d8d8d8");
-      grad.addColorStop(0.7, "#a8a8a8");
-      grad.addColorStop(1, "#7a7a7a");
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fillStyle = grad;
-      ctx.fill();
-      ctx.shadowColor = "rgba(0,0,0,0.35)";
-      ctx.shadowBlur = Math.max(1, r * 0.2);
-      ctx.shadowOffsetY = Math.max(1, r * 0.08);
-      ctx.lineWidth = Math.max(0.5, r * 0.05);
-      ctx.strokeStyle = "rgba(0,0,0,0.15)";
-      ctx.stroke();
-      ctx.restore();
+      drawAcrylicStud(ctx, cx, cy, r);
     }
   }
 

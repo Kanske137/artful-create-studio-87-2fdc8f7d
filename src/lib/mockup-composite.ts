@@ -2,6 +2,7 @@ import type { MockupScene } from "./mockup-scenes";
 import { parseSizeCm } from "./mockup-scenes";
 import type { Orientation, ProductType } from "./product-config";
 import { textureForHex, preloadTexture } from "./frame-textures";
+import { drawAcrylicStud, STUD_DIAMETER_CM, STUD_INSET_CM } from "./acrylic-stud";
 
 function loadImage(src: string, crossOrigin = false): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -381,35 +382,13 @@ export async function compositeMockup({
     ctx.lineWidth = 1;
     ctx.strokeRect(px - 0.5, py - 0.5, posterW + 1, posterH + 1);
 
-    const studR = Math.max(3, posterW * 0.012);
-    const insetS = studR * 3.2;
-    const studAt = (cx: number, cy: number) => {
-      const g = ctx.createRadialGradient(
-        cx - studR * 0.35, cy - studR * 0.35, studR * 0.15,
-        cx, cy, studR,
-      );
-      g.addColorStop(0, "#f2f4f6");
-      g.addColorStop(0.55, "#b9bfc6");
-      g.addColorStop(1, "#6c737b");
-      ctx.save();
-      ctx.shadowColor = "rgba(0,0,0,0.35)";
-      ctx.shadowBlur = studR * 0.9;
-      ctx.shadowOffsetY = studR * 0.35;
-      ctx.beginPath();
-      ctx.arc(cx, cy, studR, 0, Math.PI * 2);
-      ctx.fillStyle = g;
-      ctx.fill();
-      ctx.restore();
-      ctx.strokeStyle = "rgba(0,0,0,0.25)";
-      ctx.lineWidth = 0.8;
-      ctx.beginPath();
-      ctx.arc(cx, cy, studR, 0, Math.PI * 2);
-      ctx.stroke();
-    };
-    studAt(px + insetS, py + insetS);
-    studAt(px + posterW - insetS, py + insetS);
-    studAt(px + insetS, py + posterH - insetS);
-    studAt(px + posterW - insetS, py + posterH - insetS);
+    // Fysisk skala som Gelato: cap ~18 mm, centrum ~26 mm från kant.
+    const studR = Math.max(3, ((STUD_DIAMETER_CM / 2) / realWcm) * posterW);
+    const insetS = Math.max(studR * 1.6, (STUD_INSET_CM / realWcm) * posterW);
+    drawAcrylicStud(ctx, px + insetS, py + insetS, studR);
+    drawAcrylicStud(ctx, px + posterW - insetS, py + insetS, studR);
+    drawAcrylicStud(ctx, px + insetS, py + posterH - insetS, studR);
+    drawAcrylicStud(ctx, px + posterW - insetS, py + posterH - insetS, studR);
   }
 
   // 9. Posterhängare (trälist topp+botten + snöre)

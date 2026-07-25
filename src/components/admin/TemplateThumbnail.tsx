@@ -8,6 +8,7 @@
 //     wrapper that sets `aspect-ratio`). `width`/`height` then act only as
 //     resolution hints for Mapbox/text scaling (default 240×320).
 import { useMemo } from "react";
+import { studBackgroundCss } from "@/lib/acrylic-stud";
 import type { Orientation, Template } from "@/lib/template-schema";
 import MapLayerPreview from "./MapLayerPreview";
 import TextLayerPreview from "./TextLayerPreview";
@@ -224,9 +225,8 @@ export default function TemplateThumbnail({
                 width: "8%",
                 height: "6%",
                 ...pos,
-                background:
-                  "radial-gradient(circle at 35% 30%, #f5f5f5 0%, #c8c8c8 60%, #8a8a8a 100%)",
-                boxShadow: "0 0.5px 1px rgba(0,0,0,0.4)",
+                background: studBackgroundCss(),
+                boxShadow: "0 0.5px 1px rgba(0,0,0,0.4), inset 0 0 0 0.5px rgba(28,31,34,0.7)",
               }}
               aria-hidden
             />
