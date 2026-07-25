@@ -25,6 +25,161 @@ interface Canvas3DPreviewProps {
   embedded?: boolean;
 }
 
+/**
+ * Procedurella material för baksidan — byggda efter Gelatos egen produktbild
+ * av canvasbaksidan (canvas-back.webp): blek furu med synlig ådring,
+ * vävd dukbaksida med kantskugga, häftklamrar längs viken och vikta hörn.
+ */
+function makeWoodTexture(vertical: boolean): THREE.CanvasTexture {
+  const W = vertical ? 128 : 512;
+  const H = vertical ? 512 : 128;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const g = c.getContext("2d")!;
+  const grad = vertical ? g.createLinearGradient(0, 0, W, 0) : g.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, "#ead9b6");
+  grad.addColorStop(0.5, "#e2d0a8");
+  grad.addColorStop(1, "#e7d6b2");
+  g.fillStyle = grad;
+  g.fillRect(0, 0, W, H);
+  // Ådring längs listens längdriktning (deterministisk pseudo-slump)
+  let seed = 7;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const streaks = 26;
+  for (let i = 0; i < streaks; i++) {
+    const pos = (i + 0.2 + rnd() * 0.6) / streaks;
+    const alpha = 0.05 + rnd() * 0.11;
+    const width = 0.6 + rnd() * 1.8;
+    const wave = 3 + rnd() * 5;
+    g.strokeStyle = `rgba(168,140,96,${alpha.toFixed(3)})`;
+    g.lineWidth = width;
+    g.beginPath();
+    const len = vertical ? H : W;
+    for (let t = 0; t <= len; t += 16) {
+      const off = Math.sin((t / len) * Math.PI * (1.5 + rnd()) + i) * wave;
+      const main = pos * (vertical ? W : H) + off;
+      if (vertical) { t === 0 ? g.moveTo(main, t) : g.lineTo(main, t); }
+      else { t === 0 ? g.moveTo(t, main) : g.lineTo(t, main); }
+    }
+    g.stroke();
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+function makeFabricTexture(): THREE.CanvasTexture {
+  const S = 512;
+  const c = document.createElement("canvas");
+  c.width = S; c.height = S;
+  const g = c.getContext("2d")!;
+  g.fillStyle = "#ece6d8";
+  g.fillRect(0, 0, S, S);
+  // Vävstruktur: fina korsande trådar
+  g.globalAlpha = 0.05;
+  g.strokeStyle = "#9a917e";
+  g.lineWidth = 1;
+  for (let x = 0; x < S; x += 3) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, S); g.stroke(); }
+  for (let y = 0; y < S; y += 3) { g.beginPath(); g.moveTo(0, y); g.lineTo(S, y); g.stroke(); }
+  g.globalAlpha = 1;
+  // Kantskugga in mot spännramen (steget syns i Gelatos foto)
+  const edge = g.createLinearGradient(0, 0, 0, 40);
+  edge.addColorStop(0, "rgba(0,0,0,0.16)");
+  edge.addColorStop(1, "rgba(0,0,0,0)");
+  for (let r = 0; r < 4; r++) {
+    g.save();
+    g.translate(S / 2, S / 2);
+    g.rotate((r * Math.PI) / 2);
+    g.translate(-S / 2, -S / 2);
+    g.fillStyle = edge;
+    g.fillRect(0, 0, S, 40);
+    g.restore();
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+/** Klammerremsa (transparent) att lägga ovanpå vikbandet. */
+function makeStapleTexture(count: number, vertical: boolean): THREE.CanvasTexture {
+  const L = 512, T = 64;
+  const c = document.createElement("canvas");
+  c.width = vertical ? T : L;
+  c.height = vertical ? L : T;
+  const g = c.getContext("2d")!;
+  let seed = 13;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  for (let i = 0; i < count; i++) {
+    const pos = ((i + 0.5) / count) * L + (rnd() - 0.5) * 20;
+    const mid = T / 2 + (rnd() - 0.5) * 8;
+    const ang = (rnd() - 0.5) * 0.14;
+    g.save();
+    if (vertical) { g.translate(mid, pos); g.rotate(Math.PI / 2 + ang); }
+    else { g.translate(pos, mid); g.rotate(ang); }
+    // Klammer: platt silverbygel med mörk kontur + skugga
+    g.fillStyle = "rgba(0,0,0,0.18)";
+    g.fillRect(-11, -2.5, 24, 7);
+    g.fillStyle = "#c3c7cb";
+    g.fillRect(-12, -3.5, 24, 6);
+    g.strokeStyle = "#7e8286";
+    g.lineWidth = 1.4;
+    g.strokeRect(-12, -3.5, 24, 6);
+    g.fillStyle = "rgba(255,255,255,0.55)";
+    g.fillRect(-12, -3.5, 24, 1.6);
+    g.restore();
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+/** Vikt hörnflik: neutral dukbaksida med diagonal söm + klammer. */
+function makeCornerFlapTexture(): THREE.CanvasTexture {
+  const S = 128;
+  const c = document.createElement("canvas");
+  c.width = S; c.height = S;
+  const g = c.getContext("2d")!;
+  g.fillStyle = "#e7e1d2";
+  g.fillRect(0, 0, S, S);
+  g.globalAlpha = 0.06;
+  g.strokeStyle = "#9a917e";
+  for (let x = 0; x < S; x += 3) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, S); g.stroke(); }
+  for (let y = 0; y < S; y += 3) { g.beginPath(); g.moveTo(0, y); g.lineTo(S, y); g.stroke(); }
+  g.globalAlpha = 1;
+  // Diagonal vikskugga + söm
+  const diag = g.createLinearGradient(0, S, S, 0);
+  diag.addColorStop(0.44, "rgba(0,0,0,0)");
+  diag.addColorStop(0.5, "rgba(0,0,0,0.18)");
+  diag.addColorStop(0.56, "rgba(0,0,0,0)");
+  g.fillStyle = diag;
+  g.fillRect(0, 0, S, S);
+  g.strokeStyle = "rgba(90,80,64,0.35)";
+  g.lineWidth = 1.5;
+  g.beginPath();
+  g.moveTo(6, S - 6);
+  g.lineTo(S - 6, 6);
+  g.stroke();
+  // En klammer mitt på diagonalen
+  g.save();
+  g.translate(S / 2, S / 2);
+  g.rotate(Math.PI / 4);
+  g.fillStyle = "rgba(0,0,0,0.18)";
+  g.fillRect(-10, -2, 22, 6);
+  g.fillStyle = "#c3c7cb";
+  g.fillRect(-11, -3, 22, 5.5);
+  g.strokeStyle = "#7e8286";
+  g.lineWidth = 1.3;
+  g.strokeRect(-11, -3, 22, 5.5);
+  g.restore();
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
 /** Shared cache so each thumbnail doesn't re-download the same texture. */
 function useTexture(url: string | null) {
   const [tex, setTex] = useState<THREE.Texture | null>(null);
@@ -132,15 +287,26 @@ function CanvasMesh({
     };
   }, [texture, widthCm, heightCm, depthCm, wrapExtCm, bleedCm, foldCm]);
 
-  // Spännram (trä) + dukbaksida
-  const woodMat = useMemo(() => new THREE.MeshStandardMaterial({ color: "#d9c8a4", roughness: 0.9 }), []);
-  const woodMatDark = useMemo(() => new THREE.MeshStandardMaterial({ color: "#c9b892", roughness: 0.9 }), []);
-  const fabricBack = useMemo(() => new THREE.MeshStandardMaterial({ color: "#ece7db", roughness: 1 }), []);
+  // Spännram + baksida — material byggda efter Gelatos produktfoto.
+  const woodMatH = useMemo(() => new THREE.MeshStandardMaterial({ map: makeWoodTexture(false), roughness: 0.9 }), []);
+  const woodMatV = useMemo(() => new THREE.MeshStandardMaterial({ map: makeWoodTexture(true), roughness: 0.9 }), []);
+  const fabricBack = useMemo(() => new THREE.MeshStandardMaterial({ map: makeFabricTexture(), roughness: 1 }), []);
+  const flapMat = useMemo(() => new THREE.MeshStandardMaterial({ map: makeCornerFlapTexture(), roughness: 1 }), []);
+  const stapleMatH = useMemo(() => {
+    const t = makeStapleTexture(3, false);
+    return new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false });
+  }, []);
+  const stapleMatV = useMemo(() => {
+    const t = makeStapleTexture(3, true);
+    return new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false });
+  }, []);
 
   const barU = Math.min(u(3.5), Math.min(w, h) * 0.24); // ~3,5 cm breda lister
-  const barD = d * 0.86;
+  const barD = d * 0.94;
   const inset = 0.012;
   const zBack = -d / 2;
+  // Listerna FLUSH mot bakplanet så viken ligger an mot träet (som IRL).
+  const barZ = zBack + barD / 2 + 0.004;
 
   return (
     <group>
@@ -154,21 +320,21 @@ function CanvasMesh({
         <planeGeometry args={[w - inset, h - inset]} />
       </mesh>
 
-      {/* Spännram: topp/botten + vänster/höger (stumfog som IRL) */}
-      <mesh position={[0, h / 2 - barU / 2 - inset / 2, 0]} material={woodMat}>
+      {/* Spännram: topp/botten + vänster/höger, ådring längs listen */}
+      <mesh position={[0, h / 2 - barU / 2 - inset / 2, barZ]} material={woodMatH}>
         <boxGeometry args={[w - 2 * inset, barU, barD]} />
       </mesh>
-      <mesh position={[0, -(h / 2 - barU / 2 - inset / 2), 0]} material={woodMat}>
+      <mesh position={[0, -(h / 2 - barU / 2 - inset / 2), barZ]} material={woodMatH}>
         <boxGeometry args={[w - 2 * inset, barU, barD]} />
       </mesh>
-      <mesh position={[w / 2 - barU / 2 - inset / 2, 0, 0]} material={woodMatDark}>
+      <mesh position={[w / 2 - barU / 2 - inset / 2, 0, barZ]} material={woodMatV}>
         <boxGeometry args={[barU, h - 2 * inset - 2 * barU, barD]} />
       </mesh>
-      <mesh position={[-(w / 2 - barU / 2 - inset / 2), 0, 0]} material={woodMatDark}>
+      <mesh position={[-(w / 2 - barU / 2 - inset / 2), 0, barZ]} material={woodMatV}>
         <boxGeometry args={[barU, h - 2 * inset - 2 * barU, barD]} />
       </mesh>
 
-      {/* Vikta dukkanter på baksidan (hörnen lämnas fria = kapade veck) */}
+      {/* Vikta dukkanter på baksidan (tryckets fortsättning, speglad) */}
       <mesh position={[w / 2 - foldU / 2, 0, zBack - 0.003]} rotation={[0, Math.PI, 0]} material={foldMats.foldRight}>
         <planeGeometry args={[foldU, h - 2 * foldU]} />
       </mesh>
@@ -181,6 +347,32 @@ function CanvasMesh({
       <mesh position={[0, -(h / 2 - foldU / 2), zBack - 0.003]} rotation={[0, Math.PI, 0]} material={foldMats.foldBottom}>
         <planeGeometry args={[w - 2 * foldU, foldU]} />
       </mesh>
+
+      {/* Häftklamrar längs vikbanden */}
+      <mesh position={[w / 2 - foldU / 2, 0, zBack - 0.006]} rotation={[0, Math.PI, 0]} material={stapleMatV}>
+        <planeGeometry args={[foldU, h - 2 * foldU]} />
+      </mesh>
+      <mesh position={[-(w / 2 - foldU / 2), 0, zBack - 0.006]} rotation={[0, Math.PI, 0]} material={stapleMatV}>
+        <planeGeometry args={[foldU, h - 2 * foldU]} />
+      </mesh>
+      <mesh position={[0, h / 2 - foldU / 2, zBack - 0.006]} rotation={[0, Math.PI, 0]} material={stapleMatH}>
+        <planeGeometry args={[w - 2 * foldU, foldU]} />
+      </mesh>
+      <mesh position={[0, -(h / 2 - foldU / 2), zBack - 0.006]} rotation={[0, Math.PI, 0]} material={stapleMatH}>
+        <planeGeometry args={[w - 2 * foldU, foldU]} />
+      </mesh>
+
+      {/* Diagonalt vikta hörnflikar med klammer (Gelatos hörnvik) */}
+      {[
+        [w / 2 - foldU / 2, h / 2 - foldU / 2],
+        [-(w / 2 - foldU / 2), h / 2 - foldU / 2],
+        [w / 2 - foldU / 2, -(h / 2 - foldU / 2)],
+        [-(w / 2 - foldU / 2), -(h / 2 - foldU / 2)],
+      ].map(([x, y], i) => (
+        <mesh key={i} position={[x, y, zBack - 0.0045]} rotation={[0, Math.PI, 0]} material={flapMat}>
+          <planeGeometry args={[foldU, foldU]} />
+        </mesh>
+      ))}
     </group>
   );
 }
