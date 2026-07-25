@@ -31,3 +31,18 @@ export const HANGER_COVER_CM = HANGER_SLAT_CM - HANGER_SLAT_ABOVE_CM;
 export function hangerOverhangCm(paperWcm: number): number {
   return paperWcm <= 21 ? 0.95 : 0.5;
 }
+
+/**
+ * Canvas: officiell tryckfilsspec (support.gelato.com artikel 8996347
+ * "How do I upload my design for a canvas?"):
+ *   slim (2 cm):  fil = front + 2×34 mm wrap + 2×15 mm bleed  (200×300 → 298×398)
+ *   thick (4 cm): fil = front + 2×40 mm wrap + 2×15 mm bleed  (200×300 → 310×410)
+ * Wrap-zonen är djupet + baksidesvik; bleed därutöver. Skickas för lite yta
+ * autoskalar Gelatos preflight upp filen → motivet zoomas in på framsidan.
+ */
+export const CANVAS_BLEED_CM = 1.5;
+
+/** Wrap-zonens bredd per sida (djup + baksidesvik) enligt filspecen. */
+export function canvasWrapExtCm(depthCm: number): number {
+  return depthCm >= 4 ? 4.0 : 3.4;
+}

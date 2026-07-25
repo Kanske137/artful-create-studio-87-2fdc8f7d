@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Canvas3DPreview } from "./Canvas3DPreview";
 import { renderTemplateSnapshot } from "@/lib/template-snapshot";
+import { CANVAS_BLEED_CM, canvasWrapExtCm } from "@/lib/gelato-geometry";
 import { getProductDetailsFor, type ProductDetail } from "./product-details";
 
 interface MockupSlot {
@@ -58,7 +59,8 @@ export function MockupGallery() {
   const canvasDepthCm = isCanvas
     ? (variant?.match(/(\d+)/)?.[1] ? parseInt(variant!.match(/(\d+)/)![1], 10) : 2)
     : 0;
-  const BLEED_CM = 0.3; // Gelato canvas bleed per side
+  // Gelatos canvas-filspec: wrap (djup + baksidesvik) + bleed per sida.
+  const canvasWrapCm = isCanvas ? canvasWrapExtCm(canvasDepthCm) : 0;
 
   // Visible front size (for 3D mesh)
   const [a, b] = (size ?? "30x40").split("x").map(Number);
@@ -96,8 +98,9 @@ export function MockupGallery() {
           liveText: text,
           liveTextFont: textFont,
           liveTextVisible: textVisible,
-          wrapCm: isCanvas ? canvasDepthCm : 0,
-          bleedCm: isCanvas ? BLEED_CM : 0,
+          wrapCm: canvasWrapCm,
+          bleedCm: isCanvas ? CANVAS_BLEED_CM : 0,
+          coordWrapCm: isCanvas ? canvasDepthCm : undefined,
           acrylicCorners: config.product_type === "acrylic",
           watermark: true,
           photoOverlays: { ...photoSources && Object.fromEntries(Object.entries(photoSources).map(([id, s]) => [id, s.previewUrl])), ...photoAiResults },
@@ -310,7 +313,8 @@ export function MockupGallery() {
                     widthCm={widthCm}
                     heightCm={heightCm}
                     depthCm={canvasDepthCm}
-                    bleedCm={BLEED_CM}
+                    wrapExtCm={canvasWrapCm}
+                    bleedCm={CANVAS_BLEED_CM}
                   />
                 </div>
               ) : (

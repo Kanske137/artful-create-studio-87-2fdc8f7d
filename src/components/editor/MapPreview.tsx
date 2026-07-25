@@ -966,29 +966,63 @@ export function MapPreview({
           return null;
         })}
 
-        {/* Visible front indicator (canvas wrap mode only) */}
-        {isWrap && (
-          <div
-            className="absolute pointer-events-none border-2 border-dashed"
-            style={{
-              ...frontZoneStyle,
-              borderColor: "hsl(var(--primary))",
-              boxShadow: "0 0 0 1px hsl(var(--background) / 0.9), inset 0 0 0 1px hsl(var(--background) / 0.9)",
-              zIndex: 41,
-            }}
-          >
-            <span
-              className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full px-2 py-0.5 text-[10px] uppercase tracking-wider rounded whitespace-nowrap font-semibold shadow"
-              style={{
-                background: "hsl(var(--primary))",
-                color: "hsl(var(--primary-foreground))",
-                zIndex: 42,
-              }}
-            >
-              Synlig framsida · innehållet här viks om på sidorna
-            </span>
-          </div>
-        )}
+        {/* Canvas wrap-zoner à la Gelatos editor: allt utanför framsidan
+            frostas (innehållet skymtar = "detta viks runt kanten"), hörnen
+            gråmarkeras (kapas/viks vid montering) och framsidan ramas in med
+            en streckad gräns + etikett. */}
+        {isWrap && (() => {
+          const ix = frontMarkerInsetX * 100;
+          const iy = frontMarkerInsetY * 100;
+          const frost = "rgba(255,255,255,0.62)";
+          const cornerTint = "rgba(96,96,96,0.14)";
+          const zoneBase: React.CSSProperties = { position: "absolute", pointerEvents: "none", zIndex: 40 };
+          return (
+            <>
+              {/* Sidoband (frost) — topp/botten exkl. hörn, vänster/höger exkl. hörn */}
+              <div style={{ ...zoneBase, top: 0, left: `${ix}%`, right: `${ix}%`, height: `${iy}%`, background: frost }} />
+              <div style={{ ...zoneBase, bottom: 0, left: `${ix}%`, right: `${ix}%`, height: `${iy}%`, background: frost }} />
+              <div style={{ ...zoneBase, left: 0, top: `${iy}%`, bottom: `${iy}%`, width: `${ix}%`, background: frost }} />
+              <div style={{ ...zoneBase, right: 0, top: `${iy}%`, bottom: `${iy}%`, width: `${ix}%`, background: frost }} />
+              {/* Hörnrutor (kapas vid vikningen) */}
+              <div style={{ ...zoneBase, top: 0, left: 0, width: `${ix}%`, height: `${iy}%`, background: frost, boxShadow: `inset 0 0 0 999px ${cornerTint}` }} />
+              <div style={{ ...zoneBase, top: 0, right: 0, width: `${ix}%`, height: `${iy}%`, background: frost, boxShadow: `inset 0 0 0 999px ${cornerTint}` }} />
+              <div style={{ ...zoneBase, bottom: 0, left: 0, width: `${ix}%`, height: `${iy}%`, background: frost, boxShadow: `inset 0 0 0 999px ${cornerTint}` }} />
+              <div style={{ ...zoneBase, bottom: 0, right: 0, width: `${ix}%`, height: `${iy}%`, background: frost, boxShadow: `inset 0 0 0 999px ${cornerTint}` }} />
+              {/* Zonetikett i vänstra sidbandet (Gelato-stil, krockar ej med pillen) */}
+              <span
+                className="absolute text-[9px] uppercase tracking-wider text-muted-foreground/90 font-medium pointer-events-none"
+                style={{
+                  left: `${ix / 2}%`,
+                  top: "50%",
+                  transform: "translate(-50%, -50%) rotate(-90deg)",
+                  zIndex: 41,
+                }}
+              >
+                Sidor
+              </span>
+              {/* Streckad gräns runt synliga framsidan */}
+              <div
+                className="absolute pointer-events-none border border-dashed"
+                style={{
+                  ...frontZoneStyle,
+                  borderColor: "rgba(90,90,90,0.55)",
+                  zIndex: 41,
+                }}
+              >
+                <span
+                  className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full px-2 py-0.5 text-[10px] uppercase tracking-wider rounded whitespace-nowrap font-semibold shadow"
+                  style={{
+                    background: "hsl(var(--primary))",
+                    color: "hsl(var(--primary-foreground))",
+                    zIndex: 42,
+                  }}
+                >
+                  Synlig framsida · det frostade viks runt kanten
+                </span>
+              </div>
+            </>
+          );
+        })()}
 
         {/* Center alignment guides (shown only while dragging snaps) */}
         {guides.v && (

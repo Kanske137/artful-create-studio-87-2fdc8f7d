@@ -3,6 +3,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
 import { Loader2, AlertCircle } from "lucide-react";
+import { CANVAS_BLEED_CM, canvasWrapExtCm } from "@/lib/gelato-geometry";
 
 interface Canvas3DPreviewProps {
   printUrl: string | null;
@@ -11,9 +12,11 @@ interface Canvas3DPreviewProps {
   /** Visible front dimensions in cm (what customer ordered). */
   widthCm: number;
   heightCm: number;
-  /** Canvas depth in cm (wrap zone width per side). */
+  /** Canvas depth in cm (2 = slim, 4 = thick). */
   depthCm: number;
-  /** Bleed in cm per side outside the wrap zone (Gelato canvas = 0.3). */
+  /** Wrap-zonens bredd per sida i tryckfilen (djup + baksidesvik). */
+  wrapExtCm?: number;
+  /** Bleed per sida utanför wrap-zonen (Gelato canvas = 1.5). */
   bleedCm?: number;
   /**
    * När true: rendera bara själva 3D-canvasen utan yttre sektion/rubrik
@@ -42,56 +45,47 @@ function useTexture(url: string | null) {
 }
 
 /**
- * Canvas mesh with Gelato-accurate wrap.
+ * Canvas mesh med Gelato-verklig konstruktion:
  *
- * The input texture is the FULL print file produced by `renderArtworkSnapshot`
- * with `wrapCm` + `bleedCm`, laid out as:
+ * Tryckfilen (renderTemplateSnapshot med wrapCm + bleedCm) är upplagd som
+ *   [ bleed | wrap | FRONT | wrap | bleed ]   (per axel, wrap = djup + vik)
  *
- *   [ bleed | wrap | FRONT (visible motif) | wrap | bleed ]   (per axis)
- *
- * Each face of the box samples its own UV-rect of that single texture so the
- * front shows only the motif, sides show the wrap continuation, and corners
- * are seamless because they share pixel boundaries with the front.
+ * Framsidan samplar front-zonen, sidorna samplar DJUP-delen av wrap-zonen,
+ * och baksidans vikta kanter samplar fortsättningen (speglad — precis som
+ * duken viks IRL). Baksidan är IHÅLIG: träspännram runt kanten, dukens
+ * baksida synlig i den försänkta mitten.
  */
 function CanvasMesh({
-  texture, widthCm, heightCm, depthCm, bleedCm, autoRotate,
+  texture, widthCm, heightCm, depthCm, wrapExtCm, bleedCm,
 }: {
   texture: THREE.Texture;
-  widthCm: number; heightCm: number; depthCm: number; bleedCm: number;
-  autoRotate: boolean;
+  widthCm: number; heightCm: number; depthCm: number; wrapExtCm: number; bleedCm: number;
 }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-
-  // Normalize box size so the largest visible-front dimension = 2 units.
-  // Depth is independent so 2cm vs 4cm look visually different.
   const maxCm = Math.max(widthCm, heightCm);
-  const w = (widthCm / maxCm) * 2;
-  const h = (heightCm / maxCm) * 2;
-  const d = (depthCm / maxCm) * 2;
+  const u = (cm: number) => (cm / maxCm) * 2; // cm → scenenheter
+  const w = u(widthCm);
+  const h = u(heightCm);
+  const d = u(depthCm);
+  // Synlig vikbredd på baksidan (det som finns kvar av wrap + bleed).
+  const foldCm = Math.min(2.2, Math.max(1.2, wrapExtCm - depthCm + bleedCm));
+  const foldU = u(foldCm);
 
-  useFrame((_, dt) => {
-    if (autoRotate && meshRef.current) {
-      meshRef.current.rotation.y += dt * 0.15;
-    }
-  });
+  const { boxMaterials, foldMats } = useMemo(() => {
+    // Texturlayout-fraktioner per axel
+    const totalW = widthCm + 2 * (wrapExtCm + bleedCm);
+    const totalH = heightCm + 2 * (wrapExtCm + bleedCm);
+    const fx = (cm: number) => cm / totalW;
+    const fy = (cm: number) => cm / totalH;
+    const frontX0 = fx(bleedCm + wrapExtCm);
+    const frontY0 = fy(bleedCm + wrapExtCm);
+    const fFrontX = fx(widthCm);
+    const fFrontY = fy(heightCm);
+    const fDepthX = fx(depthCm);
+    const fDepthY = fy(depthCm);
+    const fFoldX = fx(foldCm);
+    const fFoldY = fy(foldCm);
 
-  // BoxGeometry material order: [+X, -X, +Y, -Y, +Z, -Z]
-  // = right, left, top, bottom, front, back
-  const materials = useMemo(() => {
-    // Texture-fraction layout (Gelato print file)
-    const totalW = widthCm + 2 * depthCm + 2 * bleedCm;
-    const totalH = heightCm + 2 * depthCm + 2 * bleedCm;
-    const fFrontX = widthCm / totalW;
-    const fFrontY = heightCm / totalH;
-    const fWrapX  = depthCm / totalW;
-    const fWrapY  = depthCm / totalH;
-    const fBleedX = bleedCm / totalW;
-    const fBleedY = bleedCm / totalH;
-
-    // Helper: clone texture and apply UV offset/repeat (and optional flip).
-    // Three.js UV origin: (0,0) = bottom-left of texture, (1,1) = top-right.
-    // Our snapshot is drawn with canvas 2D origin top-left → in UV space the
-    // top of the print is V=1, bottom is V=0.
+    // Klona texturen till ett UV-fönster (top-left-origo in, UV-origo ut).
     const make = (
       offsetX: number, offsetY: number,
       repeatX: number, repeatY: number,
@@ -103,94 +97,104 @@ function CanvasMesh({
       t.wrapT = THREE.ClampToEdgeWrapping;
       t.colorSpace = THREE.SRGBColorSpace;
       t.anisotropy = 8;
-      // Convert top-left-origin coordinates to UV (flip Y for the offset).
       const uvOffsetX = offsetX;
       const uvOffsetY = 1 - (offsetY + repeatY);
-      // For flips, compensate offset so the SAME UV window is sampled, just
-      // mirrored. Using texture.center would pivot around the whole texture
-      // and shift the strip onto the wrong region (front face bleed).
       t.offset.set(
         flipX ? uvOffsetX + repeatX : uvOffsetX,
         flipY ? uvOffsetY + repeatY : uvOffsetY,
       );
       t.repeat.set(flipX ? -repeatX : repeatX, flipY ? -repeatY : repeatY);
-      return new THREE.MeshStandardMaterial({ map: t, roughness: 0.85, metalness: 0 });
+      return new THREE.MeshStandardMaterial({
+        map: t, roughness: 0.85, metalness: 0, side: THREE.DoubleSide,
+      });
     };
 
-    // FRONT (+Z): inner motif zone, no wrap, no bleed.
-    // Three.js BoxGeometry +Z UVs: U=0 at -X (left), V=0 at -Y (bottom).
-    const front = make(
-      fBleedX + fWrapX, fBleedY + fWrapY,
-      fFrontX, fFrontY,
-    );
+    // FRONT (+Z)
+    const front = make(frontX0, frontY0, fFrontX, fFrontY);
+    // Sidor: DJUP-delen av wrap-bandet närmast fronten.
+    const right = make(frontX0 + fFrontX, frontY0, fDepthX, fFrontY);
+    const left = make(frontX0 - fDepthX, frontY0, fDepthX, fFrontY);
+    const top = make(frontX0, frontY0 - fDepthY, fFrontX, fDepthY);
+    const bottom = make(frontX0, frontY0 + fFrontY, fFrontX, fDepthY);
+    // Baksidan på boxen är osynlig — det ihåliga byggs av egna meshes.
+    const back = new THREE.MeshStandardMaterial({ visible: false });
 
-    // RIGHT (+X): wrap strip immediately to the right of the front in the
-    // print file. Three.js BoxGeometry +X UVs: U=0 at -Z (back edge),
-    // U=1 at +Z (FRONT edge); V=0 at bottom. The strip's leftmost pixel
-    // column (in print-file space) is closest to the front and must land at
-    // the U=1 edge (which meets the front). Default mapping puts the strip's
-    // rightmost pixel at U=1 — but our strip's "near-front" column is its
-    // LEFT column, so without any flip the wrapping continues seamlessly
-    // (the rightmost back-edge pixel lands at the back side). No flip needed,
-    // mirroring left-side behaviour.
-    const right = make(
-      fBleedX + fWrapX + fFrontX, fBleedY + fWrapY,
-      fWrapX, fFrontY,
-    );
+    // Vikta kanter på baksidan: fortsättningen BORTOM djupet, speglad
+    // (duken viks runt bakkanten → utsidan vänds mot betraktaren).
+    const foldRight = make(frontX0 + fFrontX + fDepthX, frontY0, fFoldX, fFrontY, true, false);
+    const foldLeft = make(frontX0 - fDepthX - fFoldX, frontY0, fFoldX, fFrontY, true, false);
+    const foldTop = make(frontX0, frontY0 - fDepthY - fFoldY, fFrontX, fFoldY, false, true);
+    const foldBottom = make(frontX0, frontY0 + fFrontY + fDepthY, fFrontX, fFoldY, false, true);
 
-    // LEFT (-X): wrap strip immediately to the left of the front.
-    // Three.js BoxGeometry -X UVs: U=0 at -Z (back), U=1 at +Z (FRONT edge).
-    // The strip's rightmost pixel column (in print-file space) is closest to
-    // the front and must land at U=1. Default mapping already puts the
-    // rightmost pixel at U=1 → no flip.
-    const left = make(
-      fBleedX, fBleedY + fWrapY,
-      fWrapX, fFrontY,
-    );
+    return {
+      boxMaterials: [right, left, top, bottom, front, back],
+      foldMats: { foldRight, foldLeft, foldTop, foldBottom },
+    };
+  }, [texture, widthCm, heightCm, depthCm, wrapExtCm, bleedCm, foldCm]);
 
-    // TOP (+Y): wrap strip immediately above the front in the print file.
-    // Three.js BoxGeometry +Y UVs: U=0 at -X (left); V=0 at +Z (FRONT edge),
-    // V=1 at -Z (back edge). The strip's bottom row (in print-file space) is
-    // closest to the front and must land at V=0. Default mapping puts the
-    // strip's bottom row at V=0 → no flip.
-    const top = make(
-      fBleedX + fWrapX, fBleedY,
-      fFrontX, fWrapY,
-    );
+  // Spännram (trä) + dukbaksida
+  const woodMat = useMemo(() => new THREE.MeshStandardMaterial({ color: "#d9c8a4", roughness: 0.9 }), []);
+  const woodMatDark = useMemo(() => new THREE.MeshStandardMaterial({ color: "#c9b892", roughness: 0.9 }), []);
+  const fabricBack = useMemo(() => new THREE.MeshStandardMaterial({ color: "#ece7db", roughness: 1 }), []);
 
-    // BOTTOM (-Y): wrap strip immediately below the front.
-    // Three.js BoxGeometry -Y UVs: U=0 at -X; V=0 at -Z (back), V=1 at +Z
-    // (FRONT edge). The strip's top row (in print-file space) is closest to
-    // the front and must land at V=1. Default mapping puts the strip's top
-    // row at V=1 → no flip.
-    const bottom = make(
-      fBleedX + fWrapX, fBleedY + fWrapY + fFrontY,
-      fFrontX, fWrapY,
-    );
-
-    // BACK (-Z): canvas back is plain stretched fabric. Solid neutral.
-    const back = new THREE.MeshStandardMaterial({ color: "#e8e4dc", roughness: 0.95 });
-
-    return [right, left, top, bottom, front, back];
-  }, [texture, widthCm, heightCm, depthCm, bleedCm]);
+  const barU = Math.min(u(3.5), Math.min(w, h) * 0.24); // ~3,5 cm breda lister
+  const barD = d * 0.86;
+  const inset = 0.012;
+  const zBack = -d / 2;
 
   return (
-    <mesh ref={meshRef} castShadow receiveShadow material={materials}>
-      <boxGeometry args={[w, h, d]} />
-    </mesh>
+    <group>
+      {/* Duken: front + 4 sidor (baksidan osynlig) */}
+      <mesh castShadow receiveShadow material={boxMaterials}>
+        <boxGeometry args={[w, h, d]} />
+      </mesh>
+
+      {/* Dukens baksida, försänkt ända in vid frontens insida */}
+      <mesh position={[0, 0, d / 2 - 0.006]} rotation={[0, Math.PI, 0]} material={fabricBack}>
+        <planeGeometry args={[w - inset, h - inset]} />
+      </mesh>
+
+      {/* Spännram: topp/botten + vänster/höger (stumfog som IRL) */}
+      <mesh position={[0, h / 2 - barU / 2 - inset / 2, 0]} material={woodMat}>
+        <boxGeometry args={[w - 2 * inset, barU, barD]} />
+      </mesh>
+      <mesh position={[0, -(h / 2 - barU / 2 - inset / 2), 0]} material={woodMat}>
+        <boxGeometry args={[w - 2 * inset, barU, barD]} />
+      </mesh>
+      <mesh position={[w / 2 - barU / 2 - inset / 2, 0, 0]} material={woodMatDark}>
+        <boxGeometry args={[barU, h - 2 * inset - 2 * barU, barD]} />
+      </mesh>
+      <mesh position={[-(w / 2 - barU / 2 - inset / 2), 0, 0]} material={woodMatDark}>
+        <boxGeometry args={[barU, h - 2 * inset - 2 * barU, barD]} />
+      </mesh>
+
+      {/* Vikta dukkanter på baksidan (hörnen lämnas fria = kapade veck) */}
+      <mesh position={[w / 2 - foldU / 2, 0, zBack - 0.003]} rotation={[0, Math.PI, 0]} material={foldMats.foldRight}>
+        <planeGeometry args={[foldU, h - 2 * foldU]} />
+      </mesh>
+      <mesh position={[-(w / 2 - foldU / 2), 0, zBack - 0.003]} rotation={[0, Math.PI, 0]} material={foldMats.foldLeft}>
+        <planeGeometry args={[foldU, h - 2 * foldU]} />
+      </mesh>
+      <mesh position={[0, h / 2 - foldU / 2, zBack - 0.003]} rotation={[0, Math.PI, 0]} material={foldMats.foldTop}>
+        <planeGeometry args={[w - 2 * foldU, foldU]} />
+      </mesh>
+      <mesh position={[0, -(h / 2 - foldU / 2), zBack - 0.003]} rotation={[0, Math.PI, 0]} material={foldMats.foldBottom}>
+        <planeGeometry args={[w - 2 * foldU, foldU]} />
+      </mesh>
+    </group>
   );
 }
 
 function Scene({
-  printUrl, widthCm, heightCm, depthCm, bleedCm,
+  printUrl, widthCm, heightCm, depthCm, wrapExtCm, bleedCm,
 }: {
   printUrl: string;
-  widthCm: number; heightCm: number; depthCm: number; bleedCm: number;
+  widthCm: number; heightCm: number; depthCm: number; wrapExtCm: number; bleedCm: number;
 }) {
   const tex = useTexture(printUrl);
   return (
     <>
-      <ambientLight intensity={0.65} />
+      <ambientLight intensity={0.7} />
       <directionalLight
         position={[3, 4, 5]}
         intensity={1.2}
@@ -199,14 +203,16 @@ function Scene({
         shadow-mapSize-height={1024}
       />
       <directionalLight position={[-3, 2, 2]} intensity={0.3} />
+      {/* Svagt bakljus så spännramen läses när man roterar runt */}
+      <directionalLight position={[0, 2, -4]} intensity={0.45} />
       {tex && (
         <CanvasMesh
           texture={tex}
           widthCm={widthCm}
           heightCm={heightCm}
           depthCm={depthCm}
+          wrapExtCm={wrapExtCm}
           bleedCm={bleedCm}
-          autoRotate={false}
         />
       )}
       <ContactShadows position={[0, -1.4, 0]} opacity={0.35} scale={6} blur={2.4} far={2} />
@@ -215,16 +221,16 @@ function Scene({
         enableZoom={false}
         minPolarAngle={Math.PI / 2 - Math.PI / 4}
         maxPolarAngle={Math.PI / 2 + Math.PI / 4}
-        minAzimuthAngle={-Math.PI / 4}
-        maxAzimuthAngle={Math.PI / 4}
       />
     </>
   );
 }
 
 export function Canvas3DPreview({
-  printUrl, loading, error, widthCm, heightCm, depthCm, bleedCm = 0.3, embedded = false,
+  printUrl, loading, error, widthCm, heightCm, depthCm,
+  wrapExtCm, bleedCm = CANVAS_BLEED_CM, embedded = false,
 }: Canvas3DPreviewProps) {
+  const wrapExt = wrapExtCm ?? canvasWrapExtCm(depthCm);
   const inner = (
     <div
       className="w-full rounded-2xl overflow-hidden bg-card border relative"
@@ -255,13 +261,14 @@ export function Canvas3DPreview({
               widthCm={widthCm}
               heightCm={heightCm}
               depthCm={depthCm}
+              wrapExtCm={wrapExt}
               bleedCm={bleedCm}
             />
           </Suspense>
         </Canvas>
       )}
       <div className="absolute bottom-2 right-3 text-[11px] text-muted-foreground bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full pointer-events-none">
-        dra för att rotera
+        dra för att rotera — även runt baksidan
       </div>
     </div>
   );

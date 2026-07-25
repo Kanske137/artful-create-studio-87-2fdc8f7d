@@ -57,6 +57,9 @@ export interface TemplateSnapshotInput {
   // Output sizing
   wrapCm?: number;
   bleedCm?: number;
+  /** Koordinatytans wrap per sida (cm) för fullArea-canvaslayouter — dvs.
+   *  DJUPET som editorytan visar. Default = wrapCm (bakåtkompatibelt). */
+  coordWrapCm?: number;
   hires?: boolean;
   maxPxOverride?: number;
 
@@ -700,11 +703,21 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
     input.productType === "canvas" &&
     !!namedLayoutForCoord.canvasLayout &&
     namedLayoutForCoord.canvasLayout.coordSpace === "fullArea";
-  const frontPxX = layersIncludeWrap ? 0 : Math.round(extraCm * PX_PER_CM * scale);
-  const frontPxY = layersIncludeWrap ? 0 : Math.round(extraCm * PX_PER_CM * scale);
-  const frontPxW = layersIncludeWrap ? w : Math.round(frontWcm * PX_PER_CM * scale);
-  const frontPxH = layersIncludeWrap ? h : Math.round(frontHcm * PX_PER_CM * scale);
-  const wrapPxExtra = layersIncludeWrap ? 0 : Math.round(extraCm * PX_PER_CM * scale);
+  // Koordinatytan (där lagrens % lever) kan vara mindre än tryckytan:
+  // fullArea-layouter designades mot front + 2×DJUP (editorytan), medan
+  // tryckfilen enligt Gelatos spec är front + 2×(wrap + bleed). Lager på
+  // koordinatytans kant förlängs ut i restbandet av bleed-logiken nedan.
+  const coordExtraCm = layersIncludeWrap
+    ? Math.min(Math.max(0, input.coordWrapCm ?? wrapCm), extraCm)
+    : 0;
+  const offsetPx = Math.round((extraCm - coordExtraCm) * PX_PER_CM * scale);
+  const frontPxX = offsetPx;
+  const frontPxY = offsetPx;
+  const frontPxW = w - 2 * offsetPx;
+  const frontPxH = h - 2 * offsetPx;
+  const wrapPxExtra = offsetPx;
+  // Sann framsidezon (för margin-lagret, oavsett koordinatyta).
+  const trueFrontPx = Math.round(extraCm * PX_PER_CM * scale);
 
   const out = document.createElement("canvas");
   out.width = w;
@@ -907,8 +920,13 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
       // Margin frames the FRONT zone only — never the wrap/bleed band. This
       // matches the editor's dashed "Synlig framsida" rectangle and keeps the
       // 3D canvas wrap symmetric (motif extends out into the wrap unchanged).
-      const frontRect = { x: frontPxX, y: frontPxY, w: frontPxW, h: frontPxH };
-      const shortPx = Math.min(frontPxW, frontPxH);
+      const frontRect = {
+        x: trueFrontPx,
+        y: trueFrontPx,
+        w: w - 2 * trueFrontPx,
+        h: h - 2 * trueFrontPx,
+      };
+      const shortPx = Math.min(frontRect.w, frontRect.h);
       drawMarginLayer(ctx, frontRect, layer, pxPerMm, shortPx);
     }
   }

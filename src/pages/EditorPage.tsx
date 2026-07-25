@@ -29,7 +29,7 @@ import { uploadCartPreview } from "@/lib/upload-preview";
 import { getPrintFileUrl } from "@/lib/print-pipeline";
 import { resolveShopifyVariantId } from "@/lib/shopify-variant-resolver";
 import { hangerColorFromVariant } from "@/lib/mockup-scenes";
-import { FRAME_FRONT_CM } from "@/lib/gelato-geometry";
+import { FRAME_FRONT_CM, CANVAS_BLEED_CM, canvasWrapExtCm } from "@/lib/gelato-geometry";
 import { mutateActiveLayoutBlock } from "@/lib/freeform-layers";
 import { ensureSession, getSessionKey, track } from "@/lib/analytics";
 import { SubscriberGateDialog } from "@/components/editor/SubscriberGateDialog";
@@ -338,8 +338,11 @@ export default function EditorPage() {
       liveText: text,
       liveTextFont: textFont,
       liveTextVisible: textVisible,
-      wrapCm: isCanvas ? (variant?.match(/(\d+)/)?.[1] ? parseInt(variant.match(/(\d+)/)![1], 10) : 2) : 0,
-      bleedCm: isCanvas ? 0.3 : 0,
+      // Gelatos canvas-filspec: wrap = djup + baksidesvik (3,4/4,0 cm) + 1,5 cm
+      // bleed per sida. coordWrapCm = djupet (editorytan) för fullArea-layouter.
+      wrapCm: isCanvas ? canvasWrapExtCm(canvasDepthCm) : 0,
+      bleedCm: isCanvas ? CANVAS_BLEED_CM : 0,
+      coordWrapCm: isCanvas ? canvasDepthCm : undefined,
       photoOverlays: useEditorStore.getState().getPhotoOverlays(),
       aiPhotoResults,
       aiPhotoSelectedRefUrl: useEditorStore.getState().aiPhotoSelectedRefUrl,
