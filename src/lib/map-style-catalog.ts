@@ -15,59 +15,62 @@ export interface MapStyleCatalogEntry {
 }
 
 export const MAP_STYLE_CATALOG: MapStyleCatalogEntry[] = [
+  // v2-stilar 2026-07-25: poster-klass kontrast (mörka/ljusa viktade vägar,
+  // tydligt vatten, gatunät från z11) — originalen (cmp2…) finns kvar orörda
+  // i Mapbox-kontot som fallback om något behöver rullas tillbaka.
   {
     id: "skandinavisk",
     label: "Skandinavisk",
     labelKey: "mapStyle.skandinavisk",
     previewBg: "linear-gradient(135deg, #f5f5f0, #e8e8e0)",
-    styleUrl: "mapbox://styles/maybe137/cmp2m5h3e000u01sh1w0u5di8",
+    styleUrl: "mapbox://styles/maybe137/cms0mtqjz00rh01qt7n6t64ir",
     thumbnailUrl:
-      "https://api.mapbox.com/styles/v1/maybe137/cmp2mwnte000s01shb15lbfnc/static/18.0686,59.3293,11,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
+      "https://api.mapbox.com/styles/v1/maybe137/cms0mtqjz00rh01qt7n6t64ir/static/18.0686,59.3293,12,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
   },
   {
     id: "midnatt",
     label: "Midnatt",
     labelKey: "mapStyle.midnatt",
     previewBg: "linear-gradient(135deg, #1a1a2e, #16213e)",
-    styleUrl: "mapbox://styles/maybe137/cmp2m7b2z001x01s6h0dz9kyz",
+    styleUrl: "mapbox://styles/maybe137/cms0mtqrp00qu01sc00bbdq9o",
     thumbnailUrl:
-      "https://api.mapbox.com/styles/v1/maybe137/cmp2mydkw001m01sc4ry6azi8/static/18.0686,59.3293,11,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
+      "https://api.mapbox.com/styles/v1/maybe137/cms0mtqrp00qu01sc00bbdq9o/static/18.0686,59.3293,12,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
   },
   {
     id: "outdoors-v12",
     label: "Mintgrön/Salvia",
     labelKey: "mapStyle.mintgron",
     previewBg: "linear-gradient(135deg, #d4e8d4, #a8d5a2)",
-    styleUrl: "mapbox://styles/maybe137/cmp2o0s2j001z01sc62sueshh",
+    styleUrl: "mapbox://styles/maybe137/cms0mtqzm00ri01qt8jjj81p9",
     thumbnailUrl:
-      "https://api.mapbox.com/styles/v1/maybe137/cmp2o1ftk000y01shhzca9vui/static/18.0686,59.3293,11,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
+      "https://api.mapbox.com/styles/v1/maybe137/cms0mtqzm00ri01qt8jjj81p9/static/18.0686,59.3293,12,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
   },
   {
     id: "satellite-v9",
     label: "Marin Blå",
     labelKey: "mapStyle.marinbla",
     previewBg: "linear-gradient(135deg, #1a2f4a, #0d1b2a)",
-    styleUrl: "mapbox://styles/maybe137/cmp2o2107000u01sh0f1v440n",
+    styleUrl: "mapbox://styles/maybe137/cms0mtr7100ot01qx8eqf8lam",
     thumbnailUrl:
-      "https://api.mapbox.com/styles/v1/maybe137/cmp2o2ojs000v01sh236bexlf/static/18.0686,59.3293,11,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
+      "https://api.mapbox.com/styles/v1/maybe137/cms0mtr7100ot01qx8eqf8lam/static/18.0686,59.3293,12,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
   },
   {
     id: "streets-v12",
     label: "Varm Beige/Cream",
     labelKey: "mapStyle.varmbeige",
     previewBg: "linear-gradient(135deg, #f5efe0, #e8dcc8)",
-    styleUrl: "mapbox://styles/maybe137/cmp2o3bmm003301qrbg5vh3wc",
+    styleUrl: "mapbox://styles/maybe137/cms0mtre800qv01scfoz22dhn",
     thumbnailUrl:
-      "https://api.mapbox.com/styles/v1/maybe137/cmp2o3ymr000u01saaicbel9j/static/18.0686,59.3293,11,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
+      "https://api.mapbox.com/styles/v1/maybe137/cms0mtre800qv01scfoz22dhn/static/18.0686,59.3293,12,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
   },
   {
     id: "navigation-night-v1",
     label: "Djup Skogsgrön/Svart",
     labelKey: "mapStyle.skogsgron",
     previewBg: "linear-gradient(135deg, #0a1f0a, #051405)",
-    styleUrl: "mapbox://styles/maybe137/cmp2o54dh000w01sh3a9n1l1v",
+    styleUrl: "mapbox://styles/maybe137/cms0mtrim00px01qz27t87307",
     thumbnailUrl:
-      "https://api.mapbox.com/styles/v1/maybe137/cmp2o5onl000v01sac1278wc7/static/18.0686,59.3293,11,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
+      "https://api.mapbox.com/styles/v1/maybe137/cms0mtrim00px01qz27t87307/static/18.0686,59.3293,12,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
   },
 ];
 
