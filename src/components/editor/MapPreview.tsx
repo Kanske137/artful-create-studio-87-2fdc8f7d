@@ -697,8 +697,10 @@ export function MapPreview({
                       zoom={zoom}
                       draggable={!!src}
                     />
-                    {/* Vattenmärke på bildlagret — endast förhandsvisning. */}
-                    {src ? <WatermarkOverlay clipPath={clip} /> : null}
+                    {/* Vattenmärke ENDAST när kundens AI-stylade resultat visas
+                        (Akrams beslut 2026-07-25) — rena uppladdade foton är
+                        kundens egna och märks inte. */}
+                    {photoAiResults[l.id] ? <WatermarkOverlay clipPath={clip} /> : null}
                     {/* Exempelpill när placeholder/demo visas (Paket D2) —
                         även vanliga bildlager märker sina exempelbilder. */}
                     {!!src &&
@@ -819,8 +821,13 @@ export function MapPreview({
                         zoom={zoom}
                         draggable={!!src && !usingRefOrSwap}
                       />
-                      {/* Vattenmärke på AI-bildlagret — endast förhandsvisning. */}
-                      <WatermarkOverlay clipPath={clip} />
+                      {/* Vattenmärke ENDAST när kundens eget AI-resultat visas —
+                          referens/exempelbilder märks av exempelpillen i stället. */}
+                      {aiResultUrl &&
+                        aiResultUrl !==
+                          ((l.defaults as { demoResultUrl?: string }).demoResultUrl ?? null) && (
+                          <WatermarkOverlay clipPath={clip} />
+                        )}
                       {/* Referensen visas tills kundens eget resultat finns —
                           märk den som exempel så ingen tror att personen/djuret
                           på bilden följer med tavlan. */}
@@ -912,13 +919,8 @@ export function MapPreview({
             return (
               <div key={l.id} style={wrapStyle}>
                 <ImageLayerView layer={l} />
-                {/* Vattenmärke på statiska bildlager — endast förhandsvisning.
-                    Samma cirkel-clip som ImageLayerView använder. */}
-                {l.defaults.url ? (
-                  <WatermarkOverlay
-                    clipPath={l.defaults.shape === "circle" ? "circle(50% at 50% 50%)" : undefined}
-                  />
-                ) : null}
+                {/* Inget vattenmärke på statiska bildlager — mallgrafik är vår
+                    egen och innehåller ingen AI-modifiering (Akram 2026-07-25). */}
                 {moveHandle}
                 {resizeHandle}
               </div>
@@ -1054,9 +1056,15 @@ export function MapPreview({
           />
         )}
       </div>
-      {/* Notis endast när mallen har bildlager (= vattenmärke kan synas). */}
+      {/* Notis endast när ett vattenmärke faktiskt visas = något lager har
+          kundens eget AI-resultat (demo-exempel märks med pill, ej märke). */}
       {allLayers.some(
-        (l) => l.type === "photo" || l.type === "aiPhoto" || (l.type === "image" && !!l.defaults.url),
+        (l) =>
+          (l.type === "photo" && !!photoAiResults[l.id]) ||
+          (l.type === "aiPhoto" &&
+            !!aiPhotoResults[l.id] &&
+            aiPhotoResults[l.id] !==
+              ((l.defaults as { demoResultUrl?: string }).demoResultUrl ?? null)),
       ) && (
         <p className="text-xs text-muted-foreground text-center max-w-sm">
           {t("watermark.notice")}

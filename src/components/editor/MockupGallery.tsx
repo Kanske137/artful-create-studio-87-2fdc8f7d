@@ -103,6 +103,7 @@ export function MockupGallery() {
           coordWrapCm: isCanvas ? canvasDepthCm : undefined,
           acrylicCorners: config.product_type === "acrylic",
           watermark: true,
+          aiStyledLayerIds: Object.keys(photoAiResults ?? {}),
           photoOverlays: { ...photoSources && Object.fromEntries(Object.entries(photoSources).map(([id, s]) => [id, s.previewUrl])), ...photoAiResults },
           aiPhotoResults,
         });

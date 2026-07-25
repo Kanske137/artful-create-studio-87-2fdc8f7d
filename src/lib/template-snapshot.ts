@@ -92,6 +92,9 @@ export interface TemplateSnapshotInput {
    *  other layers are expanded proportionally to fill the freed area. */
   whiteMarginEnabled?: boolean;
 
+  /** Lager-id:n (photo-typ) vars visade innehåll är ett AI-stylat kundresultat
+   *  — endast dessa vattenmärks (Akrams beslut 2026-07-25). */
+  aiStyledLayerIds?: string[];
   /** Diagonalt upprepat "Arthena"-vattenmärke på varje BILDLAGER (photo /
    *  aiPhoto / image — inte kartor, text eller bakgrund). Endast kundvända
    *  previews (kundvagnsbild, mockups, 3D). ALDRIG tryckfil — hires-vägen
@@ -835,10 +838,8 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
       drawTextLayer(ctx, rect, layer, text, font, Math.min(frontPxW, frontPxH), tv?.fontSizePt ?? null);
     } else if (layer.type === "image") {
       try {
+        // Inget vattenmärke på statiska bildlager — mallgrafik utan AI.
         await drawImageLayer(ctx, rect, layer);
-        if (layerWatermark && layer.defaults.url) {
-          drawLayerWatermark(ctx, rect, layer.defaults.shape);
-        }
       } catch (e) {
         console.warn("[template-snapshot] image layer failed", e);
       }
@@ -856,7 +857,10 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
         const zoom = pv?.zoom ?? 1;
         try {
           await drawPhotoLayer(ctx, rect, url, shape, layer.defaults.fit, offsetX, offsetY, zoom);
-          if (layerWatermark) drawLayerWatermark(ctx, rect, shape);
+          // Vattenmärke endast när lagret visar ett AI-stylat kundresultat.
+          if (layerWatermark && input.aiStyledLayerIds?.includes(layer.id)) {
+            drawLayerWatermark(ctx, rect, shape);
+          }
         } catch (e) {
           console.warn("[template-snapshot] photo layer failed", e);
         }
@@ -907,7 +911,12 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
         }
         try {
           await drawPhotoLayer(ctx, rect, url, shape, fit, offsetX, offsetY, zoom);
-          if (layerWatermark) drawLayerWatermark(ctx, rect, shape);
+          // Vattenmärke endast på kundens EGET AI-resultat — referens- och
+          // demobilder märks med exempelpillen i editorn i stället.
+          const demoUrl = (layer.defaults as { demoResultUrl?: string }).demoResultUrl ?? null;
+          if (layerWatermark && aiResultUrl && aiResultUrl !== demoUrl) {
+            drawLayerWatermark(ctx, rect, shape);
+          }
         } catch (e) {
           console.warn("[template-snapshot] aiPhoto layer failed", e);
         }
