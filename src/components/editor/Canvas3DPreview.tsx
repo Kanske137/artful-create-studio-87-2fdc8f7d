@@ -136,36 +136,37 @@ function makeStapleTexture(count: number, vertical: boolean): THREE.CanvasTextur
   return tex;
 }
 
-/** Vikt hörnflik: neutral dukbaksida med diagonal söm + klammer. */
-function makeCornerFlapTexture(): THREE.CanvasTexture {
+/**
+ * Transparent veck-overlay för hörnfliken: mjuk diagonal skugga + highlight
+ * ("\" i texturrymden; roteras per hörn så vecket går ytterhörn → innerhörn)
+ * och en klammer tvärs över vecket — som i Gelatos foto.
+ */
+function makeCornerCreaseTexture(): THREE.CanvasTexture {
   const S = 128;
   const c = document.createElement("canvas");
   c.width = S; c.height = S;
   const g = c.getContext("2d")!;
-  g.fillStyle = "#e7e1d2";
-  g.fillRect(0, 0, S, S);
-  g.globalAlpha = 0.06;
-  g.strokeStyle = "#9a917e";
-  for (let x = 0; x < S; x += 3) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, S); g.stroke(); }
-  for (let y = 0; y < S; y += 3) { g.beginPath(); g.moveTo(0, y); g.lineTo(S, y); g.stroke(); }
-  g.globalAlpha = 1;
-  // Diagonal vikskugga + söm
-  const diag = g.createLinearGradient(0, S, S, 0);
-  diag.addColorStop(0.44, "rgba(0,0,0,0)");
-  diag.addColorStop(0.5, "rgba(0,0,0,0.18)");
-  diag.addColorStop(0.56, "rgba(0,0,0,0)");
-  g.fillStyle = diag;
-  g.fillRect(0, 0, S, S);
-  g.strokeStyle = "rgba(90,80,64,0.35)";
-  g.lineWidth = 1.5;
-  g.beginPath();
-  g.moveTo(6, S - 6);
-  g.lineTo(S - 6, 6);
-  g.stroke();
-  // En klammer mitt på diagonalen
+  // Skugg-/highlightband vinkelrätt mot diagonalen (0,0)→(S,S)
   g.save();
   g.translate(S / 2, S / 2);
   g.rotate(Math.PI / 4);
+  const band = g.createLinearGradient(0, -14, 0, 14);
+  band.addColorStop(0, "rgba(0,0,0,0)");
+  band.addColorStop(0.38, "rgba(0,0,0,0.13)");
+  band.addColorStop(0.5, "rgba(0,0,0,0.02)");
+  band.addColorStop(0.62, "rgba(255,255,255,0.14)");
+  band.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = band;
+  g.fillRect(-S, -14, 2 * S, 28);
+  // Tunn vecklinje
+  g.strokeStyle = "rgba(80,72,58,0.28)";
+  g.lineWidth = 1.2;
+  g.beginPath();
+  g.moveTo(-S * 0.65, 0);
+  g.lineTo(S * 0.65, 0);
+  g.stroke();
+  // Klammer tvärs över vecket
+  g.rotate(Math.PI / 2);
   g.fillStyle = "rgba(0,0,0,0.18)";
   g.fillRect(-10, -2, 22, 6);
   g.fillStyle = "#c3c7cb";
@@ -173,6 +174,8 @@ function makeCornerFlapTexture(): THREE.CanvasTexture {
   g.strokeStyle = "#7e8286";
   g.lineWidth = 1.3;
   g.strokeRect(-11, -3, 22, 5.5);
+  g.fillStyle = "rgba(255,255,255,0.5)";
+  g.fillRect(-11, -3, 22, 1.4);
   g.restore();
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -225,7 +228,7 @@ function CanvasMesh({
   const foldCm = Math.min(2.2, Math.max(1.2, wrapExtCm - depthCm + bleedCm));
   const foldU = u(foldCm);
 
-  const { boxMaterials, foldMats } = useMemo(() => {
+  const { boxMaterials, foldMats, cornerMats } = useMemo(() => {
     // Texturlayout-fraktioner per axel
     const totalW = widthCm + 2 * (wrapExtCm + bleedCm);
     const totalH = heightCm + 2 * (wrapExtCm + bleedCm);
@@ -276,14 +279,25 @@ function CanvasMesh({
 
     // Vikta kanter på baksidan: fortsättningen BORTOM djupet, speglad
     // (duken viks runt bakkanten → utsidan vänds mot betraktaren).
-    const foldRight = make(frontX0 + fFrontX + fDepthX, frontY0, fFoldX, fFrontY, true, false);
-    const foldLeft = make(frontX0 - fDepthX - fFoldX, frontY0, fFoldX, fFrontY, true, false);
-    const foldTop = make(frontX0, frontY0 - fDepthY - fFoldY, fFrontX, fFoldY, false, true);
-    const foldBottom = make(frontX0, frontY0 + fFrontY + fDepthY, fFrontX, fFoldY, false, true);
+    const X1 = frontX0 + fFrontX + fDepthX;
+    const Xl = frontX0 - fDepthX - fFoldX;
+    const Yt = frontY0 - fDepthY - fFoldY;
+    const Yb = frontY0 + fFrontY + fDepthY;
+    const foldRight = make(X1, frontY0, fFoldX, fFrontY, true, false);
+    const foldLeft = make(Xl, frontY0, fFoldX, fFrontY, true, false);
+    const foldTop = make(frontX0, Yt, fFrontX, fFoldY, false, true);
+    const foldBottom = make(frontX0, Yb, fFrontX, fFoldY, false, true);
+    // Hörnflikarnas bas = tryckets EGET hörninnehåll (dubbelspeglat) så de
+    // smälter ihop färgmässigt med båda angränsande vikband.
+    const cornTR = make(X1, Yt, fFoldX, fFoldY, true, true);
+    const cornTL = make(Xl, Yt, fFoldX, fFoldY, true, true);
+    const cornBR = make(X1, Yb, fFoldX, fFoldY, true, true);
+    const cornBL = make(Xl, Yb, fFoldX, fFoldY, true, true);
 
     return {
       boxMaterials: [right, left, top, bottom, front, back],
       foldMats: { foldRight, foldLeft, foldTop, foldBottom },
+      cornerMats: { cornTR, cornTL, cornBR, cornBL },
     };
   }, [texture, widthCm, heightCm, depthCm, wrapExtCm, bleedCm, foldCm]);
 
@@ -291,7 +305,10 @@ function CanvasMesh({
   const woodMatH = useMemo(() => new THREE.MeshStandardMaterial({ map: makeWoodTexture(false), roughness: 0.9 }), []);
   const woodMatV = useMemo(() => new THREE.MeshStandardMaterial({ map: makeWoodTexture(true), roughness: 0.9 }), []);
   const fabricBack = useMemo(() => new THREE.MeshStandardMaterial({ map: makeFabricTexture(), roughness: 1 }), []);
-  const flapMat = useMemo(() => new THREE.MeshStandardMaterial({ map: makeCornerFlapTexture(), roughness: 1 }), []);
+  const creaseMat = useMemo(() => {
+    const t = makeCornerCreaseTexture();
+    return new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false });
+  }, []);
   const stapleMatH = useMemo(() => {
     const t = makeStapleTexture(3, false);
     return new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false });
@@ -362,16 +379,23 @@ function CanvasMesh({
         <planeGeometry args={[w - 2 * foldU, foldU]} />
       </mesh>
 
-      {/* Diagonalt vikta hörnflikar med klammer (Gelatos hörnvik) */}
-      {[
-        [w / 2 - foldU / 2, h / 2 - foldU / 2],
-        [-(w / 2 - foldU / 2), h / 2 - foldU / 2],
-        [w / 2 - foldU / 2, -(h / 2 - foldU / 2)],
-        [-(w / 2 - foldU / 2), -(h / 2 - foldU / 2)],
-      ].map(([x, y], i) => (
-        <mesh key={i} position={[x, y, zBack - 0.0045]} rotation={[0, Math.PI, 0]} material={flapMat}>
-          <planeGeometry args={[foldU, foldU]} />
-        </mesh>
+      {/* Diagonalt vikta hörnflikar: bas = tryckets hörninnehåll (smälter
+          ihop med vikbanden) + veck-overlay roterad så vecket alltid går
+          från ytterhörnet in mot mitten, med klammer — som Gelatos hörnvik. */}
+      {([
+        { x: w / 2 - foldU / 2, y: h / 2 - foldU / 2, mat: cornerMats.cornTR, rz: 0 },
+        { x: -(w / 2 - foldU / 2), y: h / 2 - foldU / 2, mat: cornerMats.cornTL, rz: Math.PI / 2 },
+        { x: w / 2 - foldU / 2, y: -(h / 2 - foldU / 2), mat: cornerMats.cornBR, rz: Math.PI / 2 },
+        { x: -(w / 2 - foldU / 2), y: -(h / 2 - foldU / 2), mat: cornerMats.cornBL, rz: 0 },
+      ]).map((c, i) => (
+        <group key={i}>
+          <mesh position={[c.x, c.y, zBack - 0.0045]} rotation={[0, Math.PI, 0]} material={c.mat}>
+            <planeGeometry args={[foldU, foldU]} />
+          </mesh>
+          <mesh position={[c.x, c.y, zBack - 0.0075]} rotation={[0, Math.PI, c.rz]} material={creaseMat}>
+            <planeGeometry args={[foldU, foldU]} />
+          </mesh>
+        </group>
       ))}
     </group>
   );
