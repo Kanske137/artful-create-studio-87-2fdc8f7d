@@ -15,6 +15,7 @@
 import mapboxgl from "mapbox-gl";
 import { drawAcrylicStud, STUD_DIAMETER_CM, STUD_INSET_CM } from "./acrylic-stud";
 import { textureForHex, preloadTexture } from "./frame-textures";
+import { FRAME_FRONT_CM, FRAME_LIP_CM, HANGER_SLAT_CM, HANGER_SLAT_ABOVE_CM, hangerOverhangCm } from "./gelato-geometry";
 import { drawShapeOnCanvas, type ClipShape } from "./shape-clip";
 import { getMapboxToken, styleUrl } from "./mapbox";
 import type { Template, TemplateLayer, TextSpan } from "./template-schema";
@@ -912,72 +913,92 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
     }
   }
 
-  // Frame / canvas-wrap overlay (preview/cart only — never on hires print).
-  // Trätextur + geringar så cart-bilden matchar editorns FrameBorder.
+  // Frame overlay (preview/cart only — never on hires print). Gelato-geometri:
+  // canvasen paddas med ramens utstick; falsens innerkant täcker ~3,5 mm av
+  // trycket. Trätextur + geringar så cart-bilden matchar editorns FrameBorder.
   const hasFrame = !!input.frameColor && input.frameColor.trim() !== "";
   if (!input.hires && extraCm === 0 && hasFrame && (input.frameWidthCm ?? 0) > 0) {
-    const fw = Math.max(1, Math.round((input.frameWidthCm ?? 1.2) * PX_PER_CM * scale));
+    const frameWcm = input.frameWidthCm ?? FRAME_FRONT_CM;
+    const fw = Math.max(2, Math.round(frameWcm * PX_PER_CM * scale));
+    const lip = Math.max(1, Math.round((FRAME_LIP_CM / frameWcm) * fw));
+    const outset = fw - lip;
     const texUrl = textureForHex(input.frameColor);
     let tex: HTMLImageElement | null = null;
     if (texUrl) {
       try { tex = await preloadTexture(texUrl); } catch { tex = null; }
     }
-    ctx.save();
+    const fW = w + 2 * outset;
+    const fH = h + 2 * outset;
+    const framed = document.createElement("canvas");
+    framed.width = fW;
+    framed.height = fH;
+    const fx = framed.getContext("2d");
+    if (!fx) throw new Error("2D ctx unavailable (frame pad)");
+    fx.imageSmoothingEnabled = true;
+    fx.fillStyle = "#ffffff";
+    fx.fillRect(0, 0, fW, fH);
+    // Motivet i FULL skala; ramen ritas ovanpå kanterna.
+    fx.drawImage(out, outset, outset);
     const paintSide = (poly: Array<[number, number]>, rotate: boolean, sx: number, sy: number, sw: number, sh: number) => {
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(poly[0][0], poly[0][1]);
-      for (let i = 1; i < poly.length; i++) ctx.lineTo(poly[i][0], poly[i][1]);
-      ctx.closePath();
-      ctx.clip();
+      fx.save();
+      fx.beginPath();
+      fx.moveTo(poly[0][0], poly[0][1]);
+      for (let i = 1; i < poly.length; i++) fx.lineTo(poly[i][0], poly[i][1]);
+      fx.closePath();
+      fx.clip();
       if (tex) {
         if (rotate) {
-          ctx.translate(sx + sw, sy);
-          ctx.rotate(Math.PI / 2);
-          ctx.drawImage(tex, 0, 0, sh, sw);
+          fx.translate(sx + sw, sy);
+          fx.rotate(Math.PI / 2);
+          fx.drawImage(tex, 0, 0, sh, sw);
         } else {
-          ctx.drawImage(tex, sx, sy, sw, sh);
+          fx.drawImage(tex, sx, sy, sw, sh);
         }
       } else {
-        ctx.fillStyle = input.frameColor!;
-        ctx.fillRect(sx, sy, sw, sh);
+        fx.fillStyle = input.frameColor!;
+        fx.fillRect(sx, sy, sw, sh);
       }
-      ctx.restore();
+      fx.restore();
     };
-    paintSide([[0, 0], [w, 0], [w - fw, fw], [fw, fw]], false, 0, 0, w, fw);
-    paintSide([[fw, h - fw], [w - fw, h - fw], [w, h], [0, h]], false, 0, h - fw, w, fw);
-    paintSide([[0, 0], [fw, fw], [fw, h - fw], [0, h]], true, 0, 0, fw, h);
-    paintSide([[w - fw, fw], [w, 0], [w, h], [w - fw, h - fw]], true, w - fw, 0, fw, h);
+    paintSide([[0, 0], [fW, 0], [fW - fw, fw], [fw, fw]], false, 0, 0, fW, fw);
+    paintSide([[fw, fH - fw], [fW - fw, fH - fw], [fW, fH], [0, fH]], false, 0, fH - fw, fW, fw);
+    paintSide([[0, 0], [fw, fw], [fw, fH - fw], [0, fH]], true, 0, 0, fw, fH);
+    paintSide([[fW - fw, fw], [fW, 0], [fW, fH], [fW - fw, fH - fw]], true, fW - fw, 0, fw, fH);
     // 45°-ljusgradient över ramen för djup
-    const fgrad = ctx.createLinearGradient(0, 0, w, h);
+    const fgrad = fx.createLinearGradient(0, 0, fW, fH);
     fgrad.addColorStop(0, "rgba(255,255,255,0.20)");
     fgrad.addColorStop(0.5, "rgba(0,0,0,0)");
     fgrad.addColorStop(1, "rgba(0,0,0,0.24)");
-    ctx.fillStyle = fgrad;
-    ctx.beginPath();
-    ctx.rect(0, 0, w, h);
-    ctx.rect(fw + (w - 2 * fw), fw, -(w - 2 * fw), h - 2 * fw); // inre urklipp
-    ctx.fill("evenodd");
+    fx.fillStyle = fgrad;
+    fx.beginPath();
+    fx.rect(0, 0, fW, fH);
+    fx.rect(fW - fw, fw, -(fW - 2 * fw), fH - 2 * fw); // inre urklipp (synlig tryckyta)
+    fx.fill("evenodd");
     // Mitre-sömmar + ytterkant + innerläpp (matchar mockup-composite)
-    ctx.strokeStyle = "rgba(0,0,0,0.16)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, 0); ctx.lineTo(fw, fw);
-    ctx.moveTo(w, 0); ctx.lineTo(w - fw, fw);
-    ctx.moveTo(0, h); ctx.lineTo(fw, h - fw);
-    ctx.moveTo(w, h); ctx.lineTo(w - fw, h - fw);
-    ctx.stroke();
-    ctx.strokeStyle = "rgba(0,0,0,0.35)";
-    ctx.lineWidth = Math.max(1, fw * 0.05);
-    ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
-    const lip = Math.max(1, fw * 0.14);
-    ctx.strokeStyle = "rgba(255,255,255,0.28)";
-    ctx.lineWidth = Math.max(1, lip * 0.6);
-    ctx.strokeRect(fw - lip * 0.7, fw - lip * 0.7, w - 2 * fw + lip * 1.4, h - 2 * fw + lip * 1.4);
-    ctx.strokeStyle = "rgba(0,0,0,0.45)";
-    ctx.lineWidth = Math.max(1, fw * 0.08);
-    ctx.strokeRect(fw - 0.5, fw - 0.5, w - 2 * fw + 1, h - 2 * fw + 1);
-    ctx.restore();
+    fx.strokeStyle = "rgba(0,0,0,0.16)";
+    fx.lineWidth = 1;
+    fx.beginPath();
+    fx.moveTo(0, 0); fx.lineTo(fw, fw);
+    fx.moveTo(fW, 0); fx.lineTo(fW - fw, fw);
+    fx.moveTo(0, fH); fx.lineTo(fw, fH - fw);
+    fx.moveTo(fW, fH); fx.lineTo(fW - fw, fH - fw);
+    fx.stroke();
+    fx.strokeStyle = "rgba(0,0,0,0.35)";
+    fx.lineWidth = Math.max(1, fw * 0.05);
+    fx.strokeRect(0.5, 0.5, fW - 1, fH - 1);
+    const lipEdge = Math.max(1, fw * 0.14);
+    fx.strokeStyle = "rgba(255,255,255,0.28)";
+    fx.lineWidth = Math.max(1, lipEdge * 0.6);
+    fx.strokeRect(fw - lipEdge * 0.7, fw - lipEdge * 0.7, fW - 2 * fw + lipEdge * 1.4, fH - 2 * fw + lipEdge * 1.4);
+    fx.strokeStyle = "rgba(0,0,0,0.45)";
+    fx.lineWidth = Math.max(1, fw * 0.08);
+    fx.strokeRect(fw - 0.5, fw - 0.5, fW - 2 * fw + 1, fH - 2 * fw + 1);
+
+    const framedUrl = framed.toDataURL("image/jpeg", 0.95);
+    if (!framedUrl || framedUrl.length < 1000) {
+      throw new Error("Empty template snapshot (frame)");
+    }
+    return framedUrl;
   } else if (!input.hires && input.canvasWrap && extraCm === 0) {
     const edge = Math.max(2, Math.round(0.25 * PX_PER_CM * scale));
     ctx.save();
@@ -1020,11 +1041,15 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
   // Endast snöret ritas utanför, så vi padar bara uppåt för det.
   if (hangerActive && extraCm === 0) {
     const color = input.hangerColor!;
-    const slatH = Math.max(4, Math.round(2.1 * PX_PER_CM * scale));
-    const slatOverhang = Math.round(slatH * 0.12);
+    const slatH = Math.max(4, Math.round(HANGER_SLAT_CM * PX_PER_CM * scale));
+    // Listen sticker ~3 mm ovanför/nedanför pappret (Gelato-geometri).
+    const slatAbove = Math.round((HANGER_SLAT_ABOVE_CM / HANGER_SLAT_CM) * slatH);
+    // Fysiskt sidöverhäng enligt Gelatos listlängder (papper i cm ur canvasen).
+    const paperWcm = w / (PX_PER_CM * scale);
+    const slatOverhang = Math.round(hangerOverhangCm(paperWcm) * PX_PER_CM * scale);
     const cordRise = Math.max(slatH * 1.6, Math.round(1.4 * PX_PER_CM * scale));
-    const padTop = Math.round(cordRise + slatH * 0.3);
-    const padBottom = 0;
+    const padTop = Math.round(cordRise + slatAbove + slatH * 0.2);
+    const padBottom = slatAbove;
     const padX = slatOverhang;
 
     const finalW = w + padX * 2;
@@ -1073,9 +1098,9 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
         );
       }
     };
-    // Topp-list INNANFÖR motivets överkant, botten-list INNANFÖR underkanten.
-    const topSlatY = motifY;
-    const botSlatY = motifY + motifH - slatH;
+    // Listen börjar 3 mm ovanför papperskanten och täcker ~18 mm av trycket.
+    const topSlatY = motifY - slatAbove;
+    const botSlatY = motifY + motifH - (slatH - slatAbove);
     drawSlat(topSlatY);
     drawSlat(botSlatY);
 

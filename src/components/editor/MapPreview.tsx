@@ -46,6 +46,7 @@ function parseCm(size: string | null): { w: number; h: number } | null {
 // truth and stay pixel-identical.
 import { buildShapeClipPath, useShapeClip, type ClipShape } from "@/lib/shape-clip";
 import { textureForHex } from "@/lib/frame-textures";
+import { FRAME_LIP_CM, HANGER_SLAT_CM, HANGER_SLAT_ABOVE_CM, hangerOverhangCm } from "@/lib/gelato-geometry";
 
 /**
  * Realistisk träram med mitred (45°) hörn.
@@ -55,12 +56,15 @@ import { textureForHex } from "@/lib/frame-textures";
  */
 function FrameBorder({
   borderPx,
+  lipPx,
   outerW,
   outerH,
   textureUrl,
   fallbackColor,
 }: {
   borderPx: number;
+  /** Hur många px av TRYCKET ramen täcker per kant (Gelato: ~3,5 mm). */
+  lipPx: number;
   outerW: number;
   outerH: number;
   textureUrl: string | null;
@@ -68,6 +72,10 @@ function FrameBorder({
 }) {
   if (borderPx <= 0 || outerW <= 0 || outerH <= 0) return null;
   const bp = borderPx;
+  // Gelato-geometri: designen ligger i FULL skala; ramens band (bp brett)
+  // täcker `lip` px av tryckkanten och sticker ut `outset` px utanför.
+  const lip = Math.min(lipPx, bp * 0.5);
+  const outset = bp - lip;
   const bg: React.CSSProperties = textureUrl
     ? { backgroundImage: `url(${textureUrl})`, backgroundSize: "cover", backgroundRepeat: "no-repeat" }
     : { backgroundColor: fallbackColor };
@@ -76,8 +84,8 @@ function FrameBorder({
   const topStyle: React.CSSProperties = {
     ...bg,
     position: "absolute",
-    top: -bp,
-    left: -bp,
+    top: -outset,
+    left: -outset,
     width: outerW,
     height: bp,
     clipPath: `polygon(0 0, 100% 0, calc(100% - ${bp}px) 100%, ${bp}px 100%)`,
@@ -85,8 +93,8 @@ function FrameBorder({
   const bottomStyle: React.CSSProperties = {
     ...bg,
     position: "absolute",
-    bottom: -bp,
-    left: -bp,
+    bottom: -outset,
+    left: -outset,
     width: outerW,
     height: bp,
     clipPath: `polygon(${bp}px 0, calc(100% - ${bp}px) 0, 100% 100%, 0 100%)`,
@@ -115,7 +123,7 @@ function FrameBorder({
       <div
         style={{
           position: "absolute",
-          inset: -bp,
+          inset: -outset,
           boxShadow: "0 8px 22px -6px rgba(0,0,0,0.32), 0 18px 40px -14px rgba(0,0,0,0.22)",
         }}
       />
@@ -125,8 +133,8 @@ function FrameBorder({
       <div
         style={{
           position: "absolute",
-          top: -bp,
-          left: -bp,
+          top: -outset,
+          left: -outset,
           width: bp,
           height: outerH,
           clipPath: sideClipLeft,
@@ -140,8 +148,8 @@ function FrameBorder({
       <div
         style={{
           position: "absolute",
-          top: -bp,
-          right: -bp,
+          top: -outset,
+          right: -outset,
           width: bp,
           height: outerH,
           clipPath: sideClipRight,
@@ -154,7 +162,7 @@ function FrameBorder({
       <div
         style={{
           position: "absolute",
-          inset: -bp,
+          inset: -outset,
           background:
             "linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0) 45%, rgba(0,0,0,0.22))",
           mixBlendMode: "overlay",
@@ -164,12 +172,12 @@ function FrameBorder({
       <div
         style={{
           position: "absolute",
-          inset: -bp,
+          inset: -outset,
           boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.32)",
         }}
       />
       <svg
-        style={{ position: "absolute", inset: -bp, width: outerW, height: outerH }}
+        style={{ position: "absolute", inset: -outset, width: outerW, height: outerH }}
         viewBox={`0 0 ${outerW} ${outerH}`}
         preserveAspectRatio="none"
       >
@@ -179,11 +187,11 @@ function FrameBorder({
           strokeWidth="1"
         />
       </svg>
-      {/* Fasad innerläpp: ljus highlight runt tryckytan */}
+      {/* Fasad innerläpp: ljus highlight vid ramens innerkant (lip in på trycket) */}
       <div
         style={{
           position: "absolute",
-          inset: 0,
+          inset: lip,
           boxShadow: `0 0 0 ${Math.max(1, bp * 0.12)}px rgba(255,255,255,0.25)`,
         }}
       />
@@ -191,7 +199,7 @@ function FrameBorder({
       <div
         style={{
           position: "absolute",
-          inset: 0,
+          inset: lip,
           background:
             "linear-gradient(135deg, rgba(255,255,255,0) 42%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0) 58%)",
           boxShadow: `inset 0 0 0 1px rgba(0,0,0,0.3), inset 0 ${Math.max(2, bp * 0.5)}px ${Math.max(4, bp * 0.9)}px -${Math.max(1, bp * 0.35)}px rgba(0,0,0,0.28), inset ${Math.max(2, bp * 0.4)}px 0 ${Math.max(4, bp * 0.9)}px -${Math.max(1, bp * 0.35)}px rgba(0,0,0,0.2)`,
@@ -202,26 +210,28 @@ function FrameBorder({
 }
 
 /**
- * Posterhängare: tunna trälister topp+botten + snöre.
- * Listerna placeras UTANFÖR motivets topp/botten så de inte täcker tryckytan.
- * Tjockleken skalas efter motivets verkliga höjd: Gelatos hängare har fast
- * 14 mm front (oavsett posterstorlek), så större postrar → relativt tunnare list.
+ * Posterhängare enligt Gelatos uppmätta geometri: listen är ~21 mm hög,
+ * sticker ~3 mm ovanför papperskanten och täcker ~18 mm av tryckets
+ * topp/botten. Överhänget i sidled följer Gelatos fysiska listlängder.
  */
-function HangerOverlay({ color, textureUrl, motifHeightCm }: { color: string; textureUrl: string | null; motifHeightCm: number }) {
+function HangerOverlay({ color, textureUrl, motifHeightCm, motifWidthCm }: { color: string; textureUrl: string | null; motifHeightCm: number; motifWidthCm: number }) {
   const isWhite = color.toLowerCase() === "#f5f5f2";
-  // 21 mm = 2.1 cm fysisk listhöjd (Gelato-spec). Procent av motivets höjd.
-  const slatPct = Math.max(0.8, (2.1 / Math.max(motifHeightCm, 1)) * 100);
+  const slatPct = Math.max(0.8, (HANGER_SLAT_CM / Math.max(motifHeightCm, 1)) * 100);
+  // Listen sticker upp ovanför papperskanten (toppen; spegelvänt i botten).
+  const abovePct = (HANGER_SLAT_ABOVE_CM / Math.max(motifHeightCm, 1)) * 100;
+  // Fysiskt överhäng per sida utanför papperet (Gelatos listlängder).
+  const overPct = (hangerOverhangCm(motifWidthCm) / Math.max(motifWidthCm, 1)) * 100;
   // Snörets båghöjd i cm, beroende av posterstorlek (men begränsad så det
   // varken blir för platt på stora eller för högt på små postrar).
   const cordRiseCm = Math.min(6, Math.max(2.5, motifHeightCm * 0.06));
   const cordRisePct = (cordRiseCm / Math.max(motifHeightCm, 1)) * 100;
   // Snörets fästpunkter på listen — nära ytterkanterna.
-  const anchorXPct = 6; // % från vänsterkant av listen (matchar slatStyle left:-2%)
+  const anchorXPct = 6; // % från vänsterkant av listen (matchar slatStyle left)
 
   const slatStyle: React.CSSProperties = {
     position: "absolute",
-    left: "-2%",
-    right: "-2%",
+    left: `-${overPct}%`,
+    right: `-${overPct}%`,
     height: `${slatPct}%`,
     background: color,
     // Ändträ-kapsyler (vänster/höger) + markerad underkant ger listen
@@ -236,13 +246,13 @@ function HangerOverlay({ color, textureUrl, motifHeightCm }: { color: string; te
   };
   return (
     <div className="pointer-events-none absolute inset-0" style={{ zIndex: 46, overflow: "visible" }} aria-hidden>
-      {/* Snöre — fäst på topp-listens ÖVERKANT (= motivets överkant), triangulär form (spik) */}
+      {/* Snöre — fäst på topp-listens ÖVERKANT (3 mm ovanför pappret), triangulär form (spik) */}
       <svg
         className="absolute"
         style={{
-          left: "-2%",
-          width: "104%",
-          top: `-${cordRisePct}%`,
+          left: `-${overPct}%`,
+          width: `${100 + 2 * overPct}%`,
+          top: `-${cordRisePct + abovePct}%`,
           height: `${cordRisePct}%`,
           overflow: "visible",
         }}
@@ -262,10 +272,10 @@ function HangerOverlay({ color, textureUrl, motifHeightCm }: { color: string; te
         <circle cx={anchorXPct} cy="100" r={Math.max(1.4, slatPct * 0.9)} fill="rgba(45,34,24,0.95)" vectorEffect="non-scaling-stroke" />
         <circle cx={100 - anchorXPct} cy="100" r={Math.max(1.4, slatPct * 0.9)} fill="rgba(45,34,24,0.95)" vectorEffect="non-scaling-stroke" />
       </svg>
-      {/* Trälist OVANPÅ motivets topp (täcker översta 21mm av tryckytan) */}
-      <div style={{ ...slatStyle, top: 0 }} />
-      {/* Trälist OVANPÅ motivets botten (täcker nedersta 21mm av tryckytan) */}
-      <div style={{ ...slatStyle, bottom: 0 }} />
+      {/* Trälist över motivets topp: 3 mm ovanför pappret, täcker ~18 mm av trycket */}
+      <div style={{ ...slatStyle, top: `-${abovePct}%` }} />
+      {/* Trälist över motivets botten (spegelvänd geometri) */}
+      <div style={{ ...slatStyle, bottom: `-${abovePct}%` }} />
     </div>
   );
 }
@@ -384,6 +394,8 @@ export function MapPreview({
   const DESKTOP_MAX_H = 820;
   const frameTextureUrl = textureForHex(frameColor);
   const hangerTextureUrl = textureForHex(hangerColor);
+  // Ramfalsens täckning av trycket i px (Gelato: ~3,5 mm av 12 mm front).
+  const frameLipPx = Math.round((borderPx * FRAME_LIP_CM) / Math.max(frameWidthCm, 0.1));
   const frameStyle: React.CSSProperties = {
     aspectRatio: `${posterAspect}`,
     width: "100%",
@@ -391,11 +403,9 @@ export function MapPreview({
     maxWidth: `min(100%, ${posterAspect * DESKTOP_MAX_H}px)`,
     background: posterBgColor,
     // Border keeps layout space for the frame; visual frame is rendered via
-    // <FrameBorder> overlay (textured + mitred corners). Transparent border
-    // preserves print-area sizing without the old flat color band.
-    borderStyle: frameColor ? "solid" : undefined,
-    borderColor: "transparent",
-    borderWidth: frameColor ? `${borderPx}px` : 0,
+    // Gelato-geometri: designen ligger ALLTID i full skala (ingen border-
+    // krympning). <FrameBorder>-overlayen täcker ~3,5 mm av tryckkanten och
+    // sticker ut resten utanför boxen — precis som den fysiska ramfalsen.
     padding: innerPadding,
     boxSizing: "border-box",
     // Lokal stacking context — alla interna z-index (inkl. akrylskruvar)
@@ -998,12 +1008,13 @@ export function MapPreview({
             <AcrylicCornerOverlay frontWcm={frontW} frontHcm={frontH} zIndex={45} />
           </div>
         )}
-        {hangerColor && <HangerOverlay color={hangerColor} textureUrl={hangerTextureUrl} motifHeightCm={frontH} />}
+        {hangerColor && <HangerOverlay color={hangerColor} textureUrl={hangerTextureUrl} motifHeightCm={frontH} motifWidthCm={frontW} />}
         {frameColor && borderPx > 0 && (
           <FrameBorder
             borderPx={borderPx}
-            outerW={frameOuter.w}
-            outerH={frameOuter.h}
+            lipPx={frameLipPx}
+            outerW={frameOuter.w + 2 * (borderPx - frameLipPx)}
+            outerH={frameOuter.h + 2 * (borderPx - frameLipPx)}
             textureUrl={frameTextureUrl}
             fallbackColor={frameColor}
           />

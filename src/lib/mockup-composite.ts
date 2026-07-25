@@ -3,6 +3,7 @@ import { parseSizeCm } from "./mockup-scenes";
 import type { Orientation, ProductType } from "./product-config";
 import { textureForHex, preloadTexture } from "./frame-textures";
 import { drawAcrylicStud, STUD_DIAMETER_CM, STUD_INSET_CM } from "./acrylic-stud";
+import { FRAME_LIP_CM, HANGER_SLAT_CM, HANGER_SLAT_ABOVE_CM, hangerOverhangCm } from "./gelato-geometry";
 
 function loadImage(src: string, crossOrigin = false): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -78,9 +79,13 @@ export async function compositeMockup({
   const frameWpx = frameColor && productType !== "canvas"
     ? (frameWidthCm / scene.referenceWidthCm) * area.w
     : 0;
+  // Gelato-geometri: ramfalsen täcker ~3,5 mm av trycket per kant; resten av
+  // 12 mm-fronten sticker ut utanför pappret.
+  const frameLipPx = frameWpx > 0 ? (frameWpx * FRAME_LIP_CM) / Math.max(frameWidthCm, 0.1) : 0;
+  const frameOutsetPx = frameWpx - frameLipPx;
 
-  const totalW = posterW + frameWpx * 2;
-  const totalH = posterH + frameWpx * 2;
+  const totalW = posterW + frameOutsetPx * 2;
+  const totalH = posterH + frameOutsetPx * 2;
   if (totalH > area.h) {
     const s = area.h / totalH;
     posterH *= s; posterW *= s;
@@ -92,8 +97,8 @@ export async function compositeMockup({
 
   const innerW = posterW;
   const innerH = posterH;
-  const outerW = innerW + frameWpx * 2;
-  const outerH = innerH + frameWpx * 2;
+  const outerW = innerW + frameOutsetPx * 2;
+  const outerH = innerH + frameOutsetPx * 2;
 
   // Canvas-djup i scenpixlar
   const depthPx = productType === "canvas"
@@ -114,8 +119,8 @@ export async function compositeMockup({
   const oy = productType === "canvas"
     ? area.y + (area.h - canvasOuterH) / 2
     : area.y + (area.h - outerH) / 2;
-  const px = productType === "canvas" ? ox : ox + frameWpx;
-  const py = productType === "canvas" ? oy + topVisibleH : oy + frameWpx;
+  const px = productType === "canvas" ? ox : ox + frameOutsetPx;
+  const py = productType === "canvas" ? oy + topVisibleH : oy + frameOutsetPx;
 
   // 3. Skugga
   if (scene.shadow) {
@@ -194,15 +199,9 @@ export async function compositeMockup({
     ctx.restore();
   }
 
-  // 6. Ram (endast poster med vald färg) — mitred corners + trätextur
+  // 6. Ramens skugga mot väggen (ritas före postern; själva ram-bandet ritas
+  // EFTER postern i steg 7a så att falsen täcker tryckkanten — Gelato-geometri)
   if (frameColor && frameWpx > 0 && productType !== "canvas") {
-    const texUrl = textureForHex(frameColor);
-    let texImg: HTMLImageElement | null = null;
-    if (texUrl) {
-      try { texImg = await preloadTexture(texUrl); } catch { texImg = null; }
-    }
-
-    // Drop shadow behind frame
     ctx.save();
     ctx.shadowColor = "rgba(0,0,0,0.35)";
     ctx.shadowBlur = frameWpx * 1.2;
@@ -210,6 +209,19 @@ export async function compositeMockup({
     ctx.fillStyle = "rgba(0,0,0,0.001)"; // shape carrier
     ctx.fillRect(ox, oy, outerW, outerH);
     ctx.restore();
+  }
+
+  // 7. Front: postern själv — RAKT, ingen skew (innehåll ska aldrig förvrängas)
+  ctx.drawImage(fg, px, py, posterW, posterH);
+
+  // 7a. Ram (endast poster med vald färg) — mitred corners + trätextur.
+  // Ritas OVANPÅ postern: falsens innerkant ligger ~3,5 mm IN på trycket.
+  if (frameColor && frameWpx > 0 && productType !== "canvas") {
+    const texUrl = textureForHex(frameColor);
+    let texImg: HTMLImageElement | null = null;
+    if (texUrl) {
+      try { texImg = await preloadTexture(texUrl); } catch { texImg = null; }
+    }
 
     const drawSide = (
       poly: Array<[number, number]>,
@@ -270,10 +282,14 @@ export async function compositeMockup({
     grad.addColorStop(0.5, "rgba(0,0,0,0)");
     grad.addColorStop(1, "rgba(0,0,0,0.24)");
     ctx.fillStyle = grad;
-    // Clip to outer rect minus inner print area so the gradient only paints on the frame band
+    // Clip to outer rect minus SYNLIG tryckyta (innanför falsen)
+    const visX = px + frameLipPx;
+    const visY = py + frameLipPx;
+    const visW = innerW - 2 * frameLipPx;
+    const visH = innerH - 2 * frameLipPx;
     ctx.beginPath();
     ctx.rect(ox, oy, outerW, outerH);
-    ctx.rect(px + innerW, py, -innerW, innerH); // inner cutout (reverse winding)
+    ctx.rect(visX + visW, visY, -visW, visH); // inner cutout (reverse winding)
     ctx.fill("evenodd");
     ctx.restore();
 
@@ -299,48 +315,49 @@ export async function compositeMockup({
     ctx.stroke();
     ctx.restore();
 
-    const lip = Math.max(1, frameWpx * 0.14);
+    const lipEdge = Math.max(1, frameWpx * 0.14);
     ctx.strokeStyle = "rgba(255,255,255,0.28)";
-    ctx.lineWidth = Math.max(1, lip * 0.6);
-    ctx.strokeRect(px - lip * 0.7, py - lip * 0.7, innerW + lip * 1.4, innerH + lip * 1.4);
+    ctx.lineWidth = Math.max(1, lipEdge * 0.6);
+    ctx.strokeRect(visX - lipEdge * 0.7, visY - lipEdge * 0.7, visW + lipEdge * 1.4, visH + lipEdge * 1.4);
 
-    // Inner rim shadow where print meets frame
+    // Inner rim shadow where print meets frame (vid falsens innerkant)
     ctx.strokeStyle = "rgba(0,0,0,0.45)";
     ctx.lineWidth = Math.max(1, frameWpx * 0.08);
-    ctx.strokeRect(px - 0.5, py - 0.5, innerW + 1, innerH + 1);
+    ctx.strokeRect(visX - 0.5, visY - 0.5, visW + 1, visH + 1);
   }
-
-  // 7. Front: postern själv — RAKT, ingen skew (innehåll ska aldrig förvrängas)
-  ctx.drawImage(fg, px, py, posterW, posterH);
 
   // 7b. Inramad poster: ramens innerskugga faller på trycket (topp+vänster)
   // och glaset ger en diskret diagonal reflex — utan detta ser ramen
   // "pålagd" ut i stället för att trycket sitter I den.
   if (frameColor && frameWpx > 0 && productType !== "canvas") {
     const inset = frameWpx * 0.9;
-    const shTop = ctx.createLinearGradient(0, py, 0, py + inset);
+    const shTop = ctx.createLinearGradient(0, py + frameLipPx, 0, py + frameLipPx + inset);
+    const vX = px + frameLipPx;
+    const vY = py + frameLipPx;
+    const vW = innerW - 2 * frameLipPx;
+    const vH = innerH - 2 * frameLipPx;
     shTop.addColorStop(0, "rgba(0,0,0,0.22)");
     shTop.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = shTop;
-    ctx.fillRect(px, py, innerW, inset);
-    const shLeft = ctx.createLinearGradient(px, 0, px + inset, 0);
+    ctx.fillRect(vX, vY, vW, inset);
+    const shLeft = ctx.createLinearGradient(vX, 0, vX + inset, 0);
     shLeft.addColorStop(0, "rgba(0,0,0,0.16)");
     shLeft.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = shLeft;
-    ctx.fillRect(px, py, inset, innerH);
+    ctx.fillRect(vX, vY, inset, vH);
 
     ctx.save();
     ctx.beginPath();
-    ctx.rect(px, py, innerW, innerH);
+    ctx.rect(vX, vY, vW, vH);
     ctx.clip();
-    const glass = ctx.createLinearGradient(px, py, px + innerW, py + innerH);
+    const glass = ctx.createLinearGradient(vX, vY, vX + vW, vY + vH);
     glass.addColorStop(0, "rgba(255,255,255,0)");
     glass.addColorStop(0.42, "rgba(255,255,255,0)");
     glass.addColorStop(0.5, "rgba(255,255,255,0.07)");
     glass.addColorStop(0.58, "rgba(255,255,255,0)");
     glass.addColorStop(1, "rgba(255,255,255,0)");
     ctx.fillStyle = glass;
-    ctx.fillRect(px, py, innerW, innerH);
+    ctx.fillRect(vX, vY, vW, vH);
     ctx.restore();
   }
 
@@ -391,10 +408,13 @@ export async function compositeMockup({
     drawAcrylicStud(ctx, px + posterW - insetS, py + posterH - insetS, studR);
   }
 
-  // 9. Posterhängare (trälist topp+botten + snöre)
+  // 9. Posterhängare (trälist topp+botten + snöre) — Gelato-geometri:
+  // listen sticker ~3 mm ovanför/nedanför pappret och täcker ~18 mm av
+  // trycket; sidöverhäng enligt Gelatos fysiska listlängder.
   if (hangerColor && productType === "posters") {
-    const slatH = Math.max(3, (2.1 / scene.referenceWidthCm) * area.w);
-    const overhang = slatH * 0.15;
+    const slatH = Math.max(3, (HANGER_SLAT_CM / scene.referenceWidthCm) * area.w);
+    const slatAbove = (HANGER_SLAT_ABOVE_CM / HANGER_SLAT_CM) * slatH;
+    const overhang = (hangerOverhangCm(realWcm) / scene.referenceWidthCm) * area.w;
     const cordRiseCm = Math.min(6, Math.max(2.5, realHcm * 0.06));
     const cordRise = (cordRiseCm / scene.referenceWidthCm) * area.w;
     const x0 = px - overhang;
@@ -438,10 +458,9 @@ export async function compositeMockup({
         ctx.strokeRect(x0 + 0.5, yTop + 0.5, x1 - x0 - 1, slatH - 1);
       }
     };
-    // Listerna sitter OVANPÅ motivets översta/nedersta 21 mm — matchar
-    // Gelatos faktiska produkt (21mm trälist på posterns front).
-    const topSlatY = py;
-    const botSlatY = py + posterH - slatH;
+    // Listen börjar 3 mm OVANFÖR papperskanten och täcker ~18 mm av trycket.
+    const topSlatY = py - slatAbove;
+    const botSlatY = py + posterH - (slatH - slatAbove);
     drawSlat(topSlatY);
     drawSlat(botSlatY);
 

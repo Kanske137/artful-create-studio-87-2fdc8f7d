@@ -29,6 +29,7 @@ import { uploadCartPreview } from "@/lib/upload-preview";
 import { getPrintFileUrl } from "@/lib/print-pipeline";
 import { resolveShopifyVariantId } from "@/lib/shopify-variant-resolver";
 import { hangerColorFromVariant } from "@/lib/mockup-scenes";
+import { FRAME_FRONT_CM } from "@/lib/gelato-geometry";
 import { mutateActiveLayoutBlock } from "@/lib/freeform-layers";
 import { ensureSession, getSessionKey, track } from "@/lib/analytics";
 import { SubscriberGateDialog } from "@/components/editor/SubscriberGateDialog";
@@ -44,7 +45,7 @@ const FRAME_COLORS: Record<string, string> = {
   Ek: "#c8a371",
   Valnöt: "#5a3a26",
 };
-const FRAME_WIDTH_CM = 1.2; // matchar Gelato frp_w12xt22-mm (12mm front)
+const FRAME_WIDTH_CM = FRAME_FRONT_CM; // Gelato frp_w12xt22-mm (12 mm front) — se lib/gelato-geometry
 
 function normalizeType(raw: string | null): ProductType | undefined {
   if (!raw) return undefined;
