@@ -324,7 +324,9 @@ export function ControlPanel({ configs, activeHandle, activeProductType, onProdu
           {editableTexts.map((l, idx) => {
             const linkedMapId = l.defaults.linkedMapLayerId;
             const linkedMap =
-              linkedMapId ? (layerValues[linkedMapId] as MapLayerValue | undefined) : undefined;
+              linkedMapId
+                ? (layerValues[linkedMapId] as MapLayerValue | StarmapLayerValue | undefined)
+                : undefined;
             return (
               <TextLayerSection
                 key={l.id}
@@ -874,7 +876,7 @@ function TextLayerSection({
   config: ProductConfig;
   layer: Extract<TemplateLayer, { type: "text" }>;
   value: TextLayerValue | null;
-  linkedMap: MapLayerValue | null;
+  linkedMap: MapLayerValue | StarmapLayerValue | null;
   heading: string | null;
 }) {
   const { t } = useTranslation();
@@ -897,6 +899,8 @@ function TextLayerSection({
         city: linkedMap.city ?? null,
         country: linkedMap.country ?? null,
         center: linkedMap.center,
+        // [[date]]-token löses bara när källan är ett starmap-lager.
+        dateISO: linkedMap.kind === "starmap" ? linkedMap.dateISO : undefined,
       }
     : null;
   // Auto-text built from the linked map (or defaults when not linked).

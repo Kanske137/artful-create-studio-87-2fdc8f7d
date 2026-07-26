@@ -13,6 +13,7 @@ import type { Orientation, Template } from "@/lib/template-schema";
 import MapLayerPreview from "./MapLayerPreview";
 import TextLayerPreview from "./TextLayerPreview";
 import { ShapeLayerView } from "@/components/editor/layers/ShapeLayerView";
+import StarmapLayerView from "@/components/editor/layers/StarmapLayerView";
 
 type LayoutOverride = {
   defaultLayout: Template["defaultLayout"];
@@ -111,6 +112,20 @@ export default function TemplateThumbnail({
                 height={h}
                 width={w}
                 canvasShortPx={Math.min(width, height)}
+              />
+            </div>
+          );
+        }
+        if (layer.type === "starmap") {
+          return (
+            <div key={layer.id} style={style}>
+              <StarmapLayerView
+                layer={layer}
+                center={layer.defaults.center}
+                dateISO={layer.defaults.dateISO}
+                timeHHMM={layer.defaults.timeHHMM}
+                showConstellations={layer.defaults.showConstellations}
+                showGrid={layer.defaults.showGrid}
               />
             </div>
           );
