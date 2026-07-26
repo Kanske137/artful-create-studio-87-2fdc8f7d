@@ -22,7 +22,14 @@ import type { Template, TemplateLayer, TextSpan } from "./template-schema";
 import { getActiveLayoutBlock } from "./template-schema";
 import type { LayerValue, MapIcon } from "@/stores/editorStore";
 import { getActiveMarginInsetsPct, expandRectForRemovedMargin } from "./layer-utils";
-import { buildEffectiveTextWithSpans, type LinkedPlace } from "./text-typography";
+import {
+  buildEffectiveTextWithSpans,
+  resolveFontPx,
+  resolveLineHeight,
+  resolveLetterSpacingEm,
+  resolveSpans,
+  type LinkedPlace,
+} from "./text-typography";
 import { iconSvgString } from "./map-icon-catalog";
 
 export interface TemplateSnapshotInput {
@@ -114,9 +121,12 @@ function pickHiresMaxPx(): number {
   const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
   const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
-  if (isMobile) return 2800;
-  if (dpr >= 2) return 4800;
-  return 4200;
+  // 70×100 cm behöver 4800 px långsida för fulla 48 px/cm — högre tak ger
+  // skarpare storformat (särskilt kartlinjer). renderHiresTemplateSnapshotSafe
+  // gör om vid 70 % om GPU:n inte klarar canvasen, så taket är riskfritt.
+  if (isMobile) return 3200;
+  if (dpr >= 2) return 5600;
+  return 4800;
 }
 
 function parseSize(size: string, orientation: "portrait" | "landscape") {
@@ -313,6 +323,7 @@ function drawTextLayer(
   liveFont: string,
   canvasShortPx: number,
   liveFontSizePt: number | null = null,
+  liveSpans?: TextSpan[],
 ): void {
   const d = layer.defaults;
   // Caller resolverar effektiv text via buildEffectiveTextWithSpans, så
@@ -328,61 +339,85 @@ function drawTextLayer(
     ctx.restore();
   }
 
-  const lines = text.split("\n");
-  // pt-based size when present (A4 reference); else legacy %-of-height.
-  // A4 short = 595.276pt. Customer override (liveFontSizePt) wins.
-  const effectivePt =
+  // Basstorlek: kundoverride vinner, annars pt (A4-referens) via samma
+  // helper som editorn — sedan legacy %-av-höjd.
+  const basePx =
     typeof liveFontSizePt === "number" && liveFontSizePt > 0
-      ? liveFontSizePt
-      : typeof d.fontSizePt === "number" && d.fontSizePt > 0
-      ? d.fontSizePt
-      : null;
-  const fontPx =
-    effectivePt !== null
-      ? Math.max(6, Math.round((effectivePt / 595.276) * canvasShortPx))
-      : Math.max(8, Math.round(rect.h * ((d.fontSizePct ?? 8) / 100)));
-  const lineMul = typeof d.lineHeight === "number" && d.lineHeight > 0 ? d.lineHeight : 1.15;
-  const lineH = Math.round(fontPx * lineMul);
-  ctx.save();
-  ctx.fillStyle = d.color;
-  ctx.font = `500 ${fontPx}px ${liveFont || d.font}, Inter, sans-serif`;
-  ctx.textBaseline = "middle";
-  ctx.textAlign = d.align === "left" ? "left" : d.align === "right" ? "right" : "center";
-  const tx = d.align === "left" ? rect.x : d.align === "right" ? rect.x + rect.w : rect.x + rect.w / 2;
-  const totalH = lineH * lines.length;
-  const firstY = rect.y + rect.h / 2 - totalH / 2 + lineH / 2;
+      ? resolveFontPx({ fontSizePt: liveFontSizePt }, canvasShortPx)
+      : resolveFontPx(d, canvasShortPx, rect.h);
+  const lineMul = resolveLineHeight(d);
+  // Letter-spacing: samma semantik som DOM (em × CONTAINERNS fontstorlek,
+  // ärvd som längd av alla segment).
+  const letterPx = resolveLetterSpacingEm(d) * basePx;
 
-  // ---- Decoration (box / side-rules) ----
+  // Segmentera texten med spans (samma helper som editorn) och bryt i rader.
+  const segments = resolveSpans(text, liveSpans ?? d.spans);
+  type Piece = { text: string; px: number; font: string; color: string; bold: boolean; italic: boolean; underline: boolean };
+  const lines: Piece[][] = [[]];
+  for (const s of segments) {
+    const px = s.fontSizePt ? resolveFontPx({ fontSizePt: s.fontSizePt }, canvasShortPx) : basePx;
+    const style: Omit<Piece, "text"> = {
+      px,
+      font: s.font || liveFont || d.font,
+      color: s.color || d.color,
+      bold: !!s.bold,
+      italic: !!s.italic,
+      underline: !!s.underline,
+    };
+    const parts = s.text.split("\n");
+    parts.forEach((part, i) => {
+      if (i > 0) lines.push([]);
+      if (part.length > 0) lines[lines.length - 1].push({ text: part, ...style });
+    });
+  }
+
+  ctx.save();
+  const spacingSupported = "letterSpacing" in ctx;
+  if (spacingSupported && letterPx !== 0) {
+    (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = `${letterPx.toFixed(2)}px`;
+  }
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "left";
+
+  const setPieceFont = (p: Piece) => {
+    ctx.font = `${p.italic ? "italic " : ""}${p.bold ? 700 : 400} ${Math.round(p.px)}px "${p.font}", Inter, sans-serif`;
+  };
+
+  // Radmått: DOM-paritet — containerns fontstorlek ger en STRUT per rad
+  // (line-height × basPx gäller även rader med enbart mindre segment),
+  // precis som editorns block-layout. Bredd mäts med letter-spacing aktiv.
+  const measured = lines.map((pieces) => {
+    const maxPx = pieces.length ? Math.max(basePx, ...pieces.map((p) => p.px)) : basePx;
+    let w = 0;
+    for (const p of pieces) {
+      setPieceFont(p);
+      w += ctx.measureText(p.text).width;
+    }
+    return { h: Math.round(maxPx * lineMul), w };
+  });
+  const totalH = measured.reduce((a, m) => a + m.h, 0);
+  const widest = Math.max(0, ...measured.map((m) => m.w));
+
+  // ---- Decoration (box / side-rules) — mot uppmätt textbbox ----
   const dec = d.decoration && d.decoration.kind !== "none" ? d.decoration : null;
   if (dec) {
-    const mmToPx = (mm: number) => (mm / 210) * canvasShortPx;
-    const padPx = mmToPx(dec.paddingMm ?? 2);
-    const thickPx = Math.max(1, mmToPx(dec.thicknessMm));
-    // Measure widest line.
-    let widest = 0;
-    for (const line of lines) {
-      const w = ctx.measureText(line).width;
-      if (w > widest) widest = w;
-    }
-    const textBoxW = widest;
-    const textBoxH = totalH;
+    const mmToPxL = (mm: number) => (mm / 210) * canvasShortPx;
+    const padPx = mmToPxL(dec.paddingMm ?? 2);
+    const thickPx = Math.max(1, mmToPxL(dec.thicknessMm));
     const cx = rect.x + rect.w / 2;
     const cy = rect.y + rect.h / 2;
-
     if (dec.kind === "box") {
       ctx.save();
       ctx.strokeStyle = dec.color;
       ctx.lineWidth = thickPx;
-      const bx = cx - textBoxW / 2 - padPx;
-      const by = cy - textBoxH / 2 - padPx;
-      ctx.strokeRect(bx, by, textBoxW + 2 * padPx, textBoxH + 2 * padPx);
+      ctx.strokeRect(cx - widest / 2 - padPx, cy - totalH / 2 - padPx, widest + 2 * padPx, totalH + 2 * padPx);
       ctx.restore();
     } else if (dec.kind === "side-rules") {
       ctx.save();
       ctx.fillStyle = dec.color;
-      const ruleLenPx = dec.ruleLengthMm ? mmToPx(dec.ruleLengthMm) : null;
-      const textLeft = cx - textBoxW / 2;
-      const textRight = cx + textBoxW / 2;
+      const ruleLenPx = dec.ruleLengthMm ? mmToPxL(dec.ruleLengthMm) : null;
+      const textLeft = cx - widest / 2;
+      const textRight = cx + widest / 2;
       const yMid = cy - thickPx / 2;
       if (ruleLenPx) {
         ctx.fillRect(textLeft - padPx - ruleLenPx, yMid, ruleLenPx, thickPx);
@@ -397,8 +432,33 @@ function drawTextLayer(
     }
   }
 
-  lines.forEach((line, i) => {
-    ctx.fillText(line, tx, firstY + i * lineH);
+  // ---- Rita raderna: segment vänster→höger från justerad startpunkt ----
+  let y = rect.y + rect.h / 2 - totalH / 2;
+  lines.forEach((pieces, i) => {
+    const m = measured[i];
+    const midY = y + m.h / 2;
+    let x =
+      d.align === "left" ? rect.x :
+      d.align === "right" ? rect.x + rect.w - m.w :
+      rect.x + rect.w / 2 - m.w / 2;
+    for (const p of pieces) {
+      setPieceFont(p);
+      ctx.fillStyle = p.color;
+      ctx.fillText(p.text, x, midY);
+      const w = ctx.measureText(p.text).width;
+      if (p.underline) {
+        ctx.save();
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = Math.max(1, p.px * 0.05);
+        ctx.beginPath();
+        ctx.moveTo(x, midY + p.px * 0.42);
+        ctx.lineTo(x + w, midY + p.px * 0.42);
+        ctx.stroke();
+        ctx.restore();
+      }
+      x += w;
+    }
+    y += m.h;
   });
   ctx.restore();
 }
@@ -834,8 +894,8 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
         ? { placeName: mv2.placeName, city: mv2.city ?? null, country: mv2.country ?? null, center: mv2.center }
         : null;
       const overrideText = tv?.overrideText ?? (isLive ? input.liveText ?? null : null);
-      const { text } = buildEffectiveTextWithSpans(layer.defaults, place, overrideText);
-      drawTextLayer(ctx, rect, layer, text, font, Math.min(frontPxW, frontPxH), tv?.fontSizePt ?? null);
+      const { text, spans } = buildEffectiveTextWithSpans(layer.defaults, place, overrideText);
+      drawTextLayer(ctx, rect, layer, text, font, Math.min(frontPxW, frontPxH), tv?.fontSizePt ?? null, spans);
     } else if (layer.type === "image") {
       try {
         // Inget vattenmärke på statiska bildlager — mallgrafik utan AI.
