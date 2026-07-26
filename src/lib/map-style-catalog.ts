@@ -72,6 +72,32 @@ export const MAP_STYLE_CATALOG: MapStyleCatalogEntry[] = [
     thumbnailUrl:
       "https://api.mapbox.com/styles/v1/maybe137/cms0mtrim00px01qz27t87307/static/18.0686,59.3293,12,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
   },
+  // v3-exklusiva 2026-07-26: strukturellt egna teman (inte nyansvarianter av
+  // samma karta) — cyanotyp-blåtryck, guld-på-kol och ren inverterad noir.
+  {
+    id: "blatryck",
+    label: "Blåtryck",
+    previewBg: "linear-gradient(135deg, #16395E, #0D2743)",
+    styleUrl: "mapbox://styles/maybe137/cms14qgka00qh01qz8xe0cic7",
+    thumbnailUrl:
+      "https://api.mapbox.com/styles/v1/maybe137/cms14qgka00qh01qz8xe0cic7/static/18.0686,59.3293,12,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
+  },
+  {
+    id: "guldlinje",
+    label: "Guldlinje",
+    previewBg: "linear-gradient(135deg, #181512, #0D0B09)",
+    styleUrl: "mapbox://styles/maybe137/cms14qgrn00rg01schtwa6w3e",
+    thumbnailUrl:
+      "https://api.mapbox.com/styles/v1/maybe137/cms14qgrn00rg01schtwa6w3e/static/18.0686,59.3293,12,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
+  },
+  {
+    id: "noir",
+    label: "Noir",
+    previewBg: "linear-gradient(135deg, #111111, #060606)",
+    styleUrl: "mapbox://styles/maybe137/cms14qgzb00oz01qkf11fdlnb",
+    thumbnailUrl:
+      "https://api.mapbox.com/styles/v1/maybe137/cms14qgzb00oz01qkf11fdlnb/static/18.0686,59.3293,12,0/200x200@2x?access_token=pk.eyJ1IjoibWF5YmUxMzciLCJhIjoiY21vN2ptNzFrMDhuYTJ3cjZneHFvb2poZCJ9.bPlyl4zWIapN0R213Loyaw",
+  },
 ];
 
 export const MAP_STYLE_BY_ID: Record<string, MapStyleCatalogEntry> = Object.fromEntries(
