@@ -19,7 +19,7 @@ import { FRAME_FRONT_CM, FRAME_LIP_CM, HANGER_SLAT_CM, HANGER_SLAT_ABOVE_CM, han
 import { drawShapeOnCanvas, type ClipShape } from "./shape-clip";
 import { getMapboxToken, styleUrl } from "./mapbox";
 import type { Template, TemplateLayer, TextSpan } from "./template-schema";
-import { getActiveLayoutBlock } from "./template-schema";
+import { getActiveLayoutBlock, applyContentVariant } from "./template-schema";
 import type { LayerValue, MapIcon } from "@/stores/editorStore";
 import { getActiveMarginInsetsPct, expandRectForRemovedMargin } from "./layer-utils";
 import {
@@ -42,6 +42,10 @@ export interface TemplateSnapshotInput {
   productType?: string | null;
   /** Active named-layout id ("Stil"). Defaults to the implicit Standard. */
   layoutId?: string | null;
+
+  /** Aktiv innehållsvariant (t.ex. vald drink) — löser bild/accentfärg ur
+   *  template.contentVariants vid rendering. */
+  contentVariantId?: string | null;
 
   // Per-layer values keyed by layer id. When provided, these override the
   // legacy live* fields. Falls back to layer.defaults when missing.
@@ -824,7 +828,16 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
   const marginEnabled = input.whiteMarginEnabled !== false;
   const marginInsets = getActiveMarginInsetsPct(allLayers, frontWcm, frontHcm);
   const marginRemovedInsets = !marginEnabled ? marginInsets : null;
-  const layers = marginEnabled ? allLayers : allLayers.filter((l) => l.type !== "margin");
+  // Innehållsvariant (vald drink etc.): bild-url + accentfärg appliceras på
+  // lagrens defaults; varianttexterna kommer redan via layerValues.
+  const activeVariant =
+    (input.contentVariantId &&
+      (input.template.contentVariants ?? []).find((v) => v.id === input.contentVariantId)) ||
+    null;
+  const layersBase = marginEnabled ? allLayers : allLayers.filter((l) => l.type !== "margin");
+  const layers = activeVariant
+    ? layersBase.map((l) => applyContentVariant(l, activeVariant) as typeof l)
+    : layersBase;
 
   // First map / text layer — used when no `layerValues` is provided so legacy
   // callers (cart pipeline) still produce the same output.

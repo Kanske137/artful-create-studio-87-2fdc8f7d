@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Image as ImageIcon, Sparkles, MapPin, Palette, Type, Ruler, Layers, Star, type LucideIcon } from "lucide-react";
+import { Image as ImageIcon, Images, Sparkles, MapPin, Palette, Type, Ruler, Layers, Star, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -115,6 +115,7 @@ interface Props {
 }
 
 export type SectionId =
+  | "motiv"
   | "lager"
   | "bild"
   | "forvandling"
@@ -130,9 +131,10 @@ export interface SectionMeta {
   icon: LucideIcon;
 }
 
-const SECTION_ORDER: SectionId[] = ["lager", "bild", "forvandling", "karta", "stjarnhimmel", "stil", "text", "format"];
+const SECTION_ORDER: SectionId[] = ["motiv", "lager", "bild", "forvandling", "karta", "stjarnhimmel", "stil", "text", "format"];
 
 const SECTION_META: Record<SectionId, { labelKey: string; icon: LucideIcon }> = {
+  motiv: { labelKey: "section.variant", icon: Images },
   lager: { labelKey: "section.layers", icon: Layers },
   bild: { labelKey: "section.image", icon: ImageIcon },
   forvandling: { labelKey: "section.transformation", icon: Sparkles },
@@ -169,6 +171,7 @@ export function useAvailableSections(): SectionMeta[] {
     const isFreeform = !!config?.is_freeform;
 
     const flags: Record<SectionId, boolean> = {
+      motiv: (template?.contentVariants?.length ?? 0) > 0,
       lager: isFreeform,
       bild: photoLayers.length > 0,
       forvandling: aiPhotoLayers.length > 0,
@@ -199,6 +202,8 @@ export function ControlPanel({ configs, activeHandle, activeProductType, onProdu
   const layerValues = useEditorStore((s) => s.layerValues);
   const photoSources = useEditorStore((s) => s.photoSources);
   const orientation = useEditorStore((s) => s.orientation);
+  const contentVariantId = useEditorStore((s) => s.contentVariantId);
+  const setContentVariant = useEditorStore((s) => s.setContentVariant);
 
   if (!config) return null;
   if (!sectionId) return null;
@@ -222,6 +227,38 @@ export function ControlPanel({ configs, activeHandle, activeProductType, onProdu
 
   const renderSection = () => {
     switch (sectionId) {
+    case "motiv": {
+      const variants = template?.contentVariants ?? [];
+      return (
+        <div className="grid grid-cols-3 gap-2">
+          {variants.map((v) => {
+            const active = contentVariantId === v.id;
+            return (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => setContentVariant(v.id)}
+                className={cn(
+                  "rounded-xl border bg-background overflow-hidden text-left transition",
+                  active ? "ring-2 ring-primary border-transparent" : "border-border hover:border-foreground/30",
+                )}
+              >
+                <div className="bg-muted overflow-hidden aspect-[3/4]">
+                  {v.thumbnailUrl ? (
+                    <img src={v.thumbnailUrl} alt={v.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground uppercase tracking-wider">
+                      {v.name.slice(0, 2)}
+                    </div>
+                  )}
+                </div>
+                <div className="px-2 py-1.5 text-[11px] font-medium truncate">{v.name}</div>
+              </button>
+            );
+          })}
+        </div>
+      );
+    }
     case "lager":
       return <LayersSection />;
     case "bild":

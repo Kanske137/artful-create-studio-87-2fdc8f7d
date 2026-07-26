@@ -39,7 +39,8 @@
     "aiStyle": "Stile IA",
     "style": "Stile",
     "layers": "Livelli",
-    "starmap": "Cielo stellato"
+    "starmap": "Cielo stellato",
+    "variant": "Motivo"
   },
   "format": {
     "backgroundColor": "Colore di sfondo",

@@ -516,6 +516,46 @@ export const productOptionsSchema = z.object({
 });
 export type ProductOptions = z.infer<typeof productOptionsSchema>;
 
+// ---------- content variants ("Drink"-väljare m.fl.) ----------
+/** En innehållsvariant är ett paket av per-lager-overrides (bild, text,
+ *  accentfärg) som kunden växlar mellan OBEROENDE av layout — t.ex. vilken
+ *  drink en drinkposter visar. Layouterna delar lager-id:n så samma variant
+ *  fungerar i alla layouter. Text-overriden appliceras som kund-override i
+ *  storen vid byte (så den följer med över layoutbyten och förblir
+ *  redigerbar); bild + färg löses vid rendering. */
+export const contentVariantOverrideSchema = z.object({
+  /** Ersätter `defaults.url` på ett image-lager. */
+  imageUrl: z.string().url().optional(),
+  /** Sätts som kundens text (overrideText) på ett text-lager vid variantbyte. */
+  text: z.string().optional(),
+  /** Ersätter `defaults.color` på ett text-lager vid rendering. */
+  color: z.string().optional(),
+});
+export const contentVariantSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  thumbnailUrl: z.string().url().optional(),
+  overrides: z.record(z.string(), contentVariantOverrideSchema).default({}),
+});
+export type ContentVariant = z.infer<typeof contentVariantSchema>;
+
+/** Applicera en variants render-overrides (bild-url + textfärg) på ett lager.
+ *  Textinnehåll hanteras separat via storens layerValues. */
+export function applyContentVariant<L extends { id: string; type: string; defaults?: unknown }>(
+  layer: L,
+  variant: ContentVariant | null | undefined,
+): L {
+  const ov = variant?.overrides?.[layer.id];
+  if (!ov) return layer;
+  if (layer.type === "image" && ov.imageUrl) {
+    return { ...layer, defaults: { ...(layer.defaults as object), url: ov.imageUrl } };
+  }
+  if (layer.type === "text" && ov.color) {
+    return { ...layer, defaults: { ...(layer.defaults as object), color: ov.color } };
+  }
+  return layer;
+}
+
 // ---------- root template ----------
 export const templateSchema = z
   .object({
@@ -552,6 +592,13 @@ export const templateSchema = z
      *  first loads the template and when the customer switches back to
      *  Standard. Omitted ⇒ portrait on first load, no switch on stil-byte. */
     defaultOrientation: orientationSchema.optional(),
+    /** Innehållsvarianter (t.ex. drinkar) som kunden växlar mellan oberoende
+     *  av layout. Tom lista ⇒ ingen variantväljare visas. */
+    contentVariants: z.array(contentVariantSchema).default([]),
+    /** Rubrik för variantväljar-sektionen i kundpanelen (t.ex. "Drink"). */
+    contentVariantLabel: z.string().optional(),
+    /** Vald variant vid första laddning. Default: första i listan. */
+    defaultContentVariantId: z.string().optional(),
     /** Optional thumbnail URL for the Standard layout shown in the "Stil"-row. */
     defaultLayoutThumbnailUrl: z.string().url().optional(),
     sizeOverrides: z.record(z.string(), sizeOverrideSchema).default({}),

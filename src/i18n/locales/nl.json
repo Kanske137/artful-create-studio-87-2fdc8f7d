@@ -39,7 +39,8 @@
     "aiStyle": "AI-stijl",
     "style": "Stijl",
     "layers": "Lagen",
-    "starmap": "Sterrenhemel"
+    "starmap": "Sterrenhemel",
+    "variant": "Motief"
   },
   "format": {
     "backgroundColor": "Achtergrondkleur",

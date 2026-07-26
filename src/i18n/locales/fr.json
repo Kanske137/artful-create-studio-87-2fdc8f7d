@@ -39,7 +39,8 @@
     "aiStyle": "Style IA",
     "style": "Style",
     "layers": "Calques",
-    "starmap": "Ciel étoilé"
+    "starmap": "Ciel étoilé",
+    "variant": "Motif"
   },
   "format": {
     "backgroundColor": "Couleur de fond",

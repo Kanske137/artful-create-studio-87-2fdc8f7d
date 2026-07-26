@@ -39,7 +39,8 @@
     "aiStyle": "KI-Stil",
     "style": "Stil",
     "layers": "Ebenen",
-    "starmap": "Sternenhimmel"
+    "starmap": "Sternenhimmel",
+    "variant": "Motiv"
   },
   "format": {
     "backgroundColor": "Hintergrundfarbe",

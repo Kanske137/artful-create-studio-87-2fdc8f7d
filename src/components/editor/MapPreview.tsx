@@ -4,6 +4,7 @@ import type mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEditorStore, type PhotoLayerValue } from "@/stores/editorStore";
 import type { TemplateLayer } from "@/lib/template-schema";
+import { applyContentVariant } from "@/lib/template-schema";
 import { MapLayerInstance } from "./layers/MapLayerInstance";
 import { ImageLayerView, LineLayerView, MarginLayerView } from "./layers/StaticLayers";
 import { TextLayerView } from "./layers/TextLayerView";
@@ -359,7 +360,17 @@ export function MapPreview({
   // wrapper still has pointer-events:none so it never blocks clicks).
   const hiddenLayerIds = useEditorStore((s) => s.hiddenLayerIds);
   const notHidden = (l: TemplateLayer) => !hiddenLayerIds[l.id];
-  const visibleLayers = (whiteMarginEnabled ? allLayers : allLayers.filter((l) => l.type !== "margin")).filter(notHidden);
+  // Innehållsvariant (t.ex. vald drink): bild-url + accentfärg löses vid
+  // rendering genom att byta ut lagrets defaults; texter ligger i layerValues.
+  const contentVariantId = useEditorStore((s) => s.contentVariantId);
+  const storeTemplate = useEditorStore((s) => s.template);
+  const activeVariant =
+    (contentVariantId && storeTemplate?.contentVariants?.find((v) => v.id === contentVariantId)) || null;
+  const withVariant = (l: TemplateLayer): TemplateLayer =>
+    activeVariant ? (applyContentVariant(l, activeVariant) as TemplateLayer) : l;
+  const visibleLayers = (whiteMarginEnabled ? allLayers : allLayers.filter((l) => l.type !== "margin"))
+    .filter(notHidden)
+    .map(withVariant);
   const layers = [
     ...visibleLayers.filter((l) => l.type !== "margin"),
     ...visibleLayers.filter((l) => l.type === "margin"),

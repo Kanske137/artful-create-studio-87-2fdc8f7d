@@ -39,7 +39,8 @@
     "aiStyle": "AI-tyyli",
     "style": "Tyyli",
     "layers": "Tasot",
-    "starmap": "Tähtitaivas"
+    "starmap": "Tähtitaivas",
+    "variant": "Aihe"
   },
   "format": {
     "backgroundColor": "Taustaväri",

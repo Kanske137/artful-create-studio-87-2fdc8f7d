@@ -325,6 +325,7 @@ export default function EditorPage() {
       orientation,
       productType: config?.product_type,
       layoutId,
+      contentVariantId: useEditorStore.getState().contentVariantId,
       size,
       layerValues,
       layerTransforms,

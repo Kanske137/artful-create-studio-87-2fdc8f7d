@@ -39,7 +39,8 @@
     "aiStyle": "AI style",
     "style": "Style",
     "layers": "Layers",
-    "starmap": "Night sky"
+    "starmap": "Night sky",
+    "variant": "Design"
   },
   "format": {
     "backgroundColor": "Background colour",

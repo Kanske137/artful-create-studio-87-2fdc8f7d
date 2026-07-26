@@ -39,7 +39,8 @@
     "aiStyle": "Estilo IA",
     "style": "Estilo",
     "layers": "Capas",
-    "starmap": "Cielo estrellado"
+    "starmap": "Cielo estrellado",
+    "variant": "Motivo"
   },
   "format": {
     "backgroundColor": "Color de fondo",

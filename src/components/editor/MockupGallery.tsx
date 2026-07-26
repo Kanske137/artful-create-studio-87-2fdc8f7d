@@ -86,6 +86,7 @@ export function MockupGallery() {
           size,
           productType: config.product_type,
           layoutId,
+          contentVariantId: useEditorStore.getState().contentVariantId,
           layerValues,
           layerTransforms,
           whiteMarginEnabled,

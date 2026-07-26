@@ -165,6 +165,10 @@ interface EditorState {
    *  Defaults to the implicit "default" Standard-layout. */
   layoutId: string | null;
 
+  /** Aktiv innehållsvariant (t.ex. vald drink). Null när mallen saknar
+   *  contentVariants. Oberoende av layoutId — layoutbyte behåller varianten. */
+  contentVariantId: string | null;
+
   // Per-layer values keyed by layer id (covers map + text layers).
   layerValues: Record<string, LayerValue>;
 
@@ -232,6 +236,9 @@ interface EditorState {
   setVariant: (v: string) => void;
   setOrientation: (o: Orientation) => void;
   setLayoutId: (id: string) => void;
+  /** Byt innehållsvariant (drink): sätter varianttexterna som kund-overrides
+   *  och pekar om render-overrides (bild + accentfärg). */
+  setContentVariant: (id: string) => void;
   setWhiteMarginEnabled: (v: boolean) => void;
   setLayerTransform: (id: string, patch: { xPct?: number; yPct?: number; wPct?: number; hPct?: number }) => void;
   resetLayerTransform: (id: string) => void;
@@ -597,6 +604,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   size: null,
   variant: null,
   orientation: "portrait",
+  contentVariantId: null,
 
   designSource: "map",
   photoFile: null,
@@ -793,11 +801,24 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       nextLayerTransforms = state.layerTransforms;
     }
 
+    // Innehållsvariant: behåll giltigt val, annars mallens default/första.
+    const variants = template.contentVariants ?? [];
+    const prevVariantId = state.contentVariantId;
+    const nextContentVariantId =
+      variants.length === 0
+        ? null
+        : (prevVariantId && variants.some((v) => v.id === prevVariantId))
+          ? prevVariantId
+          : (template.defaultContentVariantId && variants.some((v) => v.id === template.defaultContentVariantId))
+            ? template.defaultContentVariantId
+            : variants[0].id;
+
     const next = {
       config,
       template,
       productOptions,
       orientation,
+      contentVariantId: nextContentVariantId,
       layoutId: nextLayoutId,
       size: nextSize,
       variant: nextVariant,
@@ -1150,6 +1171,29 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (preferred && preferred !== state.orientation && template.orientations.includes(preferred)) {
       get().setOrientation(preferred);
     }
+  },
+  setContentVariant: (variantId) => {
+    const state = get();
+    const { template, config } = state;
+    if (!template) return;
+    const variant = (template.contentVariants ?? []).find((v) => v.id === variantId);
+    if (!variant || variantId === state.contentVariantId) return;
+    // Varianttexterna sätts som kund-override (overrideText) så de överlever
+    // layoutbyten och förblir fritt redigerbara i Text-fliken. Bild- och
+    // färg-overrides löses vid rendering via applyContentVariant.
+    const nextValues: Record<string, LayerValue> = { ...state.layerValues };
+    for (const [layerId, ov] of Object.entries(variant.overrides ?? {})) {
+      if (ov.text === undefined) continue;
+      const existing = nextValues[layerId];
+      if (existing && existing.kind === "text") {
+        nextValues[layerId] = { ...existing, text: ov.text, overrideText: ov.text };
+      }
+    }
+    set({
+      contentVariantId: variantId,
+      layerValues: nextValues,
+      ...mirrorLegacy({ template, orientation: state.orientation, layerValues: nextValues, config, layoutId: state.layoutId }),
+    });
   },
   // ---------- per-photo-layer setters ----------
   setPhotoSourceFor: (layerId, file, previewUrl) => {

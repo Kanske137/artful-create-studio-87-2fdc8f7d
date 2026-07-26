@@ -39,7 +39,8 @@
     "aiStyle": "AI-stil",
     "style": "Stil",
     "layers": "Lager",
-    "starmap": "Stjärnhimmel"
+    "starmap": "Stjärnhimmel",
+    "variant": "Motiv"
   },
   "format": {
     "backgroundColor": "Bakgrundsfärg",

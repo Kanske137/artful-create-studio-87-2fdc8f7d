@@ -39,7 +39,8 @@
     "aiStyle": "Styl AI",
     "style": "Styl",
     "layers": "Warstwy",
-    "starmap": "Gwiaździste niebo"
+    "starmap": "Gwiaździste niebo",
+    "variant": "Motyw"
   },
   "format": {
     "backgroundColor": "Kolor tła",
