@@ -1167,7 +1167,7 @@ function TextLayerDefaults({
           className="font-mono text-sm"
         />
       </Field>
-      {(d.linkedMapLayerId || /\[\[(city|country|coords?)\]\]/.test(d.text)) && (
+      {(d.linkedMapLayerId || /\[\[(city|country|coords?|date)\]\]/.test(d.text)) && (
         <p className="text-[11px] text-muted-foreground -mt-1 px-0.5">
           Förhandsvisning:{" "}
           <span className="font-medium text-foreground/80 whitespace-pre-wrap">

@@ -100,7 +100,27 @@ export interface AiPhotoLayerValue {
   zoom: number;
 }
 
-export type LayerValue = MapLayerValue | TextLayerValue | PhotoLayerValue | AiPhotoLayerValue;
+export interface StarmapLayerValue {
+  kind: "starmap";
+  /** [lng, lat] — samma konvention som map-lagret. */
+  center: [number, number];
+  /** "YYYY-MM-DD" lokalt datum för himlen. */
+  dateISO: string;
+  /** "HH:MM" lokal tid (tom ⇒ 22:00 i renderaren). */
+  timeHHMM: string;
+  placeName: string;
+  city?: string;
+  country?: string;
+  showConstellations: boolean;
+  showGrid: boolean;
+}
+
+export type LayerValue =
+  | MapLayerValue
+  | TextLayerValue
+  | PhotoLayerValue
+  | AiPhotoLayerValue
+  | StarmapLayerValue;
 
 /** Per-aiPhoto-layer customer state. The customer's selfie/pet photo lives
  *  here keyed by layer id, so multiple aiPhoto layers in one template are
@@ -282,6 +302,8 @@ interface EditorState {
   setLayerShowLabels: (id: string, v: boolean) => void;
   applyPlaceToLayer: (id: string, args: ApplyPlaceArgs) => void;
   updateMapLayerFromPan: (id: string, args: ApplyPlaceArgs) => void;
+  /** Starmap: datum/tid/toggles. Plats sätts via `applyPlaceToLayer`. */
+  patchStarmapLayer: (id: string, patch: Partial<Omit<StarmapLayerValue, "kind">>) => void;
   setLayerText: (id: string, t: string) => void;
   setLayerTextFont: (id: string, f: string) => void;
   setLayerTextFontSizePt: (id: string, pt: number | null) => void;
@@ -396,12 +418,16 @@ function buildAutoText(args: ApplyPlaceArgs, fields?: AutoTextFields): string {
   });
 }
 
-function buildAutoTextForLayer(args: ApplyPlaceArgs, d: TextDefaults): string {
+function buildAutoTextForLayer(
+  args: ApplyPlaceArgs & { dateISO?: string },
+  d: TextDefaults,
+): string {
   return buildLinkedText(d.text, resolveLinkedTokens(d), {
     placeName: args.placeName,
     city: args.city,
     country: args.country,
     center: args.center,
+    dateISO: args.dateISO,
   });
 }
 
@@ -453,6 +479,16 @@ function hydrateLayerValues(
         offsetX: 0,
         offsetY: 0,
         zoom: 1,
+      };
+    } else if (l.type === "starmap") {
+      out[l.id] = {
+        kind: "starmap",
+        center: [l.defaults.center[0], l.defaults.center[1]],
+        dateISO: l.defaults.dateISO,
+        timeHHMM: l.defaults.timeHHMM ?? "22:00",
+        placeName: l.defaults.placeName ?? "",
+        showConstellations: l.defaults.showConstellations,
+        showGrid: l.defaults.showGrid,
       };
     }
   }
@@ -1020,9 +1056,15 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         const tv = layerValues[l.id];
         if (!tv || tv.kind !== "text") continue;
         const mv = layerValues[linkedMapId];
-        if (!mv || mv.kind !== "map") continue;
+        if (!mv || (mv.kind !== "map" && mv.kind !== "starmap")) continue;
         const autoText = buildAutoTextForLayer(
-          { placeName: mv.placeName, city: mv.city, country: mv.country, center: mv.center },
+          {
+            placeName: mv.placeName,
+            city: mv.city,
+            country: mv.country,
+            center: mv.center,
+            dateISO: mv.kind === "starmap" ? mv.dateISO : undefined,
+          },
           l.defaults,
         );
         layerValues[l.id] = { ...tv, text: tv.overrideText ?? autoText };
@@ -1392,6 +1434,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   updateMapLayerFromPan: (id, args) => {
     applyPlaceInternal(set, get, id, args, /* moveCenter */ false);
   },
+  patchStarmapLayer: (id, patch) => patchStarmap(set, get, id, patch),
 
   setLayerText: (id, t) => setLayerOverrideText(set, get, id, t),
   setLayerTextFont: (id, f) => updateText(set, get, id, { font: f }),
@@ -1847,14 +1890,24 @@ function applyPlaceInternal(
 ) {
   const state = get();
   const cur = state.layerValues[mapId];
-  if (!cur || cur.kind !== "map") return;
-  const nextMap: MapLayerValue = {
-    ...cur,
-    ...(moveCenter ? { center: args.center } : {}),
-    placeName: args.placeName,
-    city: args.city,
-    country: args.country,
-  };
+  if (!cur || (cur.kind !== "map" && cur.kind !== "starmap")) return;
+  // Starmap har inget manuellt pan-läge — platsen flyttar alltid centrum.
+  const nextVal: LayerValue =
+    cur.kind === "map"
+      ? {
+          ...cur,
+          ...(moveCenter ? { center: args.center } : {}),
+          placeName: args.placeName,
+          city: args.city,
+          country: args.country,
+        }
+      : {
+          ...cur,
+          center: args.center,
+          placeName: args.placeName,
+          city: args.city,
+          country: args.country,
+        };
 
   // Update any text layers explicitly linked to this map (only when not
   // user-customised). No implicit "first map → first text" fallback — that
@@ -1865,8 +1918,9 @@ function applyPlaceInternal(
     : [];
   const newLayerValues: Record<string, LayerValue> = {
     ...state.layerValues,
-    [mapId]: nextMap,
+    [mapId]: nextVal,
   };
+  const dateISO = nextVal.kind === "starmap" ? nextVal.dateISO : undefined;
   for (const l of layers) {
     if (l.type !== "text") continue;
     if (l.defaults.linkedMapLayerId !== mapId) continue;
@@ -1876,10 +1930,55 @@ function applyPlaceInternal(
     newLayerValues[l.id] = {
       ...tv,
       overrideText: null,
-      text: buildAutoTextForLayer(args, l.defaults),
+      text: buildAutoTextForLayer({ ...args, dateISO }, l.defaults),
     };
   }
 
+  set({
+    layerValues: newLayerValues,
+    ...mirrorLegacy({ template: state.template, orientation: state.orientation, layerValues: newLayerValues, config: state.config, layoutId: state.layoutId }),
+  });
+}
+
+/** Patch på starmap-lagret (datum/tid/toggles). Datum påverkar [[date]]-token
+ *  i länkade texter, så auto-texterna räknas om — samma "kartan vinner
+ *  alltid"-regel som platsbyten. */
+function patchStarmap(
+  set: SetFn,
+  get: GetFn,
+  id: string,
+  patch: Partial<Omit<StarmapLayerValue, "kind">>,
+) {
+  const state = get();
+  const cur = state.layerValues[id];
+  if (!cur || cur.kind !== "starmap") return;
+  const next: StarmapLayerValue = { ...cur, ...patch };
+  const newLayerValues: Record<string, LayerValue> = { ...state.layerValues, [id]: next };
+  if (patch.dateISO !== undefined && patch.dateISO !== cur.dateISO) {
+    const layers = state.template
+      ? getActiveLayoutBlock(state.template, state.config?.product_type, state.layoutId)[state.orientation].layers
+      : [];
+    for (const l of layers) {
+      if (l.type !== "text") continue;
+      if (l.defaults.linkedMapLayerId !== id) continue;
+      const tv = state.layerValues[l.id];
+      if (!tv || tv.kind !== "text") continue;
+      newLayerValues[l.id] = {
+        ...tv,
+        overrideText: null,
+        text: buildAutoTextForLayer(
+          {
+            placeName: next.placeName,
+            center: next.center,
+            city: next.city,
+            country: next.country,
+            dateISO: next.dateISO,
+          },
+          l.defaults,
+        ),
+      };
+    }
+  }
   set({
     layerValues: newLayerValues,
     ...mirrorLegacy({ template: state.template, orientation: state.orientation, layerValues: newLayerValues, config: state.config, layoutId: state.layoutId }),

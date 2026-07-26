@@ -38,7 +38,8 @@
     "format": "Muoto",
     "aiStyle": "AI-tyyli",
     "style": "Tyyli",
-    "layers": "Tasot"
+    "layers": "Tasot",
+    "starmap": "Tähtitaivas"
   },
   "format": {
     "backgroundColor": "Taustaväri",
@@ -377,5 +378,12 @@
     "lager": "Lisää kuvia, tekstiä tai muotoja.",
     "startHere": "Aloita tästä",
     "continueHere": "Jatka tästä"
+  },
+  "starmap": {
+    "date": "Päivämäärä",
+    "time": "Kellonaika",
+    "constellations": "Tähdistöviivat",
+    "grid": "Koordinaatisto",
+    "tip": "Taivas lasketaan tähtitieteellisesti valitulle päivälle, ajalle ja paikalle."
   }
 }

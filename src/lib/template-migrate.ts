@@ -387,7 +387,7 @@ export function applyAdminPlaceToLinkedTexts(
           })();
     // If the admin authored a template with [[city]]/[[country]]/[[coords]]
     // placeholders, KEEP that template intact — only the runtime substitutes.
-    const hasPlaceholder = /\[\[(city|country|coords?)\]\]/.test(l.defaults.text);
+    const hasPlaceholder = /\[\[(city|country|coords?|date)\]\]/.test(l.defaults.text);
     const text = hasPlaceholder
       ? l.defaults.text
       : buildPlaceText(place, l.defaults.linkedMapFields);

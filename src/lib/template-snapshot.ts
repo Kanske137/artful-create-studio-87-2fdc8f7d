@@ -31,6 +31,7 @@ import {
   type LinkedPlace,
 } from "./text-typography";
 import { iconSvgString } from "./map-icon-catalog";
+import { renderStarmap } from "./starmap-render";
 
 export interface TemplateSnapshotInput {
   template: Template;
@@ -889,10 +890,18 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
       // applyPlaceInternal whenever the linked map updates).
       const mapId = layer.defaults.linkedMapLayerId;
       const mLv = mapId ? input.layerValues?.[mapId] : null;
-      const mv2 = mLv && mLv.kind === "map" ? mLv : null;
-      const place: LinkedPlace | null = mv2
-        ? { placeName: mv2.placeName, city: mv2.city ?? null, country: mv2.country ?? null, center: mv2.center }
-        : null;
+      const place: LinkedPlace | null =
+        mLv && mLv.kind === "map"
+          ? { placeName: mLv.placeName, city: mLv.city ?? null, country: mLv.country ?? null, center: mLv.center }
+          : mLv && mLv.kind === "starmap"
+            ? {
+                placeName: mLv.placeName,
+                city: mLv.city ?? null,
+                country: mLv.country ?? null,
+                center: mLv.center,
+                dateISO: mLv.dateISO,
+              }
+            : null;
       const overrideText = tv?.overrideText ?? (isLive ? input.liveText ?? null : null);
       const { text, spans } = buildEffectiveTextWithSpans(layer.defaults, place, overrideText);
       drawTextLayer(ctx, rect, layer, text, font, Math.min(frontPxW, frontPxH), tv?.fontSizePt ?? null, spans);
@@ -985,6 +994,30 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
       drawLineLayer(ctx, rect, layer, pxPerMm, Math.min(frontPxW, frontPxH));
     } else if (layer.type === "shape") {
       drawShapeLayer(ctx, rect, layer, Math.min(frontPxW, frontPxH));
+    } else if (layer.type === "starmap") {
+      // Deterministisk — samma renderare som editorns StarmapLayerView, så
+      // tryckfil = förhandsvisning utan att något behöver skickas in som bild.
+      const lv = input.layerValues?.[layer.id];
+      const sv = lv && lv.kind === "starmap" ? lv : null;
+      renderStarmap(
+        ctx,
+        { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+        {
+          dateISO: sv?.dateISO ?? layer.defaults.dateISO,
+          timeHHMM: sv?.timeHHMM ?? layer.defaults.timeHHMM,
+          lat: (sv?.center ?? layer.defaults.center)[1],
+          lon: (sv?.center ?? layer.defaults.center)[0],
+        },
+        {
+          bgColor: layer.defaults.bgColor,
+          starColor: layer.defaults.starColor,
+          lineColor: layer.defaults.lineColor,
+          gridColor: layer.defaults.gridColor,
+          showConstellations: sv?.showConstellations ?? layer.defaults.showConstellations,
+          showGrid: sv?.showGrid ?? layer.defaults.showGrid,
+          magLimit: layer.defaults.magLimit,
+        },
+      );
     } else if (layer.type === "margin") {
       // Margin frames the FRONT zone only — never the wrap/bleed band. This
       // matches the editor's dashed "Synlig framsida" rectangle and keeps the

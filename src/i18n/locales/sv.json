@@ -38,7 +38,8 @@
     "format": "Format",
     "aiStyle": "AI-stil",
     "style": "Stil",
-    "layers": "Lager"
+    "layers": "Lager",
+    "starmap": "Stjärnhimmel"
   },
   "format": {
     "backgroundColor": "Bakgrundsfärg",
@@ -377,5 +378,12 @@
     "lager": "Lägg till bilder, text eller former.",
     "startHere": "Börja här",
     "continueHere": "Fortsätt här"
+  },
+  "starmap": {
+    "date": "Datum",
+    "time": "Klockslag",
+    "constellations": "Stjärnbildslinjer",
+    "grid": "Gradnät",
+    "tip": "Himlen beräknas astronomiskt för valt datum, klockslag och plats."
   }
 }

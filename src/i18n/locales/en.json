@@ -38,7 +38,8 @@
     "format": "Format",
     "aiStyle": "AI style",
     "style": "Style",
-    "layers": "Layers"
+    "layers": "Layers",
+    "starmap": "Night sky"
   },
   "format": {
     "backgroundColor": "Background colour",
@@ -377,5 +378,12 @@
     "lager": "Add images, text or shapes.",
     "startHere": "Start here",
     "continueHere": "Continue here"
+  },
+  "starmap": {
+    "date": "Date",
+    "time": "Time",
+    "constellations": "Constellation lines",
+    "grid": "Celestial grid",
+    "tip": "The sky is calculated astronomically for your chosen date, time and place."
   }
 }

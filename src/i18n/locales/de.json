@@ -38,7 +38,8 @@
     "format": "Format",
     "aiStyle": "KI-Stil",
     "style": "Stil",
-    "layers": "Ebenen"
+    "layers": "Ebenen",
+    "starmap": "Sternenhimmel"
   },
   "format": {
     "backgroundColor": "Hintergrundfarbe",
@@ -377,5 +378,12 @@
     "lager": "Bilder, Text oder Formen hinzufügen.",
     "startHere": "Hier starten",
     "continueHere": "Hier weiter"
+  },
+  "starmap": {
+    "date": "Datum",
+    "time": "Uhrzeit",
+    "constellations": "Sternbildlinien",
+    "grid": "Gradnetz",
+    "tip": "Der Himmel wird astronomisch für Datum, Uhrzeit und Ort berechnet."
   }
 }

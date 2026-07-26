@@ -38,7 +38,8 @@
     "format": "Formato",
     "aiStyle": "Stile IA",
     "style": "Stile",
-    "layers": "Livelli"
+    "layers": "Livelli",
+    "starmap": "Cielo stellato"
   },
   "format": {
     "backgroundColor": "Colore di sfondo",
@@ -377,5 +378,12 @@
     "lager": "Aggiungi immagini, testo o forme.",
     "startHere": "Inizia qui",
     "continueHere": "Continua qui"
+  },
+  "starmap": {
+    "date": "Data",
+    "time": "Ora",
+    "constellations": "Linee delle costellazioni",
+    "grid": "Griglia celeste",
+    "tip": "Il cielo viene calcolato astronomicamente per data, ora e luogo scelti."
   }
 }

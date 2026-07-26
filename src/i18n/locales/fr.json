@@ -38,7 +38,8 @@
     "format": "Format",
     "aiStyle": "Style IA",
     "style": "Style",
-    "layers": "Calques"
+    "layers": "Calques",
+    "starmap": "Ciel étoilé"
   },
   "format": {
     "backgroundColor": "Couleur de fond",
@@ -377,5 +378,12 @@
     "lager": "Ajoutez images, texte ou formes.",
     "startHere": "Commencer ici",
     "continueHere": "Continuer ici"
+  },
+  "starmap": {
+    "date": "Date",
+    "time": "Heure",
+    "constellations": "Lignes des constellations",
+    "grid": "Grille céleste",
+    "tip": "Le ciel est calculé astronomiquement pour la date, l'heure et le lieu choisis."
   }
 }

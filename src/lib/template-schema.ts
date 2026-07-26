@@ -206,10 +206,12 @@ export const aiPhotoDefaultsSchema = z.object({
 });
 export type AiPhotoDefaults = z.infer<typeof aiPhotoDefaultsSchema>;
 
-// Token used in linked text: city / country / coords. Maps to placeholder
-// `[[city]]`, `[[country]]`, `[[coords]]` in the text. The renderer replaces
-// these at runtime with the linked map layer's place data.
-export const linkedTextTokenSchema = z.enum(["city", "country", "coordinates"]);
+// Token used in linked text: city / country / coords / date. Maps to
+// placeholder `[[city]]`, `[[country]]`, `[[coords]]`, `[[date]]` in the text.
+// The renderer replaces these at runtime with the linked layer's place data —
+// source is a map layer or a starmap layer ("date" resolves only from
+// starmap; a map source leaves it empty).
+export const linkedTextTokenSchema = z.enum(["city", "country", "coordinates", "date"]);
 export type LinkedTextToken = z.infer<typeof linkedTextTokenSchema>;
 
 // Rich-text span: applies optional style overrides to a [start,end) range of
@@ -330,6 +332,30 @@ export const shapeDefaultsSchema = z.object({
 });
 export type ShapeDefaults = z.infer<typeof shapeDefaultsSchema>;
 
+// ---------- starmap layer ----------
+// Stjärnhimmel beräknad ur datum/klockslag/plats (lokal siderisk tid +
+// ekvatoriella→horisontella koordinater), ritad deterministiskt på canvas av
+// src/lib/starmap-render.ts — identisk i editor och tryck-snapshot.
+export const starmapDefaultsSchema = z.object({
+  /** Lokalt datum "YYYY-MM-DD" (t.ex. födelsedag/bröllopsdag). */
+  dateISO: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  /** Lokal tid "HH:MM". Utelämnad ⇒ 22:00. */
+  timeHHMM: z.string().regex(/^\d{1,2}:\d{2}$/).optional(),
+  /** [lng, lat] — samma konvention som map-lagret/editorStore. */
+  center: z.tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)]),
+  /** Visningsnamn för platsen — källa för [[city]]-token i länkad text. */
+  placeName: z.string().optional(),
+  bgColor: hexColorSchema,
+  starColor: hexColorSchema,
+  lineColor: hexColorSchema,
+  gridColor: hexColorSchema.optional(),
+  showConstellations: z.boolean().default(true),
+  showGrid: z.boolean().default(false),
+  /** Magnitudgräns 2–6.5 (default 5.8 = allt blotta ögat ser). */
+  magLimit: z.number().min(2).max(6.5).optional(),
+});
+export type StarmapDefaults = z.infer<typeof starmapDefaultsSchema>;
+
 // ---------- layer base + discriminated union ----------
 const layerBase = z.object({
   id: z.string().min(1),
@@ -375,6 +401,10 @@ export const shapeLayerSchema = layerBase.extend({
   type: z.literal("shape"),
   defaults: shapeDefaultsSchema,
 });
+export const starmapLayerSchema = layerBase.extend({
+  type: z.literal("starmap"),
+  defaults: starmapDefaultsSchema,
+});
 
 export const layerSchema = z.discriminatedUnion("type", [
   mapLayerSchema,
@@ -385,6 +415,7 @@ export const layerSchema = z.discriminatedUnion("type", [
   photoLayerSchema,
   aiPhotoLayerSchema,
   shapeLayerSchema,
+  starmapLayerSchema,
 ]);
 export type TemplateLayer = z.infer<typeof layerSchema>;
 export type LayerType = TemplateLayer["type"];

@@ -38,7 +38,8 @@
     "format": "Formato",
     "aiStyle": "Estilo IA",
     "style": "Estilo",
-    "layers": "Capas"
+    "layers": "Capas",
+    "starmap": "Cielo estrellado"
   },
   "format": {
     "backgroundColor": "Color de fondo",
@@ -377,5 +378,12 @@
     "lager": "Añade imágenes, texto o formas.",
     "startHere": "Empieza aquí",
     "continueHere": "Continúa aquí"
+  },
+  "starmap": {
+    "date": "Fecha",
+    "time": "Hora",
+    "constellations": "Líneas de constelaciones",
+    "grid": "Cuadrícula celeste",
+    "tip": "El cielo se calcula astronómicamente para la fecha, hora y lugar elegidos."
   }
 }

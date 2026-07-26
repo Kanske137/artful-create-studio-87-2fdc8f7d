@@ -38,7 +38,8 @@
     "format": "Format",
     "aiStyle": "Styl AI",
     "style": "Styl",
-    "layers": "Warstwy"
+    "layers": "Warstwy",
+    "starmap": "Gwiaździste niebo"
   },
   "format": {
     "backgroundColor": "Kolor tła",
@@ -377,5 +378,12 @@
     "lager": "Dodaj obrazy, tekst lub kształty.",
     "startHere": "Zacznij tutaj",
     "continueHere": "Kontynuuj tutaj"
+  },
+  "starmap": {
+    "date": "Data",
+    "time": "Godzina",
+    "constellations": "Linie gwiazdozbiorów",
+    "grid": "Siatka współrzędnych",
+    "tip": "Niebo jest obliczane astronomicznie dla wybranej daty, godziny i miejsca."
   }
 }

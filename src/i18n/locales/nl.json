@@ -38,7 +38,8 @@
     "format": "Formaat",
     "aiStyle": "AI-stijl",
     "style": "Stijl",
-    "layers": "Lagen"
+    "layers": "Lagen",
+    "starmap": "Sterrenhemel"
   },
   "format": {
     "backgroundColor": "Achtergrondkleur",
@@ -377,5 +378,12 @@
     "lager": "Voeg afbeeldingen, tekst of vormen toe.",
     "startHere": "Begin hier",
     "continueHere": "Ga verder hier"
+  },
+  "starmap": {
+    "date": "Datum",
+    "time": "Tijdstip",
+    "constellations": "Sterrenbeeldlijnen",
+    "grid": "Gradennet",
+    "tip": "De hemel wordt astronomisch berekend voor de gekozen datum, tijd en plaats."
   }
 }

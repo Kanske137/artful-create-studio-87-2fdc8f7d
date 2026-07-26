@@ -9,6 +9,7 @@ import { ImageLayerView, LineLayerView, MarginLayerView } from "./layers/StaticL
 import { TextLayerView } from "./layers/TextLayerView";
 import { substituteTokensWithSpans, buildEffectiveTextWithSpans } from "@/lib/text-typography";
 import { ShapeLayerView } from "./layers/ShapeLayerView";
+import StarmapLayerView from "./layers/StarmapLayerView";
 import {
   lineThicknessPxFromCanvas,
   effectiveLayerRect,
@@ -890,7 +891,15 @@ export function MapPreview({
                     country: mv.country ?? null,
                     center: mv.center,
                   }
-                : null;
+                : mv && mv.kind === "starmap"
+                  ? {
+                      placeName: mv.placeName,
+                      city: mv.city ?? null,
+                      country: mv.country ?? null,
+                      center: mv.center,
+                      dateISO: mv.dateISO,
+                    }
+                  : null;
             const { text: effectiveText, spans: effectiveSpans } = buildEffectiveTextWithSpans(
               d,
               place,
@@ -964,6 +973,24 @@ export function MapPreview({
             );
           }
 
+          if (l.type === "starmap") {
+            const v = layerValues[l.id];
+            const sv = v && v.kind === "starmap" ? v : null;
+            return (
+              <div key={l.id} style={{ ...wrapStyle, pointerEvents: "none" }}>
+                <StarmapLayerView
+                  layer={l}
+                  center={sv?.center ?? [l.defaults.center[0]!, l.defaults.center[1]!]}
+                  dateISO={sv?.dateISO ?? l.defaults.dateISO}
+                  timeHHMM={sv?.timeHHMM ?? l.defaults.timeHHMM}
+                  showConstellations={sv?.showConstellations ?? l.defaults.showConstellations}
+                  showGrid={sv?.showGrid ?? l.defaults.showGrid}
+                />
+                {moveHandle}
+                {resizeHandle}
+              </div>
+            );
+          }
 
           return null;
         })}

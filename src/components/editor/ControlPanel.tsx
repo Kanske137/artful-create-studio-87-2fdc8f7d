@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Image as ImageIcon, Sparkles, MapPin, Palette, Type, Ruler, Layers, type LucideIcon } from "lucide-react";
+import { Image as ImageIcon, Sparkles, MapPin, Palette, Type, Ruler, Layers, Star, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { Circle, Heart, Star, Square, RotateCcw } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useEditorStore, type MapLayerValue, type TextLayerValue, type PhotoLayerValue, type PhotoShape } from "@/stores/editorStore";
+import { useEditorStore, type MapLayerValue, type TextLayerValue, type PhotoLayerValue, type PhotoShape, type StarmapLayerValue } from "@/stores/editorStore";
 import { FONT_FAMILIES } from "@/lib/font-catalog";
 import { substituteTokens } from "@/lib/text-typography";
 import { geocode, type GeocodeResult } from "@/lib/mapbox";
@@ -114,7 +114,15 @@ interface Props {
   sectionId?: SectionId;
 }
 
-export type SectionId = "lager" | "bild" | "forvandling" | "karta" | "stil" | "text" | "format";
+export type SectionId =
+  | "lager"
+  | "bild"
+  | "forvandling"
+  | "karta"
+  | "stjarnhimmel"
+  | "stil"
+  | "text"
+  | "format";
 
 export interface SectionMeta {
   id: SectionId;
@@ -122,13 +130,14 @@ export interface SectionMeta {
   icon: LucideIcon;
 }
 
-const SECTION_ORDER: SectionId[] = ["lager", "bild", "forvandling", "karta", "stil", "text", "format"];
+const SECTION_ORDER: SectionId[] = ["lager", "bild", "forvandling", "karta", "stjarnhimmel", "stil", "text", "format"];
 
 const SECTION_META: Record<SectionId, { labelKey: string; icon: LucideIcon }> = {
   lager: { labelKey: "section.layers", icon: Layers },
   bild: { labelKey: "section.image", icon: ImageIcon },
   forvandling: { labelKey: "section.transformation", icon: Sparkles },
   karta: { labelKey: "section.map", icon: MapPin },
+  stjarnhimmel: { labelKey: "section.starmap", icon: Star },
   stil: { labelKey: "section.style", icon: Palette },
   text: { labelKey: "section.text", icon: Type },
   format: { labelKey: "section.format", icon: Ruler },
@@ -148,6 +157,7 @@ export function useAvailableSections(): SectionMeta[] {
     const aiPhotoLayers = layers.filter((l) => l.type === "aiPhoto");
     const mapLayers = layers.filter((l) => l.type === "map");
     const textLayers = layers.filter((l) => l.type === "text");
+    const starmapLayers = layers.filter((l) => l.type === "starmap");
 
     const editableMaps = mapLayers.filter(
       (l: any) => !l.locks.position || !l.locks.style || !l.locks.shape || !l.locks.visibility || !l.locks.size || !l.locks.move,
@@ -163,6 +173,7 @@ export function useAvailableSections(): SectionMeta[] {
       bild: photoLayers.length > 0,
       forvandling: aiPhotoLayers.length > 0,
       karta: editableMaps.length > 0,
+      stjarnhimmel: starmapLayers.length > 0,
       stil: allLayouts.length > 1,
       text: editableTexts.length > 0,
       format: true,
@@ -246,6 +257,25 @@ export function ControlPanel({ configs, activeHandle, activeProductType, onProdu
       );
     case "karta":
       return <MapTabs config={config} layers={editableMaps} layerValues={layerValues} />;
+    case "stjarnhimmel": {
+      const starmapLayers = layers.filter(
+        (l): l is Extract<TemplateLayer, { type: "starmap" }> => l.type === "starmap",
+      );
+      return (
+        <div className="space-y-6">
+          {starmapLayers.map((l) => {
+            const v = layerValues[l.id];
+            return (
+              <StarmapSection
+                key={l.id}
+                layer={l}
+                value={v && v.kind === "starmap" ? v : null}
+              />
+            );
+          })}
+        </div>
+      );
+    }
     case "stil":
       return (
         <div className="grid grid-cols-3 gap-2">
@@ -579,6 +609,147 @@ function PlaceLayerSection({
         {t("map.tipDrag")}
       </p>
       <LayerTransformControls layer={layer} />
+    </div>
+  );
+}
+
+function StarmapSection({
+  layer,
+  value,
+}: {
+  layer: Extract<TemplateLayer, { type: "starmap" }>;
+  value: StarmapLayerValue | null;
+}) {
+  const { t } = useTranslation();
+  const applyPlaceToLayer = useEditorStore((s) => s.applyPlaceToLayer);
+  const patchStarmapLayer = useEditorStore((s) => s.patchStarmapLayer);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<GeocodeResult[]>([]);
+  const [searching, setSearching] = useState(false);
+
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) {
+      setResults([]);
+      return;
+    }
+    setSearching(true);
+    const timer = setTimeout(async () => {
+      const r = await geocode(q);
+      setResults(r);
+      setSearching(false);
+    }, 300);
+    return () => {
+      clearTimeout(timer);
+      setSearching(false);
+    };
+  }, [query]);
+
+  const onPick = (r: GeocodeResult) => {
+    applyPlaceToLayer(layer.id, {
+      placeName: r.place_name,
+      center: r.center,
+      city: r.city,
+      country: r.country,
+    });
+    setResults([]);
+    setQuery("");
+  };
+
+  const dateISO = value?.dateISO ?? layer.defaults.dateISO;
+  const timeHHMM = value?.timeHHMM ?? layer.defaults.timeHHMM ?? "22:00";
+  const showConstellations = value?.showConstellations ?? layer.defaults.showConstellations;
+  const showGrid = value?.showGrid ?? layer.defaults.showGrid;
+  const placeName = value?.placeName || layer.defaults.placeName || "—";
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("map.selectedPlace")}</Label>
+        <p className="text-sm font-medium font-serif-display">{placeName}</p>
+      </div>
+      <div className="space-y-2">
+        <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+          {t("map.searchAddress")}
+        </Label>
+        <Popover open={results.length > 0}>
+          <PopoverTrigger asChild>
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t("map.searchPlaceholder")}
+                className="pl-10 pr-10 h-12 rounded-full bg-background shadow-inner"
+              />
+              {searching && (
+                <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+              )}
+            </div>
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            sideOffset={6}
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            className="p-0 w-[var(--radix-popover-trigger-width)] z-[60] rounded-2xl overflow-hidden"
+          >
+            <div className="max-h-[14rem] overflow-y-auto divide-y">
+              {results.slice(0, 4).map((r, i) => (
+                <button
+                  key={i}
+                  onClick={() => onPick(r)}
+                  className="block w-full text-left px-4 py-2 text-sm hover:bg-accent transition h-[3.5rem] leading-tight"
+                >
+                  {r.place_name}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+            {t("starmap.date")}
+          </Label>
+          <Input
+            type="date"
+            value={dateISO}
+            onChange={(e) => {
+              if (e.target.value) patchStarmapLayer(layer.id, { dateISO: e.target.value });
+            }}
+            className="h-11 rounded-xl bg-background"
+          />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+            {t("starmap.time")}
+          </Label>
+          <Input
+            type="time"
+            value={timeHHMM}
+            onChange={(e) => {
+              if (e.target.value) patchStarmapLayer(layer.id, { timeHHMM: e.target.value });
+            }}
+            className="h-11 rounded-xl bg-background"
+          />
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <Label className="text-sm">{t("starmap.constellations")}</Label>
+        <Switch
+          checked={showConstellations}
+          onCheckedChange={(v) => patchStarmapLayer(layer.id, { showConstellations: v })}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <Label className="text-sm">{t("starmap.grid")}</Label>
+        <Switch
+          checked={showGrid}
+          onCheckedChange={(v) => patchStarmapLayer(layer.id, { showGrid: v })}
+        />
+      </div>
+      <p className="text-[11px] text-muted-foreground">{t("starmap.tip")}</p>
     </div>
   );
 }

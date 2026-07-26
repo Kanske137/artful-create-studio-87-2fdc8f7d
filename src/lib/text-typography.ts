@@ -52,6 +52,7 @@ const PLACEHOLDER_RX: Record<LinkedTextToken, RegExp> = {
   city: /\[\[city\]\]/g,
   country: /\[\[country\]\]/g,
   coordinates: /\[\[coords?\]\]/g,
+  date: /\[\[date\]\]/g,
 };
 
 export interface LinkedPlace {
@@ -59,6 +60,8 @@ export interface LinkedPlace {
   city?: string | null;
   country?: string | null;
   center?: [number, number];
+  /** "YYYY-MM-DD" — sätts bara när källan är ett starmap-lager. */
+  dateISO?: string;
 }
 
 export function tokenValue(place: LinkedPlace, token: LinkedTextToken): string {
@@ -69,6 +72,10 @@ export function tokenValue(place: LinkedPlace, token: LinkedTextToken): string {
   if (token === "coordinates" && place.center) {
     const [lng, lat] = place.center;
     return `${lat.toFixed(3)}°N · ${lng.toFixed(3)}°E`;
+  }
+  if (token === "date" && place.dateISO) {
+    const [y, m, d] = place.dateISO.split("-");
+    if (y && m && d) return `${d.padStart(2, "0")}.${m.padStart(2, "0")}.${y}`;
   }
   return "";
 }
@@ -103,7 +110,7 @@ export function buildLinkedText(
   tokens: LinkedTextToken[],
   place: LinkedPlace,
 ): string {
-  const hasPlaceholder = template ? /\[\[(city|country|coords?)\]\]/.test(template) : false;
+  const hasPlaceholder = template ? /\[\[(city|country|coords?|date)\]\]/.test(template) : false;
   if (template && hasPlaceholder) {
     let out = template;
     (Object.keys(PLACEHOLDER_RX) as LinkedTextToken[]).forEach((tok) => {
@@ -136,7 +143,7 @@ export function substituteTokensWithSpans(
   if (!hasPlaceholder || !d.spans?.length) return { text, spans: d.spans };
 
   const segments: Array<{ rawStart: number; rawEnd: number; outStart: number; outEnd: number; token: boolean }> = [];
-  const rx = /\[\[(city|country|coords?)\]\]/g;
+  const rx = /\[\[(city|country|coords?|date)\]\]/g;
   let outPos = 0;
   let rawPos = 0;
   for (const m of raw.matchAll(rx)) {
@@ -201,7 +208,7 @@ export function buildEffectiveTextWithSpans(
   const auto = substituteTokensWithSpans(d, place);
   if (overrideText === null) return auto;
 
-  const isLinked = !!d.linkedMapLayerId || /\[\[(city|country|coords?)\]\]/.test(d.text ?? "");
+  const isLinked = !!d.linkedMapLayerId || /\[\[(city|country|coords?|date)\]\]/.test(d.text ?? "");
   if (!isLinked) {
     // Non-linked: override is just the customer's free text. Keep admin spans
     // only if they still fit inside the new length.
@@ -360,7 +367,7 @@ export function decorationDefaults(d: TextDecoration | undefined): TextDecoratio
 
 // ---------- token substitution (display) ----------
 
-const PLACEHOLDER_TEST_RX = /\[\[(city|country|coords?)\]\]/;
+const PLACEHOLDER_TEST_RX = /\[\[(city|country|coords?|date)\]\]/;
 
 /** Default fallback used by admin previews when no real place is available. */
 export const FALLBACK_PLACE: LinkedPlace = {
