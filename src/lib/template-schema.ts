@@ -548,6 +548,10 @@ export const templateSchema = z
     /** Optional admin-overridden display name for the implicit Standard layout
      *  shown in the customer "Stil"-row. Defaults to "Standard" when omitted. */
     defaultLayoutName: z.string().min(1).optional(),
+    /** Orientation the Standard layout looks best in. Applied when the editor
+     *  first loads the template and when the customer switches back to
+     *  Standard. Omitted ⇒ portrait on first load, no switch on stil-byte. */
+    defaultOrientation: orientationSchema.optional(),
     /** Optional thumbnail URL for the Standard layout shown in the "Stil"-row. */
     defaultLayoutThumbnailUrl: z.string().url().optional(),
     sizeOverrides: z.record(z.string(), sizeOverrideSchema).default({}),
@@ -563,6 +567,10 @@ export const templateSchema = z
           id: z.string().min(1),
           name: z.string().min(1),
           thumbnailUrl: z.string().url().optional(),
+          /** Orientation this layout looks best in (e.g. multi-map rows →
+           *  landscape). Applied automatically when the customer switches to
+           *  the layout; they can still toggle back manually afterwards. */
+          preferredOrientation: orientationSchema.optional(),
           defaultLayout: z.object({
             portrait: orientationLayoutSchema,
             landscape: orientationLayoutSchema,
@@ -630,6 +638,8 @@ export interface NamedLayout {
   id: string;
   name: string;
   thumbnailUrl?: string;
+  /** Orientation this layout is designed for; editor auto-switches on stil-byte. */
+  preferredOrientation?: "portrait" | "landscape";
   defaultLayout: { portrait: OrientationLayout; landscape: OrientationLayout };
   canvasLayout?: {
     portrait: OrientationLayout;
@@ -647,6 +657,7 @@ export function getAllLayouts(template: Template): NamedLayout[] {
     id: DEFAULT_LAYOUT_ID,
     name: template.defaultLayoutName?.trim() || "Standard",
     thumbnailUrl: template.defaultLayoutThumbnailUrl,
+    preferredOrientation: template.defaultOrientation,
     defaultLayout: template.defaultLayout,
     canvasLayout: template.canvasLayout,
   };

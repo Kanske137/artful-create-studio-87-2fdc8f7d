@@ -3,7 +3,7 @@ import type { Orientation, ProductConfig } from "@/lib/product-config";
 import { getEffectiveSizes } from "@/lib/product-config";
 import type { DesignSource } from "@/lib/print-pipeline";
 import type { ProductOptions, Template, TemplateLayer } from "@/lib/template-schema";
-import { getActiveLayoutBlock } from "@/lib/template-schema";
+import { getActiveLayoutBlock, getAllLayouts } from "@/lib/template-schema";
 import { resolveTemplate } from "@/lib/template-migrate";
 import { clampLayerRect } from "@/lib/layer-utils";
 import {
@@ -704,8 +704,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       ? prevVariant
       : variantsForSize[0]?.name ?? nextSizeDef?.variants[0]?.name ?? null;
 
-    const orientation = state.orientation;
     const isFirstLoad = state.config === null;
+    // First template load: honour the template's preferred orientation (e.g.
+    // multi-map standard layouts designed for landscape). Later loads (product
+    // type switches etc.) keep whatever the customer chose.
+    const orientation =
+      isFirstLoad && template.defaultOrientation && template.orientations.includes(template.defaultOrientation)
+        ? template.defaultOrientation
+        : state.orientation;
     const prevTemplate = state.template;
     const prevProductType = state.config?.product_type;
     const prevLayoutId = state.layoutId;
@@ -791,6 +797,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       config,
       template,
       productOptions,
+      orientation,
       layoutId: nextLayoutId,
       size: nextSize,
       variant: nextVariant,
@@ -1134,6 +1141,15 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       ...mirrorLegacy({ template, orientation: state.orientation, layerValues, config, layoutId: nextLayoutId }),
       ...mirrorPhoto({ template, orientation: state.orientation, config, photoSources, photoAiResults, layoutId: nextLayoutId }),
     });
+
+    // Auto-switch to the layout's preferred orientation (e.g. multi-map
+    // "Vår resa 2"/"Två himlar" are designed landscape). Runs after the
+    // layout state has landed so setOrientation re-hydrates + carries values
+    // against the new layout. The customer can still toggle back via Format.
+    const preferred = getAllLayouts(template).find((l) => l.id === nextLayoutId)?.preferredOrientation;
+    if (preferred && preferred !== state.orientation && template.orientations.includes(preferred)) {
+      get().setOrientation(preferred);
+    }
   },
   // ---------- per-photo-layer setters ----------
   setPhotoSourceFor: (layerId, file, previewUrl) => {

@@ -197,7 +197,7 @@ async function drawMapLayer(
     });
 
     await new Promise<void>((resolve, reject) => {
-      const t = window.setTimeout(() => reject(new Error("Map render timeout")), 15000);
+      const t = window.setTimeout(() => reject(new Error("Map render timeout")), 30000);
       map!.once("error", (e) => {
         window.clearTimeout(t);
         reject(new Error(`Mapbox error: ${(e as any)?.error?.message ?? "unknown"}`));
