@@ -530,6 +530,10 @@ export const contentVariantOverrideSchema = z.object({
   text: z.string().optional(),
   /** Ersätter `defaults.color` på ett text-lager vid rendering. */
   color: z.string().optional(),
+  /** Ersätter `defaults.fontSizePt` på ett text-lager vid rendering — låter en
+   *  variant autoanpassa t.ex. titelstorleken per drink (fullbreddstitel
+   *  oavsett namnlängd). Kundens egna storleksändring vinner fortfarande. */
+  fontSizePt: z.number().positive().max(400).optional(),
 });
 export const contentVariantSchema = z.object({
   id: z.string().min(1),
@@ -550,8 +554,11 @@ export function applyContentVariant<L extends { id: string; type: string; defaul
   if (layer.type === "image" && ov.imageUrl) {
     return { ...layer, defaults: { ...(layer.defaults as object), url: ov.imageUrl } };
   }
-  if (layer.type === "text" && ov.color) {
-    return { ...layer, defaults: { ...(layer.defaults as object), color: ov.color } };
+  if (layer.type === "text" && (ov.color || ov.fontSizePt !== undefined)) {
+    const d = { ...(layer.defaults as Record<string, unknown>) };
+    if (ov.color) d.color = ov.color;
+    if (ov.fontSizePt !== undefined) d.fontSizePt = ov.fontSizePt;
+    return { ...layer, defaults: d };
   }
   return layer;
 }
