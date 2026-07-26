@@ -24,6 +24,7 @@ import MapLayerPreview from "./MapLayerPreview";
 import TextLayerPreview from "./TextLayerPreview";
 import { LineLayerView, MarginLayerView } from "@/components/editor/layers/StaticLayers";
 import { ShapeLayerView } from "@/components/editor/layers/ShapeLayerView";
+import StarmapLayerView from "@/components/editor/layers/StarmapLayerView";
 import { AcrylicCornerOverlay } from "@/components/editor/AcrylicCornerOverlay";
 
 const SNAP_PCT = 1.25;
@@ -148,6 +149,17 @@ export default function LayerCanvas({
           <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground bg-muted">
             🖼 Bild
           </div>
+        );
+      case "starmap":
+        return (
+          <StarmapLayerView
+            layer={layer}
+            center={layer.defaults.center}
+            dateISO={layer.defaults.dateISO}
+            timeHHMM={layer.defaults.timeHHMM}
+            showConstellations={layer.defaults.showConstellations}
+            showGrid={layer.defaults.showGrid}
+          />
         );
       case "line":
         return <LineLayerView layer={layer} thicknessPx={lineThicknessPxFromCanvas(layer, Math.min(size.w, size.h))} />;

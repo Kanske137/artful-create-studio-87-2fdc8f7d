@@ -240,6 +240,127 @@ export default function LayerInspector({ config, layer, allLayers, onChange, onL
         </div>
       )}
 
+      {layer.type === "starmap" && (
+        <div className="space-y-3 border-t pt-4">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Stjärnhimmel — defaults
+          </p>
+
+          <DefaultPlaceSearch
+            current={layer.defaults.placeName}
+            onPick={(r) => {
+              const starId = layer.id;
+              const nextStar: TemplateLayer = {
+                ...layer,
+                defaults: {
+                  ...layer.defaults,
+                  center: r.center,
+                  placeName: r.place_name,
+                },
+              };
+              if (onLayersChange) {
+                const replaced = allLayers.map((l) => (l.id === starId ? nextStar : l));
+                const propagated = applyAdminPlaceToLinkedTexts(replaced, starId, {
+                  placeName: r.place_name,
+                  city: r.city,
+                  country: r.country,
+                  center: r.center,
+                });
+                onLayersChange(propagated);
+              } else {
+                onChange(nextStar);
+              }
+            }}
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Datum">
+              <Input
+                type="date"
+                value={layer.defaults.dateISO}
+                onChange={(e) => e.target.value && updateDefaults({ dateISO: e.target.value })}
+              />
+            </Field>
+            <Field label="Klockslag">
+              <Input
+                type="time"
+                value={layer.defaults.timeHHMM ?? "22:00"}
+                onChange={(e) => e.target.value && updateDefaults({ timeHHMM: e.target.value })}
+              />
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Lng">
+              <Input
+                type="number"
+                step="0.0001"
+                value={layer.defaults.center[0]}
+                onChange={(e) =>
+                  updateDefaults({ center: [Number(e.target.value), layer.defaults.center[1]] })
+                }
+              />
+            </Field>
+            <Field label="Lat">
+              <Input
+                type="number"
+                step="0.0001"
+                value={layer.defaults.center[1]}
+                onChange={(e) =>
+                  updateDefaults({ center: [layer.defaults.center[0], Number(e.target.value)] })
+                }
+              />
+            </Field>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <Field label="Himmel">
+              <Input
+                type="color"
+                value={layer.defaults.bgColor}
+                onChange={(e) => updateDefaults({ bgColor: e.target.value })}
+              />
+            </Field>
+            <Field label="Stjärnor">
+              <Input
+                type="color"
+                value={layer.defaults.starColor}
+                onChange={(e) => updateDefaults({ starColor: e.target.value })}
+              />
+            </Field>
+            <Field label="Linjer">
+              <Input
+                type="color"
+                value={layer.defaults.lineColor}
+                onChange={(e) => updateDefaults({ lineColor: e.target.value })}
+              />
+            </Field>
+          </div>
+          <div className="flex items-center justify-between">
+            <Label className="text-sm">Stjärnbildslinjer</Label>
+            <Switch
+              checked={layer.defaults.showConstellations}
+              onCheckedChange={(c) => updateDefaults({ showConstellations: c })}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label className="text-sm">Gradnät</Label>
+            <Switch
+              checked={layer.defaults.showGrid}
+              onCheckedChange={(c) => updateDefaults({ showGrid: c })}
+            />
+          </div>
+          <Field label="Magnitudgräns (2–6.5, högre = fler stjärnor)">
+            <Input
+              type="number"
+              step="0.1"
+              min={2}
+              max={6.5}
+              value={layer.defaults.magLimit ?? 5.8}
+              onChange={(e) => updateDefaults({ magLimit: Number(e.target.value) })}
+            />
+          </Field>
+        </div>
+      )}
+
       {layer.type === "text" && (
         <TextLayerDefaults
           layer={layer}

@@ -76,6 +76,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.160.0",
+    "tz-lookup": "^6.1.25",
     "vaul": "^0.9.9",
     "zod": "^4.3.6",
     "zustand": "^5.0.12"
@@ -88,6 +89,7 @@
     "@types/node": "^22.16.5",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
+    "@types/tz-lookup": "^6.1.2",
     "@vitejs/plugin-react-swc": "^3.11.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.32.0",

@@ -388,6 +388,28 @@ export function createLayer(type: LayerType, existing: TemplateLayer[]): Templat
         defaults: { fit: "cover", shape: "rect" },
         locks: defaultLocks({ content: false }),
       };
+    case "starmap":
+      return {
+        ...base,
+        xPct: 11,
+        yPct: 6.5,
+        wPct: 78,
+        hPct: 55.5,
+        type: "starmap",
+        name: `Stjärnhimmel ${countOfType(existing, "starmap") + 1}`,
+        defaults: {
+          dateISO: "2000-01-01",
+          timeHHMM: "22:00",
+          center: [18.0686, 59.3293],
+          placeName: "Stockholm",
+          bgColor: "#0B1830",
+          starColor: "#FFFFFF",
+          lineColor: "#7E93B8",
+          showConstellations: true,
+          showGrid: false,
+        },
+        locks: defaultLocks({ content: false }),
+      };
     case "line":
       return {
         ...base,

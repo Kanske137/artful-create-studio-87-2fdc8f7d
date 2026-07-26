@@ -1042,6 +1042,39 @@ export const useEditorStore = create<EditorState>((set, get) => ({
           ...fresh,
           ...(!locks.move ? { offsetX: oldVal.offsetX, offsetY: oldVal.offsetY, zoom: oldVal.zoom } : {}),
         };
+      } else if (
+        oldVal.kind === "starmap" &&
+        fresh.kind === "starmap" &&
+        newLayer.type === "starmap" &&
+        prevLayer?.type === "starmap"
+      ) {
+        // Kundens datum/tid/plats/toggles är innehåll, inte layout — bär över
+        // det som avviker från förra layoutens defaults (annars vinner nya
+        // layoutens egna defaults, t.ex. andra färger).
+        const pd = prevLayer.defaults;
+        const changed =
+          oldVal.dateISO !== pd.dateISO ||
+          oldVal.timeHHMM !== (pd.timeHHMM ?? "22:00") ||
+          Math.abs(oldVal.center[0] - pd.center[0]) > 1e-6 ||
+          Math.abs(oldVal.center[1] - pd.center[1]) > 1e-6;
+        layerValues[newId] = {
+          ...fresh,
+          ...(changed
+            ? {
+                dateISO: oldVal.dateISO,
+                timeHHMM: oldVal.timeHHMM,
+                center: oldVal.center,
+                placeName: oldVal.placeName,
+                city: oldVal.city,
+                country: oldVal.country,
+              }
+            : {}),
+          showConstellations:
+            oldVal.showConstellations !== pd.showConstellations
+              ? oldVal.showConstellations
+              : fresh.showConstellations,
+          showGrid: oldVal.showGrid !== pd.showGrid ? oldVal.showGrid : fresh.showGrid,
+        };
       }
     }
 

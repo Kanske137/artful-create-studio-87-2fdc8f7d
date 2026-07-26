@@ -13,6 +13,7 @@
 // Stjärndata: HYG via d3-celestial (BSD-3, © Olaf Frohn) — bantad till
 // [ra, dec, mag] för mag ≤ 5,8 (~4 000 stjärnor = allt blotta ögat ser).
 
+import tzLookup from "tz-lookup";
 import starsData from "@/assets/starmap/stars.json";
 import linesData from "@/assets/starmap/lines.json";
 
@@ -43,15 +44,47 @@ export interface StarmapStyle {
   magLimit?: number;
 }
 
-/** Lokal siderisk tid i grader för momentet. Deterministisk (ingen Date.now). */
+/** Zonens UTC-offset (ms) vid en given UTC-tidpunkt, via Intl:s tz-databas. */
+function zoneOffsetMs(atUtcMs: number, timeZone: string): number {
+  const dtf = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  const parts = dtf.formatToParts(new Date(atUtcMs));
+  const get = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0);
+  const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour") % 24, get("minute"), get("second"));
+  return asUtc - atUtcMs;
+}
+
+/** Epoch-ms för en lokal väggtid i angiven IANA-zon (tvåpass fångar DST). */
+function utcFromLocal(y: number, mo: number, d: number, hh: number, mm: number, timeZone: string): number {
+  const guess = Date.UTC(y, mo - 1, d, hh, mm);
+  const utc1 = guess - zoneOffsetMs(guess, timeZone);
+  return guess - zoneOffsetMs(utc1, timeZone);
+}
+
+/** Lokal siderisk tid i grader för momentet. Deterministisk (ingen Date.now).
+ *  Tidszonen slås upp ur lat/lon (tz-lookup → IANA-zon → Intl:s tz-databas,
+ *  inkl. historiska regler och sommartid). Fallback: soltid (longitud/15h). */
 export function localSiderealDeg(m: StarmapMoment): number {
   const [y, mo, d] = m.dateISO.split("-").map(Number);
   const [hh, mm] = (m.timeHHMM && /^\d{1,2}:\d{2}$/.test(m.timeHHMM) ? m.timeHHMM : "22:00")
     .split(":")
     .map(Number);
-  // Soltids-approximation av tidszonen: hela timmar från longituden.
-  const tzOffsetH = Math.round(m.lon / 15);
-  const utcMs = Date.UTC(y, (mo || 1) - 1, d || 1, (hh ?? 22) - tzOffsetH, mm ?? 0);
+  let utcMs: number;
+  try {
+    const zone = tzLookup(m.lat, m.lon);
+    utcMs = utcFromLocal(y, mo || 1, d || 1, hh ?? 22, mm ?? 0, zone);
+  } catch {
+    const tzOffsetH = Math.round(m.lon / 15);
+    utcMs = Date.UTC(y, (mo || 1) - 1, d || 1, (hh ?? 22) - tzOffsetH, mm ?? 0);
+  }
   const days = (utcMs - J2000_MS) / 86400000;
   const gmst = (280.46061837 + 360.98564736629 * days) % 360;
   return (((gmst + m.lon) % 360) + 360) % 360;
@@ -135,7 +168,7 @@ export function renderStarmap(
   // --- RA/Dec-graticule (diskret) ---
   if (style.showGrid) {
     ctx.strokeStyle = style.gridColor ?? style.lineColor;
-    ctx.globalAlpha = 0.16;
+    ctx.globalAlpha = 0.3;
     ctx.lineWidth = Math.max(0.5, 0.7 * pxScale);
     // Deklinationscirklar
     for (let dec = -60; dec <= 80; dec += 20) {

@@ -590,6 +590,10 @@ export default function DesignerPage() {
                 <MapPin className="h-3.5 w-3.5 mr-1.5" />
                 Lägg till karta
               </Button>
+              <Button size="sm" variant="outline" onClick={() => addLayer("starmap")}>
+                <Sparkle className="h-3.5 w-3.5 mr-1.5" />
+                Lägg till stjärnhimmel
+              </Button>
               <Button size="sm" variant="outline" onClick={() => addLayer("text")}>
                 <Type className="h-3.5 w-3.5 mr-1.5" />
                 Lägg till text
