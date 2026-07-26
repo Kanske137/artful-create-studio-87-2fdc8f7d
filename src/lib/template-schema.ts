@@ -361,6 +361,9 @@ export const starmapDefaultsSchema = z.object({
   showGrid: z.boolean().default(false),
   /** Magnitudgräns 2–6.5 (default 5.8 = allt blotta ögat ser). */
   magLimit: z.number().min(2).max(6.5).optional(),
+  /** "circle" (default) = inskriven cirkel med horisontring.
+   *  "rect" = heltäckande himmel kant till kant utan ring. */
+  shape: z.enum(["circle", "rect"]).optional(),
 });
 export type StarmapDefaults = z.infer<typeof starmapDefaultsSchema>;
 

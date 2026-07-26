@@ -1034,6 +1034,7 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
           showConstellations: sv?.showConstellations ?? layer.defaults.showConstellations,
           showGrid: sv?.showGrid ?? layer.defaults.showGrid,
           magLimit: layer.defaults.magLimit,
+          shape: layer.defaults.shape,
         },
       );
     } else if (layer.type === "margin") {

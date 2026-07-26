@@ -53,6 +53,7 @@ export default function StarmapLayerView({
           showConstellations,
           showGrid,
           magLimit: layer.defaults.magLimit,
+          shape: layer.defaults.shape,
         },
       );
     };

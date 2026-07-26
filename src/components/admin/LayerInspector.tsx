@@ -289,6 +289,18 @@ export default function LayerInspector({ config, layer, allLayers, onChange, onL
               />
             </Field>
           </div>
+          <Field label="Form">
+            <Select
+              value={layer.defaults.shape ?? "circle"}
+              onValueChange={(v) => updateDefaults({ shape: v as "circle" | "rect" })}
+            >
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="circle">Cirkel med horisontring</SelectItem>
+                <SelectItem value="rect">Heltäckande (kant till kant)</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Lng">
               <Input

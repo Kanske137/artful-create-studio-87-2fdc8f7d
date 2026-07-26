@@ -42,6 +42,10 @@ export interface StarmapStyle {
   showGrid: boolean;
   /** Magnitudgräns (default 5.8 = hela katalogen). Lägre tal = färre stjärnor. */
   magLimit?: number;
+  /** "circle" (default) = himlen som inskriven cirkel med horisontring.
+   *  "rect" = heltäckande: himlen fyller hela rektangeln kant till kant
+   *  (projektion skalad så hörnen når horisonten), ingen ring. */
+  shape?: "circle" | "rect";
 }
 
 /** Zonens UTC-offset (ms) vid en given UTC-tidpunkt, via Intl:s tz-databas. */
@@ -148,7 +152,11 @@ export function renderStarmap(
   const { x, y, w, h } = rect;
   const cx = x + w / 2;
   const cy = y + h / 2;
-  const R = Math.min(w, h) / 2;
+  const isRect = style.shape === "rect";
+  // Cirkel: himlen inskriven (kortaste sidan). Heltäckande: projektionens
+  // horisont läggs vid hörnen (halva diagonalen) så stjärnhimlen fyller
+  // varje hörn av rektangeln.
+  const R = isRect ? Math.sqrt(w * w + h * h) / 2 : Math.min(w, h) / 2;
   // Radie-relativ skala: 1.0 vid R=300px (typisk editorstorlek).
   const pxScale = R / 300;
   const lst = localSiderealDeg(moment);
@@ -157,10 +165,10 @@ export function renderStarmap(
 
   ctx.save();
 
-  // Allt — inklusive bakgrunden — klipps till cirkeln, så himlen blir en ren
-  // cirkulär pläterad yta oavsett posterns bakgrundsfärg.
+  // Cirkel: allt klipps till cirkeln. Heltäckande: klipp till rektangeln.
   ctx.beginPath();
-  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  if (isRect) ctx.rect(x, y, w, h);
+  else ctx.arc(cx, cy, R, 0, Math.PI * 2);
   ctx.clip();
   ctx.fillStyle = style.bgColor;
   ctx.fillRect(x, y, w, h);
@@ -249,13 +257,15 @@ export function renderStarmap(
   }
   ctx.globalAlpha = 1;
 
-  // Tunn horisontring som avslut.
-  ctx.strokeStyle = style.lineColor;
-  ctx.globalAlpha = 0.4;
-  ctx.lineWidth = Math.max(0.6, 1 * pxScale);
-  ctx.beginPath();
-  ctx.arc(cx, cy, R - ctx.lineWidth / 2, 0, Math.PI * 2);
-  ctx.stroke();
+  // Tunn horisontring som avslut (bara i cirkelläget).
+  if (!isRect) {
+    ctx.strokeStyle = style.lineColor;
+    ctx.globalAlpha = 0.4;
+    ctx.lineWidth = Math.max(0.6, 1 * pxScale);
+    ctx.beginPath();
+    ctx.arc(cx, cy, R - ctx.lineWidth / 2, 0, Math.PI * 2);
+    ctx.stroke();
+  }
 
   ctx.restore();
 }
