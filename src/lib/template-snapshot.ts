@@ -332,6 +332,10 @@ function drawTextLayer(
   // `liveText || d.text` här — det skulle falla tillbaka på placeholder.
   const text = liveText;
   if (!text.trim()) return;
+  // multiply-blend: underliggande tyg/skuggor lyser igenom (tröjnummer) —
+  // speglar TextLayerView:s mix-blend-mode. Återställs i slutet av funktionen.
+  const prevComposite = ctx.globalCompositeOperation;
+  if (d.blendMode === "multiply") ctx.globalCompositeOperation = "multiply";
   const hasBg = !!d.backgroundColor && d.backgroundColor !== "transparent";
   if (hasBg) {
     ctx.save();
@@ -462,6 +466,7 @@ function drawTextLayer(
     y += m.h;
   });
   ctx.restore();
+  ctx.globalCompositeOperation = prevComposite;
 }
 
 async function drawImageLayer(
@@ -884,6 +889,19 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
       const isLive = layer.id === liveTextId;
       const visible = tv ? tv.visible : isLive ? input.liveTextVisible : true;
       if (!visible) continue;
+      // Spegellager: rita källagrets effektiva text i egen stil (bröstnummer).
+      if (layer.defaults.mirrorTextLayerId) {
+        const srcLv = input.layerValues?.[layer.defaults.mirrorTextLayerId];
+        const srcLayer = layers.find((x) => x.id === layer.defaults.mirrorTextLayerId);
+        const mirrored =
+          srcLv && srcLv.kind === "text"
+            ? srcLv.text
+            : srcLayer && srcLayer.type === "text"
+              ? srcLayer.defaults.text
+              : "";
+        drawTextLayer(ctx, rect, layer, mirrored, layer.defaults.font, Math.min(frontPxW, frontPxH), null, []);
+        continue;
+      }
       const font = tv ? tv.font : isLive ? input.liveTextFont : layer.defaults.font;
       // Resolve effective text via the override-aware helper so customer
       // overrides win, but kartan vinner alltid (overrideText cleared by

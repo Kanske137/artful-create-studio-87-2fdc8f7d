@@ -268,6 +268,14 @@ export const textDefaultsSchema = z.object({
   spans: z.array(textSpanSchema).optional(),
   // Decoration around the text content.
   decoration: textDecorationSchema.optional(),
+  // Blend mode against underlying layers. "multiply" låter underliggande
+  // tyg/skuggor lysa igenom texten — tryckt-i-tyget-känsla för t.ex.
+  // tröjnummer. Default normal.
+  blendMode: z.enum(["normal", "multiply"]).optional(),
+  // Spegellager: renderar ett ANNAT textlagers effektiva text (t.ex. litet
+  // bröstnummer som följer kundens stora nummertext). Spegeln ska vara
+  // content-låst — den läser källan vid render och har inget eget värde.
+  mirrorTextLayerId: z.string().optional(),
   // When set, this text auto-updates to match the selected place of the
   // referenced map layer (city/country/coords). Customer manual edits override
   // the auto-text until the field is cleared.

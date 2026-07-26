@@ -103,6 +103,8 @@ export function TextLayerView({
           letterSpacing: `${letterSp}em`,
           padding: "0 4px",
           pointerEvents: "none",
+          // multiply låter underliggande tyg/skuggor lysa igenom (tröjnummer).
+          mixBlendMode: d.blendMode === "multiply" ? "multiply" : undefined,
         }}
       >
         <span style={{ width: "100%" }}>{renderText}</span>

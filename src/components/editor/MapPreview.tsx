@@ -877,6 +877,31 @@ export function MapPreview({
             const tv = v && v.kind === "text" ? v : null;
             if (tv && !tv.visible) return null;
             const d = l.defaults;
+            // Spegellager: renderar källagrets effektiva text i EGEN stil
+            // (t.ex. bröstnummer som följer kundens stora nummertext).
+            if (d.mirrorTextLayerId) {
+              const srcV = layerValues[d.mirrorTextLayerId];
+              const srcLayer = layers.find((x) => x.id === d.mirrorTextLayerId);
+              const mirrored =
+                srcV && srcV.kind === "text"
+                  ? srcV.text
+                  : srcLayer && srcLayer.type === "text"
+                    ? srcLayer.defaults.text
+                    : "";
+              const mirrorHeightPx = (l.hPct / 100) * (frameShortPx > 0 ? frameShortPx : 0);
+              return (
+                <div key={l.id} style={{ ...wrapStyle, pointerEvents: "none" }}>
+                  <TextLayerView
+                    layer={l}
+                    effectiveText={mirrored}
+                    effectiveFont={d.font}
+                    effectiveSpans={[]}
+                    canvasShortPx={frameShortPx}
+                    layerHeightPx={mirrorHeightPx}
+                  />
+                </div>
+              );
+            }
             // If user customised the text, render it raw. Otherwise substitute
             // [[city]]/[[country]]/[[coords]] tokens using the linked map's
             // current value — so tokens never appear as literal text on first
