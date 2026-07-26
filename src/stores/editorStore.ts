@@ -439,6 +439,32 @@ function buildAutoTextForLayer(
 }
 
 
+/** Re-apply the active content-variant's TEXT onto a freshly rebuilt layerValues
+ *  set (used after a stil-byte / layout switch). Content-locked variant layers
+ *  (title, corner labels, one-line recipe) always reflect the active drink;
+ *  content-unlocked layers (the editable recipe) take the drink's text only when
+ *  the customer hasn't set an override in this set — so in-layout edits survive,
+ *  but layers that are new in this layout (or were reset) get the right drink.
+ *  Image + colour come from applyContentVariant at render time. */
+function applyVariantTextInPlace(
+  template: Template,
+  variantId: string | null,
+  layersById: Record<string, TemplateLayer>,
+  values: Record<string, LayerValue>,
+): void {
+  const variant = variantId ? (template.contentVariants ?? []).find((v) => v.id === variantId) : null;
+  if (!variant) return;
+  for (const [layerId, ov] of Object.entries(variant.overrides ?? {})) {
+    if (ov.text === undefined) continue;
+    const cur = values[layerId];
+    const layer = layersById[layerId];
+    if (!cur || cur.kind !== "text" || !layer || layer.type !== "text") continue;
+    if (layer.locks.content || cur.overrideText === null) {
+      values[layerId] = { ...cur, text: ov.text, overrideText: ov.text };
+    }
+  }
+}
+
 function hydrateLayerValues(
   template: Template,
   orientation: Orientation,
@@ -1147,6 +1173,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const aiPhotoSources = remap(state.aiPhotoSources);
     const aiPhotoResults = remap(state.aiPhotoResults);
     const aiPhotoSelectedRefUrl = remap(state.aiPhotoSelectedRefUrl);
+
+    // Re-apply the active drink's variant text so title/labels/one-liner and
+    // untouched recipe fields reflect the selected drink in the new layout —
+    // not the layout's own (Aperol) defaults — after a stil-byte.
+    applyVariantTextInPlace(template, state.contentVariantId, nextLayersById, layerValues);
 
     const nextBgColor = nextBlock[state.orientation]?.background?.color;
     set({
