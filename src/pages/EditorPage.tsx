@@ -311,6 +311,18 @@ export default function EditorPage() {
     const designId = (crypto as any)?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
     if (!template) return;
+
+    // Drink-väljaren: kundvagnen ska få den VALDA drinkens huvudprodukt, inte
+    // den sida kunden råkar stå på. Finns en dedikerad produkt för vald
+    // contentVariant (handle = "<slug>-tavla") används den; annars sidans
+    // handle. För icke-drinkmallar matchar inget → oförändrat beteende.
+    const selectedVariantId = useEditorStore.getState().contentVariantId;
+    const dedicatedConfig = selectedVariantId
+      ? configs.find((c) => c.shopify_handle === `${selectedVariantId}-tavla`)
+      : undefined;
+    const effectiveHandle = dedicatedConfig?.shopify_handle ?? config.shopify_handle;
+    const effectiveTitle = dedicatedConfig?.title ?? config.title;
+
     // Strip hidden layers from the template before snapshot/print so the
     // customer's "öga av"-val faktiskt syns i tryckfilen och kundvagnsbilden.
     const printableTemplate = Object.keys(hiddenLayerIds).length
@@ -394,7 +406,7 @@ export default function EditorPage() {
       _variant: variant,
       _bg_color: posterBgColor,
       _orientation: orientation,
-      _product_handle: config.shopify_handle,
+      _product_handle: effectiveHandle,
       _product_type: config.product_type,
       _design_id: designId,
       _map_shape: mapShape,
@@ -410,7 +422,7 @@ export default function EditorPage() {
 
     track("add_to_cart", {
       designId,
-      handle: config.shopify_handle,
+      handle: effectiveHandle,
       productType: config.product_type,
       size,
       variant,
@@ -423,7 +435,7 @@ export default function EditorPage() {
       window.parent.postMessage(
         {
           type: "ADD_TO_CART",
-          handle: config.shopify_handle,
+          handle: effectiveHandle,
           size,
           variant,
           quantity: 1,
@@ -437,21 +449,23 @@ export default function EditorPage() {
 
     // Resolve real variant ID. Fall back to a fresh lookup if not yet cached
     // (race when user clicks before the effect resolves).
-    let variantGid = shopifyVariantId;
+    // Den cachade shopifyVariantId gäller sidans produkt; om vald drink har en
+    // annan huvudprodukt måste vi slå upp DEN produktens variant på nytt.
+    let variantGid = effectiveHandle === config.shopify_handle ? shopifyVariantId : null;
     if (!variantGid) {
-      variantGid = await resolveShopifyVariantId(config.shopify_handle, size, variant, config.product_type);
-      if (variantGid) setShopifyVariantId(variantGid);
+      variantGid = await resolveShopifyVariantId(effectiveHandle, size, variant, config.product_type);
+      if (variantGid && effectiveHandle === config.shopify_handle) setShopifyVariantId(variantGid);
     }
     if (!variantGid) {
       toast.error(t("cartAdd.variantUnavailable"), {
-        description: t("cartAdd.variantUnavailableHint", { size, variant, handle: config.shopify_handle }),
+        description: t("cartAdd.variantUnavailableHint", { size, variant, handle: effectiveHandle }),
       });
       return;
     }
 
     await addItem({
       variantId: variantGid,
-      productTitle: config.title,
+      productTitle: effectiveTitle,
       variantTitle: `${size} · ${variant}`,
       imageUrl: previewUrl,
       price: { amount: String(currentPrice()), currencyCode: "SEK" },

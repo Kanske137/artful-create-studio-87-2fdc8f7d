@@ -90,8 +90,11 @@ Följ stegen i ordning. Allt sker i din Shopify Admin — ingen Dev Dashboard, i
       return;
     }
     if(d.type!=='ADD_TO_CART') return;
-    if(d.handle && d.handle!=='{{ product.handle }}') return;
-    fetch('/products/{{ product.handle }}.js').then(function(r){return r.json();})
+    // Drink-väljaren kan välja en ANNAN drinks huvudprodukt än den sida kunden
+    // står på; lägg då till den VALDA produkten (d.handle). Faller tillbaka
+    // till sidans produkt när ingen handle skickas.
+    var addHandle = d.handle || '{{ product.handle }}';
+    fetch('/products/'+addHandle+'.js').then(function(r){return r.json();})
       .then(function(p){
         var match = p.variants.find(function(v){
           var o=(v.options||[]).map(function(x){return String(x).toLowerCase();});
