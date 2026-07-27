@@ -351,6 +351,15 @@ export function MapPreview({
   const posterAspect = editorW / editorH;
   const frontInsetX = wrapCm > 0 && !layersIncludeWrap ? wrapCm / editorW : 0;
   const frontInsetY = wrapCm > 0 && !layersIncludeWrap ? wrapCm / editorH : 0;
+  // Text (font pt, letter-spacing, decoration) must scale with the FRONT-zone
+  // short side — same space the layer box is sized in — NOT the full wrap
+  // surface. Otherwise on canvas the font is ~wrap% too big for its box and a
+  // fit-to-width title wraps to a 2nd line. Flat products have wrapCm=0 ⇒
+  // frontInset=0 ⇒ this equals frameShortPx (no change).
+  const frontShortPx = Math.min(
+    frameOuter.w * (1 - 2 * frontInsetX),
+    frameOuter.h * (1 - 2 * frontInsetY),
+  );
 
   // Derive margin insets and (when customer hides margin) filter the margin
   // layer + remap remaining layers so they fill the freed-up area.
@@ -907,7 +916,7 @@ export function MapPreview({
                     effectiveText={mirrored}
                     effectiveFont={d.font}
                     effectiveSpans={[]}
-                    canvasShortPx={frameShortPx}
+                    canvasShortPx={frontShortPx}
                     layerHeightPx={mirrorHeightPx}
                   />
                 </div>
@@ -950,7 +959,7 @@ export function MapPreview({
                   effectiveText={effectiveText}
                   effectiveFont={effectiveFont}
                   effectiveSpans={effectiveSpans}
-                  canvasShortPx={frameShortPx}
+                  canvasShortPx={frontShortPx}
                   layerHeightPx={layerHeightPx}
                   effectiveFontSizePt={tv?.fontSizePt ?? undefined}
                 />
