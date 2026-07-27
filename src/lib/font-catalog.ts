@@ -35,6 +35,7 @@ export const FONT_CATALOG: FontDef[] = [
   { family: "DM Sans", category: "sans", googleSpec: `DM+Sans:${W}` },
   { family: "Manrope", category: "sans", googleSpec: `Manrope:${W}` },
   { family: "Raleway", category: "sans", googleSpec: `Raleway:${W}` },
+  { family: "Questrial", category: "sans", googleSpec: `Questrial` },
 
   // Serif
   { family: "Playfair Display", category: "serif", googleSpec: `Playfair+Display:${W}` },
