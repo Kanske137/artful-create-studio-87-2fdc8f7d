@@ -212,7 +212,7 @@
     "uploadNote": "Je foto's worden alleen voor je kunstwerk gebruikt en na 60 dagen automatisch verwijderd.",
     "deliveryDays": "Levering {{min}}–{{max}} werkdagen",
     "freeShipping": "Gratis verzending vanaf {{amount}}",
-    "madeInEu": "Op bestelling gemaakt in de EU",
+    "madeInEu": "Op bestelling gemaakt",
     "securePayment": "Veilig betalen"
   },
   "exampleBadge": {

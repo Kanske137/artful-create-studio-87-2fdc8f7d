@@ -212,7 +212,7 @@
     "uploadNote": "Your photos are only used for your artwork and are automatically deleted after 60 days.",
     "deliveryDays": "Delivery {{min}}–{{max}} business days",
     "freeShipping": "Free shipping over {{amount}}",
-    "madeInEu": "Made to order in the EU",
+    "madeInEu": "Made to order",
     "securePayment": "Secure payment"
   },
   "exampleBadge": {

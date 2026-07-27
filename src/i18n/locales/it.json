@@ -212,7 +212,7 @@
     "uploadNote": "Le tue foto vengono usate solo per il tuo quadro e vengono eliminate automaticamente dopo 60 giorni.",
     "deliveryDays": "Consegna {{min}}–{{max}} giorni lavorativi",
     "freeShipping": "Spedizione gratuita oltre {{amount}}",
-    "madeInEu": "Prodotto su ordinazione nell'UE",
+    "madeInEu": "Prodotto su ordinazione",
     "securePayment": "Pagamento sicuro"
   },
   "exampleBadge": {

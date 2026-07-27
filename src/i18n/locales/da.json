@@ -212,7 +212,7 @@
     "uploadNote": "Dine billeder bruges kun til din plakat og slettes automatisk efter 60 dage.",
     "deliveryDays": "Levering {{min}}–{{max}} hverdage",
     "freeShipping": "Fri fragt over {{amount}}",
-    "madeInEu": "Trykkes på bestilling i EU",
+    "madeInEu": "Trykkes på bestilling",
     "securePayment": "Sikker betaling"
   },
   "exampleBadge": {

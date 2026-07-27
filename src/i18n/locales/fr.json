@@ -212,7 +212,7 @@
     "uploadNote": "Vos photos ne servent qu'à votre tableau et sont supprimées automatiquement après 60 jours.",
     "deliveryDays": "Livraison {{min}}–{{max}} jours ouvrés",
     "freeShipping": "Livraison offerte dès {{amount}}",
-    "madeInEu": "Fabriqué à la commande dans l'UE",
+    "madeInEu": "Fabriqué à la commande",
     "securePayment": "Paiement sécurisé"
   },
   "exampleBadge": {

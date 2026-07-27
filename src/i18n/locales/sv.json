@@ -212,7 +212,7 @@
     "uploadNote": "Dina bilder används bara för din tavla och raderas automatiskt efter 60 dagar.",
     "deliveryDays": "Leverans {{min}}–{{max}} arbetsdagar",
     "freeShipping": "Fri frakt över {{amount}}",
-    "madeInEu": "Tryckt på beställning i EU",
+    "madeInEu": "Tryckt på beställning",
     "securePayment": "Säker betalning"
   },
   "exampleBadge": {

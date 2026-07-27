@@ -212,7 +212,7 @@
     "uploadNote": "Deine Fotos werden nur für dein Bild verwendet und nach 60 Tagen automatisch gelöscht.",
     "deliveryDays": "Lieferung {{min}}–{{max}} Werktage",
     "freeShipping": "Kostenloser Versand ab {{amount}}",
-    "madeInEu": "Auf Bestellung in der EU gefertigt",
+    "madeInEu": "Auf Bestellung gefertigt",
     "securePayment": "Sichere Bezahlung"
   },
   "exampleBadge": {
