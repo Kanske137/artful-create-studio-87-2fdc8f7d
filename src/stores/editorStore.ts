@@ -1071,18 +1071,24 @@ export const useEditorStore = create<EditorState>((set, get) => ({
               }
             : {}),
         };
-      } else if (oldVal.kind === "text" && fresh.kind === "text" && newLayer.type === "text") {
-        const locks = newLayer.locks;
-        // Only customer-edited override survives a layout switch — otherwise
-        // the destination layout's default text should win. Bevara även
-        // kundens font-size-override (om satt) över layout-byten.
-        layerValues[newId] = {
-          ...fresh,
-          ...(!locks.content && oldVal.overrideText !== null
-            ? { overrideText: oldVal.overrideText, text: oldVal.overrideText }
-            : {}),
-          ...(oldVal.fontSizePt !== null ? { fontSizePt: oldVal.fontSizePt } : {}),
-        };
+      } else if (oldVal.kind === "text") {
+        // Text content follows a layer ONLY when the SAME id exists in the new
+        // layout — never index-paired onto a different layer. Styles with
+        // distinct per-style ids (title/labels/one-liner/kickers) must not
+        // inherit each other's text (would scramble labels/recipe). Fresh
+        // defaults win + the active content-variant is re-applied afterwards.
+        const dstLayer = nextLayersById[oldId];
+        const dstFresh = layerValues[oldId];
+        if (dstLayer?.type === "text" && dstFresh?.kind === "text") {
+          const locks = dstLayer.locks;
+          layerValues[oldId] = {
+            ...dstFresh,
+            ...(!locks.content && oldVal.overrideText !== null
+              ? { overrideText: oldVal.overrideText, text: oldVal.overrideText }
+              : {}),
+            ...(oldVal.fontSizePt !== null ? { fontSizePt: oldVal.fontSizePt } : {}),
+          };
+        }
       } else if (oldVal.kind === "photo" && fresh.kind === "photo" && newLayer.type === "photo") {
         const locks = newLayer.locks;
         // Photo shape is layout-defining; only customer offset/zoom survives.
