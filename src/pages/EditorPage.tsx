@@ -19,6 +19,8 @@ import {
 import { MapPreview } from "@/components/editor/MapPreview";
 import { EditorShell } from "@/components/editor/EditorShell";
 import { StickyCta } from "@/components/editor/StickyCta";
+import { DeliveryTrustRow } from "@/components/editor/DeliveryTrustRow";
+import { freeShippingThresholdSek } from "@/lib/delivery";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { MockupGallery } from "@/components/editor/MockupGallery";
 import { postEditorResize } from "@/lib/iframe-resize";
@@ -487,16 +489,27 @@ export default function EditorPage() {
   );
 
 
+  // Fri frakt-tröskeln kommer från fraktpolicyn (SEK) och formateras i kundens
+  // valuta med samma Shopify-rate som alla andra priser i editorn (formatPrice),
+  // så beloppet är konsekvent med det kunden ser i övrigt.
+  const freeShipDisplay = formatPrice(freeShippingThresholdSek(shopCtx.country), shopCtx);
   const ctaNode = (
-    <StickyCta
-      price={displayPrice}
-      summary={summary}
-      loading={isAdding || isPreparing}
-      disabled={!canAddToCart}
-      disabledHint={blockHint}
-      onAdd={handleAddToCart}
-      showCartHint={showCartHint}
-    />
+    <div className="w-full">
+      <DeliveryTrustRow
+        productType={config.product_type}
+        country={shopCtx.country}
+        freeShippingDisplay={freeShipDisplay}
+      />
+      <StickyCta
+        price={displayPrice}
+        summary={summary}
+        loading={isAdding || isPreparing}
+        disabled={!canAddToCart}
+        disabledHint={blockHint}
+        onAdd={handleAddToCart}
+        showCartHint={showCartHint}
+      />
+    </div>
   );
 
   const standalone = window.self === window.top;

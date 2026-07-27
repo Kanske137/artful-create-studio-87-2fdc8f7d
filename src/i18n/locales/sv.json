@@ -209,7 +209,11 @@
     "allSlotsFull": "Alla platser är fyllda — ta bort ett porträtt först."
   },
   "trust": {
-    "uploadNote": "Dina bilder används bara för din tavla och raderas automatiskt efter 60 dagar."
+    "uploadNote": "Dina bilder används bara för din tavla och raderas automatiskt efter 60 dagar.",
+    "deliveryDays": "Leverans {{min}}–{{max}} arbetsdagar",
+    "freeShipping": "Fri frakt över {{amount}}",
+    "madeInEu": "Tryckt på beställning i EU",
+    "securePayment": "Säker betalning"
   },
   "exampleBadge": {
     "label": "Exempelbild – byts mot ditt foto"

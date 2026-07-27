@@ -209,7 +209,11 @@
     "allSlotsFull": "Tous les emplacements sont remplis — retirez d'abord un portrait."
   },
   "trust": {
-    "uploadNote": "Vos photos ne servent qu'à votre tableau et sont supprimées automatiquement après 60 jours."
+    "uploadNote": "Vos photos ne servent qu'à votre tableau et sont supprimées automatiquement après 60 jours.",
+    "deliveryDays": "Livraison {{min}}–{{max}} jours ouvrés",
+    "freeShipping": "Livraison offerte dès {{amount}}",
+    "madeInEu": "Fabriqué à la commande dans l'UE",
+    "securePayment": "Paiement sécurisé"
   },
   "exampleBadge": {
     "label": "Image d'exemple – remplacée par votre photo"

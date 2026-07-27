@@ -209,7 +209,11 @@
     "allSlotsFull": "Todos los espacios están llenos — quita primero un retrato."
   },
   "trust": {
-    "uploadNote": "Tus fotos solo se usan para tu cuadro y se eliminan automáticamente después de 60 días."
+    "uploadNote": "Tus fotos solo se usan para tu cuadro y se eliminan automáticamente después de 60 días.",
+    "deliveryDays": "Entrega {{min}}–{{max}} días laborables",
+    "freeShipping": "Envío gratis desde {{amount}}",
+    "madeInEu": "Hecho por encargo en la UE",
+    "securePayment": "Pago seguro"
   },
   "exampleBadge": {
     "label": "Imagen de ejemplo – se sustituye por tu foto"

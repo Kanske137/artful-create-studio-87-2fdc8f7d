@@ -209,7 +209,11 @@
     "allSlotsFull": "Kaikki paikat ovat täynnä — poista ensin yksi muotokuva."
   },
   "trust": {
-    "uploadNote": "Kuviasi käytetään vain tauluusi ja ne poistetaan automaattisesti 60 päivän kuluttua."
+    "uploadNote": "Kuviasi käytetään vain tauluusi ja ne poistetaan automaattisesti 60 päivän kuluttua.",
+    "deliveryDays": "Toimitus {{min}}–{{max}} arkipäivää",
+    "freeShipping": "Ilmainen toimitus yli {{amount}}",
+    "madeInEu": "Valmistetaan tilauksesta EU:ssa",
+    "securePayment": "Turvallinen maksu"
   },
   "exampleBadge": {
     "label": "Esimerkkikuva – korvataan omalla kuvallasi"

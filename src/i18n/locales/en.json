@@ -209,7 +209,11 @@
     "allSlotsFull": "All slots are filled — remove a portrait first."
   },
   "trust": {
-    "uploadNote": "Your photos are only used for your artwork and are automatically deleted after 60 days."
+    "uploadNote": "Your photos are only used for your artwork and are automatically deleted after 60 days.",
+    "deliveryDays": "Delivery {{min}}–{{max}} business days",
+    "freeShipping": "Free shipping over {{amount}}",
+    "madeInEu": "Made to order in the EU",
+    "securePayment": "Secure payment"
   },
   "exampleBadge": {
     "label": "Example image – replaced with your photo"

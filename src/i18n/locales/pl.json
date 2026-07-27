@@ -209,7 +209,11 @@
     "allSlotsFull": "Wszystkie pola są zapełnione — najpierw usuń portret."
   },
   "trust": {
-    "uploadNote": "Twoje zdjęcia są używane tylko do Twojego obrazu i automatycznie usuwane po 60 dniach."
+    "uploadNote": "Twoje zdjęcia są używane tylko do Twojego obrazu i automatycznie usuwane po 60 dniach.",
+    "deliveryDays": "Dostawa {{min}}–{{max}} dni roboczych",
+    "freeShipping": "Darmowa wysyłka od {{amount}}",
+    "madeInEu": "Produkowane na zamówienie w UE",
+    "securePayment": "Bezpieczna płatność"
   },
   "exampleBadge": {
     "label": "Przykładowy obraz – zostanie zastąpiony Twoim zdjęciem"

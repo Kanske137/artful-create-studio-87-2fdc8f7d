@@ -209,7 +209,11 @@
     "allSlotsFull": "Alle feltene er fylt — fjern et portrett først."
   },
   "trust": {
-    "uploadNote": "Bildene dine brukes bare til tavlen din og slettes automatisk etter 60 dager."
+    "uploadNote": "Bildene dine brukes bare til tavlen din og slettes automatisk etter 60 dager.",
+    "deliveryDays": "Levering {{min}}–{{max}} virkedager",
+    "freeShipping": "Fri frakt over {{amount}}",
+    "madeInEu": "Trykkes på bestilling i EU",
+    "securePayment": "Sikker betaling"
   },
   "exampleBadge": {
     "label": "Eksempelbilde – byttes med ditt foto"

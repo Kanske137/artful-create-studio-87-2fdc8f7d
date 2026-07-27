@@ -209,7 +209,11 @@
     "allSlotsFull": "Alle vakken zijn gevuld — verwijder eerst een portret."
   },
   "trust": {
-    "uploadNote": "Je foto's worden alleen voor je kunstwerk gebruikt en na 60 dagen automatisch verwijderd."
+    "uploadNote": "Je foto's worden alleen voor je kunstwerk gebruikt en na 60 dagen automatisch verwijderd.",
+    "deliveryDays": "Levering {{min}}–{{max}} werkdagen",
+    "freeShipping": "Gratis verzending vanaf {{amount}}",
+    "madeInEu": "Op bestelling gemaakt in de EU",
+    "securePayment": "Veilig betalen"
   },
   "exampleBadge": {
     "label": "Voorbeeldafbeelding – wordt vervangen door jouw foto"
