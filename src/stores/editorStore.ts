@@ -839,6 +839,17 @@ export const useEditorStore = create<EditorState>((set, get) => ({
             ? template.defaultContentVariantId
             : variants[0].id;
 
+    // Applicera vald drinks varianttext på canvasen redan vid init/produktbyte.
+    // Bild + accentfärg löses vid render (applyContentVariant), men texterna
+    // (titel/recept/one-liner) måste sättas som overrides här — annars visar en
+    // drink-specifik produkt (t.ex. Negroni-tavlan, default=negroni) basmallens
+    // drink-text (Aperol) trots rätt motiv. Hjälparen respekterar kundens egna
+    // redigeringar (olåsta lager byts bara när overrideText===null).
+    if (nextContentVariantId && layout?.layers) {
+      const variantLayersById = Object.fromEntries(layout.layers.map((l) => [l.id, l]));
+      applyVariantTextInPlace(template, nextContentVariantId, variantLayersById, nextLayerValues);
+    }
+
     const next = {
       config,
       template,
