@@ -484,9 +484,33 @@ export default function EditorPage() {
   }
 
   if (loading || !config) {
+    // Strukturerad skelett-vy medan configs/mall/typsnitt laddas — speglar
+    // editorns tvåpanelslayout så landningssidan aldrig ser tom/trasig ut.
+    // (Tidigare: ensam spinner på vit yta → läste som "inget här" → studs.)
     return (
-      <div className="min-h-[400px] flex items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="flex flex-col md:flex-row gap-5 p-4 bg-background min-h-screen">
+        {/* Vänster kontrollpanel */}
+        <div className="w-full md:w-[360px] shrink-0 space-y-4 animate-pulse">
+          <div className="h-6 w-40 rounded bg-muted" />
+          <div className="h-9 w-full rounded-lg bg-muted/70" />
+          <div className="flex gap-2">
+            <div className="h-5 w-24 rounded-full bg-muted" />
+            <div className="h-5 w-16 rounded-full bg-muted" />
+            <div className="h-5 w-20 rounded-full bg-muted" />
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="aspect-square rounded-xl bg-muted" />
+            <div className="aspect-square rounded-xl bg-muted" />
+            <div className="aspect-square rounded-xl bg-muted" />
+          </div>
+          <div className="h-28 w-full rounded-xl border-2 border-dashed border-border bg-muted/40" />
+          <div className="h-11 w-full rounded-lg bg-muted" />
+        </div>
+        {/* Höger förhandsvisning */}
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 min-h-[340px]">
+          <div className="w-[70%] max-w-[420px] aspect-[3/4] rounded bg-muted animate-pulse" />
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </div>
       </div>
     );
   }
