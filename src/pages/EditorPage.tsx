@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Check, Loader2, Palette, RotateCcw, ShoppingCart } from "lucide-react";
+import { Check, Loader2, Palette, ShoppingCart, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useResultActionsStore } from "@/stores/resultActionsStore";
 import { useShopContextStore } from "@/stores/shopContextStore";
@@ -104,8 +104,8 @@ export default function EditorPage() {
   const shopCtx = useShopContextStore();
   const addItem = useCartStore((s) => s.addItem);
   const isAdding = useCartStore((s) => s.isLoading);
-  const regenerate = useResultActionsStore((s) => s.regenerate);
   const openSection = useResultActionsStore((s) => s.openSection);
+  const productOptions = useEditorStore((s) => s.productOptions);
   const [isPreparing, setIsPreparing] = useState(false);
   const { map: shopifyPriceMap, derivedFx } = useShopifyPriceMap();
   const { activeHintSection } = useOnboarding();
@@ -540,6 +540,9 @@ export default function EditorPage() {
   // förhandsvisningen (i CTA-blocket, alltid synligt — ej gömt i mobil-drawern),
   // så vi faktiskt fångar om kunden gillar resultatet (Akram: gömd tidigare).
   const firstAiResult = Object.values(aiPhotoResults).find(Boolean) ?? null;
+  // "Byt stil" visas bara på stiliserings-mallar (som har AI-stilar att välja
+  // mellan), INTE på face-swap (kung/drottning/husdjur — de saknar aiStyles).
+  const styleCount = (productOptions?.aiStyles ?? []).filter((s) => s.enabled !== false).length;
   const ctaNode = (
     <div className="w-full">
       {firstAiResult && (
@@ -554,21 +557,23 @@ export default function EditorPage() {
               variant="outline"
               size="sm"
               className="gap-1.5"
-              onClick={() => regenerate()}
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-              {t("result.retry", { defaultValue: "Try again" })}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-1.5"
               onClick={() => openSection("forvandling")}
             >
-              <Palette className="h-3.5 w-3.5" />
-              {t("result.changeStyle", { defaultValue: "Change style" })}
+              <Upload className="h-3.5 w-3.5" />
+              {t("result.changePhoto", { defaultValue: "Change photo" })}
             </Button>
+            {styleCount > 1 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => openSection("forvandling")}
+              >
+                <Palette className="h-3.5 w-3.5" />
+                {t("result.changeStyle", { defaultValue: "Change style" })}
+              </Button>
+            )}
           </div>
         </div>
       )}

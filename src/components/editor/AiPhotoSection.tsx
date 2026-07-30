@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useEditorStore } from "@/stores/editorStore";
 import { useAiBusyStore } from "@/stores/aiBusyStore";
-import { useResultActionsStore } from "@/stores/resultActionsStore";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadCartPreview } from "@/lib/upload-preview";
 import { getSessionKey, track } from "@/lib/analytics";
@@ -97,7 +96,6 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
   // Subscribe to the cache so thumbnails re-render when new swaps complete.
   const faceSwapCache = useEditorStore((s) => s.faceSwapCache);
   void faceSwapCache;
-  const regenerateNonce = useResultActionsStore((s) => s.regenerateNonce);
 
   const source = sources[layer.id];
   const result = results[layer.id] ?? null;
@@ -386,16 +384,6 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
       endAiJob(jobId);
     }
   };
-
-  // "Prova igen" i resultat-/köp-zonen (EditorPage) → kör om med samma foto +
-  // stil för en ny variant. Bara om detta lager har ett resultat och inte är
-  // upptaget. Nonce-driven så knapptrycket alltid triggar en ny körning.
-  useEffect(() => {
-    if (regenerateNonce === 0) return;
-    if (!source?.file || !result || busy) return;
-    void runSwap({ force: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [regenerateNonce]);
 
   // Disabled state for the create button. Reference image is only required
   // for non-removeBackground modes.

@@ -190,7 +190,7 @@
   },
   "result": {
     "done": "Klart! Så här blir din tavla.",
-    "retry": "Prova igen",
+    "changePhoto": "Byt bild",
     "changeStyle": "Byt stil"
   },
   "feedback": {
