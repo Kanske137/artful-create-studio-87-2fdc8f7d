@@ -18,6 +18,7 @@ import {
 } from "@/lib/product-config";
 import { MapPreview } from "@/components/editor/MapPreview";
 import { EditorShell } from "@/components/editor/EditorShell";
+import { GenerationFeedback } from "@/components/editor/GenerationFeedback";
 import { StickyCta } from "@/components/editor/StickyCta";
 import { DeliveryTrustRow } from "@/components/editor/DeliveryTrustRow";
 import { freeShippingThresholdSek } from "@/lib/delivery";
@@ -531,8 +532,15 @@ export default function EditorPage() {
   // valuta med samma Shopify-rate som alla andra priser i editorn (formatPrice),
   // så beloppet är konsekvent med det kunden ser i övrigt.
   const freeShipDisplay = formatPrice(freeShippingThresholdSek(shopCtx.country), shopCtx);
+  // Vald drinks/generering-resultat: visa 👍/👎-feedback PROMINENT precis under
+  // förhandsvisningen (i CTA-blocket, alltid synligt — ej gömt i mobil-drawern),
+  // så vi faktiskt fångar om kunden gillar resultatet (Akram: gömd tidigare).
+  const firstAiResult = Object.values(aiPhotoResults).find(Boolean) ?? null;
   const ctaNode = (
     <div className="w-full">
+      {firstAiResult && (
+        <GenerationFeedback resultUrl={firstAiResult} className="mb-3" />
+      )}
       <DeliveryTrustRow
         productType={config.product_type}
         country={shopCtx.country}

@@ -48,33 +48,39 @@ export function GenerationFeedback({ resultUrl, handle, provider, className }: G
   };
 
   if (phase === "done") {
-    return <p className={cn("text-xs text-muted-foreground", className)}>{t("feedback.thanks")}</p>;
+    return (
+      <div className={cn("rounded-xl border bg-accent/20 px-3 py-2.5 text-sm text-muted-foreground", className)}>
+        {t("feedback.thanks")}
+      </div>
+    );
   }
 
   return (
-    <div className={cn("space-y-2", className)}>
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-muted-foreground">{t("feedback.question")}</span>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-7 w-7"
-          onClick={sendUp}
-          aria-label={t("feedback.up")}
-        >
-          <ThumbsUp className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-7 w-7"
-          onClick={() => setPhase("comment")}
-          aria-label={t("feedback.down")}
-        >
-          <ThumbsDown className="h-3.5 w-3.5" />
-        </Button>
+    <div className={cn("rounded-xl border bg-accent/20 p-3 space-y-2.5", className)}>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm font-medium">{t("feedback.question")}</span>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-9 w-9"
+            onClick={sendUp}
+            aria-label={t("feedback.up")}
+          >
+            <ThumbsUp className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-9 w-9"
+            onClick={() => setPhase("comment")}
+            aria-label={t("feedback.down")}
+          >
+            <ThumbsDown className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       {phase === "comment" && (
         <div className="space-y-2">

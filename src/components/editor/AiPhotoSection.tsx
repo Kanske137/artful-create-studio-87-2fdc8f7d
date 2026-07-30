@@ -34,7 +34,6 @@ import type { TemplateLayer, AiStylePreset } from "@/lib/template-schema";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AiProgress } from "./AiProgress";
-import { GenerationFeedback } from "./GenerationFeedback";
 import { invalidatePreviousResults, PreviousResults, PreviousUploads } from "./PreviousResults";
 
 type AiPhotoLayer = Extract<TemplateLayer, { type: "aiPhoto" }>;
@@ -587,7 +586,8 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
         )}
       </Button>
 
-      {result && !busy && <GenerationFeedback resultUrl={result} />}
+      {/* 👍/👎-feedback flyttad till CTA-blocket (EditorPage) så den syns
+          prominent under förhandsvisningen på alla enheter. */}
 
       {/* Tidigare bilder för samma referenser — klick återanvänder gratis. */}
       <PreviousResults
