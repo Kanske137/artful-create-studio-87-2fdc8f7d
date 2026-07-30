@@ -24,7 +24,8 @@
     "empty": "Handlekurven er tom",
     "total": "Totalt",
     "checkout": "Til kassen",
-    "readyHint": "Fornøyd? Legg i handlekurven"
+    "readyHint": "Fornøyd? Legg i handlekurven",
+    "order": "Bestill"
   },
   "orientation": {
     "portrait": "Stående",
@@ -390,5 +391,10 @@
     "constellations": "Stjernebildelinjer",
     "grid": "Gradnett",
     "tip": "Himmelen beregnes astronomisk for valgt dato, klokkeslett og sted."
+  },
+  "result": {
+    "done": "Ferdig! Slik blir bildet ditt.",
+    "changePhoto": "Bytt bilde",
+    "changeStyle": "Bytt stil"
   }
 }

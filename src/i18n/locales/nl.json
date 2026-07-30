@@ -24,7 +24,8 @@
     "empty": "Je winkelwagen is leeg",
     "total": "Totaal",
     "checkout": "Afrekenen",
-    "readyHint": "Tevreden? In winkelwagen"
+    "readyHint": "Tevreden? In winkelwagen",
+    "order": "Bestellen"
   },
   "orientation": {
     "portrait": "Staand",
@@ -390,5 +391,10 @@
     "constellations": "Sterrenbeeldlijnen",
     "grid": "Gradennet",
     "tip": "De hemel wordt astronomisch berekend voor de gekozen datum, tijd en plaats."
+  },
+  "result": {
+    "done": "Klaar! Dit is jouw ontwerp.",
+    "changePhoto": "Foto wijzigen",
+    "changeStyle": "Stijl wijzigen"
   }
 }

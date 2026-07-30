@@ -24,7 +24,8 @@
     "empty": "Ostoskorisi on tyhjä",
     "total": "Yhteensä",
     "checkout": "Kassalle",
-    "readyHint": "Tyytyväinen? Lisää ostoskoriin"
+    "readyHint": "Tyytyväinen? Lisää ostoskoriin",
+    "order": "Tilaa"
   },
   "orientation": {
     "portrait": "Pystysuora",
@@ -390,5 +391,10 @@
     "constellations": "Tähdistöviivat",
     "grid": "Koordinaatisto",
     "tip": "Taivas lasketaan tähtitieteellisesti valitulle päivälle, ajalle ja paikalle."
+  },
+  "result": {
+    "done": "Valmis! Tältä kuvasi näyttää.",
+    "changePhoto": "Vaihda kuva",
+    "changeStyle": "Vaihda tyyli"
   }
 }

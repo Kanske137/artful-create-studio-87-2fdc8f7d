@@ -24,7 +24,8 @@
     "empty": "Votre panier est vide",
     "total": "Total",
     "checkout": "Commander",
-    "readyHint": "Satisfait ? Ajouter au panier"
+    "readyHint": "Satisfait ? Ajouter au panier",
+    "order": "Commander"
   },
   "orientation": {
     "portrait": "Portrait",
@@ -390,5 +391,10 @@
     "constellations": "Lignes des constellations",
     "grid": "Grille céleste",
     "tip": "Le ciel est calculé astronomiquement pour la date, l'heure et le lieu choisis."
+  },
+  "result": {
+    "done": "C'est prêt ! Voici votre création.",
+    "changePhoto": "Changer de photo",
+    "changeStyle": "Changer de style"
   }
 }

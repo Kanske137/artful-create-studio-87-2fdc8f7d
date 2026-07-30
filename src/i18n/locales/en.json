@@ -24,7 +24,8 @@
     "empty": "Your cart is empty",
     "total": "Total",
     "checkout": "Checkout",
-    "readyHint": "Happy with it? Add to cart"
+    "readyHint": "Happy with it? Add to cart",
+    "order": "Order"
   },
   "orientation": {
     "portrait": "Portrait",
@@ -390,5 +391,10 @@
     "constellations": "Constellation lines",
     "grid": "Celestial grid",
     "tip": "The sky is calculated astronomically for your chosen date, time and place."
+  },
+  "result": {
+    "done": "Done! Here's your artwork.",
+    "changePhoto": "Change photo",
+    "changeStyle": "Change style"
   }
 }

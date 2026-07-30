@@ -24,7 +24,8 @@
     "empty": "Tu carrito está vacío",
     "total": "Total",
     "checkout": "Pagar",
-    "readyHint": "¿Te gusta? Añadir al carrito"
+    "readyHint": "¿Te gusta? Añadir al carrito",
+    "order": "Pedir"
   },
   "orientation": {
     "portrait": "Vertical",
@@ -390,5 +391,10 @@
     "constellations": "Líneas de constelaciones",
     "grid": "Cuadrícula celeste",
     "tip": "El cielo se calcula astronómicamente para la fecha, hora y lugar elegidos."
+  },
+  "result": {
+    "done": "¡Listo! Aquí está tu diseño.",
+    "changePhoto": "Cambiar foto",
+    "changeStyle": "Cambiar estilo"
   }
 }

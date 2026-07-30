@@ -24,7 +24,8 @@
     "empty": "Il tuo carrello è vuoto",
     "total": "Totale",
     "checkout": "Cassa",
-    "readyHint": "Soddisfatto? Aggiungi al carrello"
+    "readyHint": "Soddisfatto? Aggiungi al carrello",
+    "order": "Ordina"
   },
   "orientation": {
     "portrait": "Verticale",
@@ -390,5 +391,10 @@
     "constellations": "Linee delle costellazioni",
     "grid": "Griglia celeste",
     "tip": "Il cielo viene calcolato astronomicamente per data, ora e luogo scelti."
+  },
+  "result": {
+    "done": "Fatto! Ecco la tua creazione.",
+    "changePhoto": "Cambia foto",
+    "changeStyle": "Cambia stile"
   }
 }

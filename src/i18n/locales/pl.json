@@ -24,7 +24,8 @@
     "empty": "Twój koszyk jest pusty",
     "total": "Razem",
     "checkout": "Do kasy",
-    "readyHint": "Zadowolony? Dodaj do koszyka"
+    "readyHint": "Zadowolony? Dodaj do koszyka",
+    "order": "Zamów"
   },
   "orientation": {
     "portrait": "Pionowo",
@@ -390,5 +391,10 @@
     "constellations": "Linie gwiazdozbiorów",
     "grid": "Siatka współrzędnych",
     "tip": "Niebo jest obliczane astronomicznie dla wybranej daty, godziny i miejsca."
+  },
+  "result": {
+    "done": "Gotowe! Oto Twój projekt.",
+    "changePhoto": "Zmień zdjęcie",
+    "changeStyle": "Zmień styl"
   }
 }

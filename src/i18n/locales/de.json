@@ -24,7 +24,8 @@
     "empty": "Dein Warenkorb ist leer",
     "total": "Gesamt",
     "checkout": "Zur Kasse",
-    "readyHint": "Zufrieden? In den Warenkorb"
+    "readyHint": "Zufrieden? In den Warenkorb",
+    "order": "Bestellen"
   },
   "orientation": {
     "portrait": "Hochformat",
@@ -390,5 +391,10 @@
     "constellations": "Sternbildlinien",
     "grid": "Gradnetz",
     "tip": "Der Himmel wird astronomisch für Datum, Uhrzeit und Ort berechnet."
+  },
+  "result": {
+    "done": "Fertig! So sieht dein Motiv aus.",
+    "changePhoto": "Foto ändern",
+    "changeStyle": "Stil ändern"
   }
 }
