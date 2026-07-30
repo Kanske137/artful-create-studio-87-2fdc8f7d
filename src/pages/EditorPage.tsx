@@ -105,7 +105,7 @@ export default function EditorPage() {
   const addItem = useCartStore((s) => s.addItem);
   const isAdding = useCartStore((s) => s.isLoading);
   const openSection = useResultActionsStore((s) => s.openSection);
-  const productOptions = useEditorStore((s) => s.productOptions);
+  const templateLayers = useEditorStore((s) => s.templateLayers);
   const [isPreparing, setIsPreparing] = useState(false);
   const { map: shopifyPriceMap, derivedFx } = useShopifyPriceMap();
   const { activeHintSection } = useOnboarding();
@@ -540,9 +540,14 @@ export default function EditorPage() {
   // förhandsvisningen (i CTA-blocket, alltid synligt — ej gömt i mobil-drawern),
   // så vi faktiskt fångar om kunden gillar resultatet (Akram: gömd tidigare).
   const firstAiResult = Object.values(aiPhotoResults).find(Boolean) ?? null;
-  // "Byt stil" visas bara på stiliserings-mallar (som har AI-stilar att välja
-  // mellan), INTE på face-swap (kung/drottning/husdjur — de saknar aiStyles).
-  const styleCount = (productOptions?.aiStyles ?? []).filter((s) => s.enabled !== false).length;
+  // "Byt stil" visas bara på stiliserings-mallar (removeBackground-lager där
+  // kunden faktiskt väljer stil), INTE på face-swap (kung/drottning/husdjur =
+  // subjectKind human/pet). OBS: antalet aiStyles duger EJ som signal — temat
+  // injicerar DEFAULT_AI_STYLES i ALLA mallar (template-migrate.ts), så det är
+  // >1 överallt. Det avgörande är att det finns ett removeBackground-lager.
+  const hasStyleLayer = templateLayers().some(
+    (l) => l.type === "aiPhoto" && l.defaults.subjectKind === "removeBackground",
+  );
   const ctaNode = (
     <div className="w-full">
       {firstAiResult && (
@@ -562,7 +567,7 @@ export default function EditorPage() {
               <Upload className="h-3.5 w-3.5" />
               {t("result.changePhoto", { defaultValue: "Change photo" })}
             </Button>
-            {styleCount > 1 && (
+            {hasStyleLayer && (
               <Button
                 type="button"
                 variant="outline"
