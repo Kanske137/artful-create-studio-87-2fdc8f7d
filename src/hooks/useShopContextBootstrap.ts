@@ -42,6 +42,8 @@ export function useShopContextBootstrap() {
     const queryCurrency = params.get("currency");
     const queryRate = parseFloat(params.get("rate") ?? "");
     const queryCountry = params.get("country");
+    const queryRating = parseFloat(params.get("rating") ?? "");
+    const queryReviews = parseInt(params.get("reviews") ?? "", 10);
 
     // Fallback to navigator.language outside the iframe.
     const fallbackLocale = window.self === window.top ? navigator.language : null;
@@ -56,6 +58,8 @@ export function useShopContextBootstrap() {
       currency: initialCurrency,
       rate: initialRate,
       country: initialCountry,
+      reviewRating: Number.isFinite(queryRating) && queryRating > 0 ? queryRating : null,
+      reviewCount: Number.isFinite(queryReviews) && queryReviews > 0 ? queryReviews : null,
     });
     void i18n.changeLanguage(initialLocale);
     syncContextToUrl({

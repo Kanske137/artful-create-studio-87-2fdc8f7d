@@ -24,6 +24,10 @@ export interface ShopContext {
   rate: number;
   /** ISO country code, e.g. "SE", "DE". Used for tax hints if needed. */
   country: string | null;
+  /** Judge.me-snittbetyg (Shopify reviews.rating), null om inga omdömen. */
+  reviewRating: number | null;
+  /** Antal omdömen (reviews.rating_count), null/0 om inga. */
+  reviewCount: number | null;
 }
 
 interface ShopContextStore extends ShopContext {
@@ -35,6 +39,8 @@ const DEFAULT_CONTEXT: ShopContext = {
   currency: "SEK",
   rate: 1,
   country: "SE",
+  reviewRating: null,
+  reviewCount: null,
 };
 
 export const useShopContextStore = create<ShopContextStore>((set) => ({

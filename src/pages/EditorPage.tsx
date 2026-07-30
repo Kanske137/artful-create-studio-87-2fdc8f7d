@@ -19,6 +19,7 @@ import {
 import { MapPreview } from "@/components/editor/MapPreview";
 import { EditorShell } from "@/components/editor/EditorShell";
 import { GenerationFeedback } from "@/components/editor/GenerationFeedback";
+import { ReviewBadge } from "@/components/editor/ReviewBadge";
 import { StickyCta } from "@/components/editor/StickyCta";
 import { DeliveryTrustRow } from "@/components/editor/DeliveryTrustRow";
 import { freeShippingThresholdSek } from "@/lib/delivery";
@@ -546,6 +547,13 @@ export default function EditorPage() {
         country={shopCtx.country}
         freeShippingDisplay={freeShipDisplay}
       />
+      {shopCtx.reviewCount ? (
+        <ReviewBadge
+          rating={shopCtx.reviewRating ?? 0}
+          count={shopCtx.reviewCount}
+          className="mb-1"
+        />
+      ) : null}
       <StickyCta
         price={displayPrice}
         summary={summary}
