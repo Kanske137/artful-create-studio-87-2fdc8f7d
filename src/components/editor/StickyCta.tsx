@@ -56,7 +56,7 @@ export function StickyCta({ price, summary, loading, disabled, disabledHint, onA
         ) : (
           <span className="flex items-center gap-2">
             <ShoppingCart className="h-4 w-4" />
-            <span className="hidden sm:inline">{t("common.addToCart")}</span>
+            <span>{t("cart.order", { defaultValue: "Order" })}</span>
           </span>
         )}
       </Button>

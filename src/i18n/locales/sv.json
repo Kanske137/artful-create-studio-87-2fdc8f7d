@@ -24,7 +24,8 @@
     "empty": "Varukorgen är tom",
     "total": "Totalt",
     "checkout": "Till kassan",
-    "readyHint": "Är du nöjd? Lägg till i kundvagnen"
+    "readyHint": "Är du nöjd? Lägg till i kundvagnen",
+    "order": "Beställ"
   },
   "orientation": {
     "portrait": "Stående",
@@ -186,6 +187,11 @@
     "errorGeneric": "Något gick fel. Försök igen.",
     "rateLimited": "Du har nått dagens gräns för AI-genereringar. Försök igen imorgon.",
     "successToast": "Klart! Fortsätt skapa."
+  },
+  "result": {
+    "done": "Klart! Så här blir din tavla.",
+    "retry": "Prova igen",
+    "changeStyle": "Byt stil"
   },
   "feedback": {
     "question": "Blev resultatet bra?",

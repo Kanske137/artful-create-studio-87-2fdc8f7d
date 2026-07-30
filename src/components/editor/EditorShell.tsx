@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { postEditorResize } from "@/lib/iframe-resize";
 import { AiBusyOverlay } from "./AiBusyOverlay";
 import { useIsAnyAiBusy } from "@/stores/aiBusyStore";
+import { useResultActionsStore } from "@/stores/resultActionsStore";
 import { useParentViewport } from "@/hooks/useParentViewport";
 
 interface Props {
@@ -28,6 +29,8 @@ export function EditorShell({ configs, activeHandle, activeProductType, onProduc
   const [snap, setSnap] = useState<number | string | null>("content");
   const isAiBusy = useIsAnyAiBusy();
   const { visibleTop, visibleHeight } = useParentViewport();
+  const pendingSection = useResultActionsStore((s) => s.pendingSection);
+  const consumePendingSection = useResultActionsStore((s) => s.consumePendingSection);
 
 
   useEffect(() => {
@@ -39,6 +42,17 @@ export function EditorShell({ configs, activeHandle, activeProductType, onProduc
       setActiveId(sections[0]!.id);
     }
   }, [sections, activeId]);
+
+  // "Byt stil"-knappen i resultat-/köp-zonen ber EditorShell öppna en sektion
+  // (t.ex. forvandling) + fälla ut mobil-lådan, så kunden når stilval direkt.
+  useEffect(() => {
+    if (!pendingSection) return;
+    if (sections.some((s) => s.id === pendingSection)) {
+      setActiveId(pendingSection);
+      setMobileOpen(true);
+    }
+    consumePendingSection();
+  }, [pendingSection, sections, consumePendingSection]);
 
   // Rapportera ny höjd efter tab-byte (dubbel RAF för att invänta layout).
   useEffect(() => {

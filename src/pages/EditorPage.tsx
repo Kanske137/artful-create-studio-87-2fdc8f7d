@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Loader2, ShoppingCart } from "lucide-react";
+import { Check, Loader2, Palette, RotateCcw, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useResultActionsStore } from "@/stores/resultActionsStore";
 import { useShopContextStore } from "@/stores/shopContextStore";
 import { formatPrice, formatMoney } from "@/lib/format-price";
 import { useShopifyPriceMap, priceFromMap } from "@/hooks/useShopifyPriceMap";
@@ -103,6 +104,8 @@ export default function EditorPage() {
   const shopCtx = useShopContextStore();
   const addItem = useCartStore((s) => s.addItem);
   const isAdding = useCartStore((s) => s.isLoading);
+  const regenerate = useResultActionsStore((s) => s.regenerate);
+  const openSection = useResultActionsStore((s) => s.openSection);
   const [isPreparing, setIsPreparing] = useState(false);
   const { map: shopifyPriceMap, derivedFx } = useShopifyPriceMap();
   const { activeHintSection } = useOnboarding();
@@ -540,13 +543,35 @@ export default function EditorPage() {
   const ctaNode = (
     <div className="w-full">
       {firstAiResult && (
-        <GenerationFeedback resultUrl={firstAiResult} className="mb-3" />
+        <div className="px-4 pt-3 pb-1 space-y-2">
+          <p className="flex items-center gap-1.5 text-sm font-medium">
+            <Check className="h-4 w-4 text-green-600" />
+            {t("result.done", { defaultValue: "Done! Here's your poster." })}
+          </p>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => regenerate()}
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              {t("result.retry", { defaultValue: "Try again" })}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => openSection("forvandling")}
+            >
+              <Palette className="h-3.5 w-3.5" />
+              {t("result.changeStyle", { defaultValue: "Change style" })}
+            </Button>
+          </div>
+        </div>
       )}
-      <DeliveryTrustRow
-        productType={config.product_type}
-        country={shopCtx.country}
-        freeShippingDisplay={freeShipDisplay}
-      />
       {shopCtx.reviewCount ? (
         <ReviewBadge
           rating={shopCtx.reviewRating ?? 0}
@@ -554,6 +579,11 @@ export default function EditorPage() {
           className="mb-1"
         />
       ) : null}
+      <DeliveryTrustRow
+        productType={config.product_type}
+        country={shopCtx.country}
+        freeShippingDisplay={freeShipDisplay}
+      />
       <StickyCta
         price={displayPrice}
         summary={summary}
@@ -563,6 +593,9 @@ export default function EditorPage() {
         onAdd={handleAddToCart}
         showCartHint={showCartHint}
       />
+      {firstAiResult && (
+        <GenerationFeedback resultUrl={firstAiResult} className="mx-4 mt-3 mb-2" />
+      )}
     </div>
   );
 
