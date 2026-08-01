@@ -96,9 +96,10 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
   const result = aiPhotoResults[layer.id] ?? null;
 
   const [busy, setBusy] = useState(false);
-  // 2 personer = cdingram crop-composite + NB2-identitetspass (~45 s totalt);
-  // 3-4 personer = ett enda NB2-anrop (~30 s).
-  const expectedSeconds = slots.length === 2 ? 50 : 30;
+  // 2 personer = cdingram crop-composite + NB2-identitetspass (~40 s uppmätt,
+  // + ansiktsdetektering ~10 s första gången per referens); 3-4 personer =
+  // ett enda NB2-anrop (~30 s).
+  const expectedSeconds = slots.length === 2 ? 60 : 30;
 
   const cacheRef = useRef<Record<string, MultiFaceCacheEntry>>(loadMultiFaceCache());
 
@@ -243,8 +244,9 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
         }),
       );
 
-      // Parflödet (2 personer) kör hybrid-kedjan — informera om väntetiden.
-      updateAiJobStage(jobId, slots.length === 2 ? t("ai.stageCreateLong") : t("ai.stageCreate"));
+      // Parflödet (2 personer) kör hybrid-kedjan (2× cdingram + NB2-pass +
+      // ev. ansiktsdetektering) — egen text som lovar upp till en minut.
+      updateAiJobStage(jobId, slots.length === 2 ? t("ai.stageCreateLongPair") : t("ai.stageCreate"));
       const designId = `multi-${(crypto as { randomUUID?: () => string }).randomUUID?.() ?? Date.now()}`;
       console.info("[MultiFace] invoking multi-face-swap", {
         layerId: layer.id,

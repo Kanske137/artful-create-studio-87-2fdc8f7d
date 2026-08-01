@@ -135,6 +135,7 @@
     "stageUpload": "Przesyłanie zdjęcia…",
     "stageCreate": "Tworzenie obrazu…",
     "stageCreateLong": "Tworzenie obrazu – potrwa około pół minuty…",
+    "stageCreateLongPair": "Tworzymy Wasz obraz – może potrwać do minuty…",
     "stageFetch": "Pobieranie wyniku…",
     "noResult": "Usługa nie zwróciła obrazu",
     "overlay": {

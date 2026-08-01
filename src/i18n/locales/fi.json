@@ -135,6 +135,7 @@
     "stageUpload": "Ladataan kuvaasi…",
     "stageCreate": "Luodaan kuvaasi…",
     "stageCreateLong": "Luodaan kuvaasi – kestää noin puoli minuuttia…",
+    "stageCreateLongPair": "Luodaan kuvaanne – voi kestää jopa minuutin…",
     "stageFetch": "Haetaan tulosta…",
     "noResult": "Palvelu ei palauttanut kuvaa",
     "overlay": {
