@@ -134,6 +134,7 @@
     "stagePrep": "Forbereder dit billede…",
     "stageUpload": "Uploader dit billede…",
     "stageCreate": "Skaber dit billede…",
+    "stageCreateLong": "Skaber dit billede – tager cirka et halvt minut…",
     "stageFetch": "Henter resultat…",
     "noResult": "Tjenesten returnerede intet billede",
     "overlay": {

@@ -134,6 +134,7 @@
     "stagePrep": "Préparation de votre image…",
     "stageUpload": "Téléchargement de votre image…",
     "stageCreate": "Création de votre image…",
+    "stageCreateLong": "Création de votre image – environ une demi-minute…",
     "stageFetch": "Récupération du résultat…",
     "noResult": "Le service n'a renvoyé aucune image",
     "overlay": {

@@ -134,6 +134,7 @@
     "stagePrep": "Valmistellaan kuvaasi…",
     "stageUpload": "Ladataan kuvaasi…",
     "stageCreate": "Luodaan kuvaasi…",
+    "stageCreateLong": "Luodaan kuvaasi – kestää noin puoli minuuttia…",
     "stageFetch": "Haetaan tulosta…",
     "noResult": "Palvelu ei palauttanut kuvaa",
     "overlay": {

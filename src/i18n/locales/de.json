@@ -134,6 +134,7 @@
     "stagePrep": "Bild wird vorbereitet…",
     "stageUpload": "Bild wird hochgeladen…",
     "stageCreate": "Bild wird erstellt…",
+    "stageCreateLong": "Bild wird erstellt – dauert etwa eine halbe Minute…",
     "stageFetch": "Ergebnis wird geladen…",
     "noResult": "Der Dienst hat kein Bild zurückgegeben",
     "overlay": {

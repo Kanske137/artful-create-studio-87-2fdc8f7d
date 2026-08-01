@@ -134,6 +134,7 @@
     "stagePrep": "Je afbeelding voorbereiden…",
     "stageUpload": "Je afbeelding uploaden…",
     "stageCreate": "Je afbeelding maken…",
+    "stageCreateLong": "Je afbeelding maken – duurt ongeveer een halve minuut…",
     "stageFetch": "Resultaat ophalen…",
     "noResult": "De service heeft geen afbeelding teruggegeven",
     "overlay": {

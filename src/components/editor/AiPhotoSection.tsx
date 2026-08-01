@@ -176,9 +176,9 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
 
   const [busy, setBusy] = useState(false);
   const [stage, setStage] = useState<string | null>(null);
-  // All three routes now run through Nano Banana 2 — expect ~18s end-to-end
-  // including potential retry backoff.
-  const expectedSeconds = 18;
+  // Human kör hybrid-kedjan cdingram → Nano Banana 2 (~11s + ~20s + overhead);
+  // pet/removeBackground är ett enda NB2-anrop (~18s inkl retry-backoff).
+  const expectedSeconds = subjectKind === "human" ? 40 : 18;
 
   // Hash the face photo whenever it changes.
   useEffect(() => {
@@ -313,8 +313,10 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
         }
       }
 
-      setStage(t("ai.stageCreate"));
-      updateAiJobStage(jobId, t("ai.stageCreate"));
+      // Human-hybriden tar ~35 s — informera kunden om den längre väntetiden.
+      const createStage = subjectKind === "human" ? t("ai.stageCreateLong") : t("ai.stageCreate");
+      setStage(createStage);
+      updateAiJobStage(jobId, createStage);
       const res = await invokeWithSubscriberGate<{
         printFileUrl?: string;
         error?: string;

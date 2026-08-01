@@ -44,6 +44,25 @@ const FACE_DETECT_MODEL_VERSION = "efd10a8ddc57ea28773327e881ce95e20cc1d734c589f
 const CDINGRAM_PROVIDER = `${FACE_SWAP_MODEL_NAME} x2 (crop-composite)`;
 const CROP_FEATHER_PX = 24;
 
+// ---------- Hybrid identity pass (2026-08-02) ----------
+// Samma princip som i replicate-face-swap: cdingram-swappen bevarar
+// referensen pixelexakt men tappar frisyr/piercings/glasögon/hudton. Efter
+// crop-kompositen körs därför ETT NB2-pass på HELA den färdiga bilden med
+// båda porträtten (bild #2 = vänster person, bild #3 = höger person — samma
+// vänster→höger-ordning som slot-mappningen). Helbildspasset korrigerar även
+// hud utanför cropparna (händer/armar). Misslyckas passet används
+// cdingram-kompositen som förut. Avstängbart via ?hybrid=off.
+const HYBRID_PAIR_PROMPT = [
+  "Image #1 is a portrait artwork of TWO people where face swaps have already been performed. Image #2 is a photograph of the person on the LEFT in image #1. Image #3 is a photograph of the person on the RIGHT in image #1.",
+  "For EACH of the two people, correct image #1 so their identity fully matches their own photograph:",
+  "1. Transfer the exact hairstyle, hair color and hair length from their photo - including whether the hair is worn loose or tied up - adapted naturally around/under any headwear in image #1. If a person is bald in their photo, make them bald in image #1.",
+  "2. Transfer each person's facial hair (or lack of it), glasses (if worn), and all jewelry/piercings visible in their photo (earrings, nose rings, etc.).",
+  "3. Adjust ALL visible skin of each person in image #1 (face, neck, ears, hands) to the same skin tone as in their own photo. Never mix the two persons' attributes.",
+  "Keep EVERYTHING ELSE in image #1 completely unchanged: headwear/crowns, clothing, outfit accessories, background, lighting, art style, composition, framing and aspect ratio.",
+  "The result must remain ONE coherent artwork in the exact art style of image #1 - no photo-collage look.",
+  "Return ONE single edited image with the same aspect ratio as image #1.",
+].join("\n");
+
 // ---------- analytics: generations-logg (Fas 2) ----------
 // Loggar varje generering till `generations`-tabellen (service role). Får
 // ALDRIG påverka själva genereringen — alla fel sväljs och loggas bara.
@@ -345,7 +364,10 @@ Deno.serve(async (req) => {
   //   2 personer  → cdingram crop-composite (default)
   //   3–4 personer → nano-banana-2 (enda motorn för fler än 2 ansikten)
   //   ?engine=nano / ?engine=cdingram = explicit override för test/rollback.
-  const engineParam = new URL(req.url).searchParams.get("engine");
+  const reqUrl = new URL(req.url);
+  const engineParam = reqUrl.searchParams.get("engine");
+  // Hybrid-passet är default PÅ för 2-personersmotorn — ?hybrid=off stänger av.
+  const hybridEnabled = reqUrl.searchParams.get("hybrid") !== "off";
 
   let genId: string | null = null;
   const genT0 = Date.now();
@@ -417,7 +439,12 @@ Deno.serve(async (req) => {
       );
     }
 
-    const provider = engine === "cdingram" ? CDINGRAM_PROVIDER : NANO_BANANA_MODEL;
+    const useHybrid = engine === "cdingram" && hybridEnabled;
+    const provider = engine === "cdingram"
+      ? useHybrid
+        ? `${CDINGRAM_PROVIDER}+${NANO_BANANA_MODEL}`
+        : CDINGRAM_PROVIDER
+      : NANO_BANANA_MODEL;
     console.log(
       `[multi-face-swap] start engine=${engine} layerId=${layerId} designId=${designId} ` +
       `slots=${normalisedSlots.length} referenceImage=${referenceImageUrl} ` +
@@ -436,13 +463,44 @@ Deno.serve(async (req) => {
       reference_image_url: referenceImageUrl,
     });
 
-    const result =
+    let result =
       engine === "cdingram"
         ? await runCdingramTwoFaceSwap({ referenceImageUrl, portraitUrls, designId })
         : await callNanoBanana({
             promptText,
             imageUrls: [referenceImageUrl, ...portraitUrls],
           });
+
+    // Hybrid identity pass: NB2 på hela kompositen med båda porträtten.
+    // Kompositen laddas upp temporärt (cart-previews, gallringscron städar)
+    // så NB2 kan hämta den via publik URL. Fel = behåll cdingram-kompositen.
+    if (result.ok && useHybrid) {
+      try {
+        const db = genLogDb();
+        const hybridPath = `mfhybrid-${designId}.jpg`;
+        const { error: hupErr } = await db.storage
+          .from("cart-previews")
+          .upload(hybridPath, result.bytes, { contentType: result.contentType, upsert: true });
+        if (hupErr) throw new Error(`hybrid composite upload failed: ${hupErr.message}`);
+        const compositeUrl = db.storage.from("cart-previews").getPublicUrl(hybridPath).data.publicUrl;
+        const pass = await callNanoBanana({
+          promptText: HYBRID_PAIR_PROMPT,
+          imageUrls: [compositeUrl, portraitUrls[0], portraitUrls[1]],
+        });
+        if (pass.ok) {
+          result = { ok: true, bytes: pass.bytes, contentType: pass.contentType, outputUrl: pass.outputUrl };
+          console.log(`[multi-face-swap] hybrid NB2 identity pass done designId=${designId}`);
+        } else {
+          console.warn(`[multi-face-swap] hybrid NB2 pass failed designId=${designId} — using composite as-is`);
+        }
+      } catch (e) {
+        console.warn(
+          `[multi-face-swap] hybrid pass error designId=${designId} — using composite as-is:`,
+          e instanceof Error ? e.message : e,
+        );
+      }
+    }
+
     if (!result.ok) {
       await genLogEnd(genId, {
         status: "failed",

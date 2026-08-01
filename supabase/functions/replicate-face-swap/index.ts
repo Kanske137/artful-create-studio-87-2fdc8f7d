@@ -52,6 +52,27 @@ const corsHeaders = {
 const FACE_SWAP_MODEL_VERSION = "cdingram/face-swap:d1d6ea8c8be89d664a07a457526f7128109dee7030fdac424788d762c71ed111";
 const FACE_SWAP_MODEL_NAME = "cdingram/face-swap";
 
+// ---------- Hybrid identity pass (2026-08-02) ----------
+// cdingram byter ENDAST ansiktsregionen — frisyr, piercings/smycken, glasögon
+// och hudton på hals/händer följer inte med. Efter swappen körs därför ett
+// Nano Banana 2-korrigeringspass som får cdingram-resultatet (bild #1) +
+// kundens foto (bild #2) och ENBART justerar identitetsattributen. Eftersom
+// kompositionen redan är låst av cdingram undviker vi NB2:s klassiska svagheter
+// (omritad bakgrund, "inklistrat" ansikte). A/B-validerad 2026-08-02 på 6/6
+// testfall (flint+glasögon, genusbyte, dreadlocks, fräknar m.m.).
+// Misslyckas passet efter retries används cdingram-resultatet som förut —
+// hellre dagens kvalitet än ett fel. Avstängbart via ?hybrid=off (test/debug).
+const HYBRID_IDENTITY_PROMPT = [
+  "Image #1 is a portrait artwork where a face swap has already been performed. Image #2 is a photograph of the actual person.",
+  "Correct image #1 so the person's identity fully matches image #2:",
+  "1. Transfer the exact hairstyle, hair color and hair length from image #2 - including whether the hair is worn loose or tied up - adapted naturally around/under any headwear in image #1. If the person in image #2 is bald, make them bald in image #1.",
+  "2. Transfer the facial hair (or lack of it), glasses (if worn), and all jewelry/piercings visible in image #2 (earrings, nose rings, etc.).",
+  "3. Adjust ALL visible skin in image #1 (face, neck, ears, hands) to the same skin tone as in image #2.",
+  "Keep EVERYTHING ELSE in image #1 completely unchanged: headwear/crown, clothing, outfit accessories, background, lighting, art style, composition, framing and aspect ratio.",
+  "The result must remain ONE coherent artwork in the exact art style of image #1 - no photo-collage look.",
+  "Return ONE single edited image with the same aspect ratio as image #1.",
+].join("\n");
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -869,6 +890,8 @@ Deno.serve(async (req) => {
   const engineParam = reqUrl.searchParams.get("engine");
   const stubParam = reqUrl.searchParams.get("stub");
   const stubUrlParam = reqUrl.searchParams.get("stubUrl");
+  // Hybrid-passet är default PÅ för human — ?hybrid=off stänger av (debug).
+  const hybridEnabled = reqUrl.searchParams.get("hybrid") !== "off";
 
   let genId: string | null = null;
   const genT0 = Date.now();
@@ -980,7 +1003,9 @@ Deno.serve(async (req) => {
     const willUseFlux = !willUseSimple && subjectKind === "removeBackground" && fluxEnabledHandler && hasFluxStyle;
     const route =
       subjectKind === "human"
-        ? "human-cdingram"
+        ? hybridEnabled
+          ? "human-cdingram+nb2"
+          : "human-cdingram"
         : subjectKind === "pet"
           ? "pet-nano-banana"
           : willUseSimple
@@ -990,7 +1015,9 @@ Deno.serve(async (req) => {
               : "remove-bg-nano-banana";
     const modelUsed =
       subjectKind === "human"
-        ? FACE_SWAP_MODEL_NAME
+        ? hybridEnabled
+          ? `${FACE_SWAP_MODEL_NAME}+${NANO_BANANA_MODEL}`
+          : FACE_SWAP_MODEL_NAME
         : willUseSimple || willUseFlux
           ? "black-forest-labs/flux-kontext-pro+851-labs/background-remover"
           : NANO_BANANA_MODEL;
@@ -1030,7 +1057,7 @@ Deno.serve(async (req) => {
     const fluxStylePrompt: string | null =
       typeof body?.fluxStylePrompt === "string" && body.fluxStylePrompt.trim().length > 0 ? body.fluxStylePrompt : null;
 
-    const result =
+    let result =
       subjectKind === "human"
         ? await runReplicateFaceSwap({
             referenceImageUrl: referenceImageUrl!,
@@ -1066,6 +1093,22 @@ Deno.serve(async (req) => {
         error: "model fallback (se funktionsloggar)",
       });
       return result.response;
+    }
+
+    // Hybrid identity pass för human: NB2 justerar frisyr/glasögon/smycken/
+    // hudton mot kundens foto. Misslyckas passet behålls cdingram-resultatet
+    // (graceful degradation) — genereringen felar aldrig på det här steget.
+    if (subjectKind === "human" && hybridEnabled) {
+      const pass = await callNanoBanana({
+        promptText: HYBRID_IDENTITY_PROMPT,
+        imageUrls: [result.outputUrl, faceImageUrl],
+      });
+      if (pass.ok) {
+        result = { ok: true, bytes: pass.bytes, contentType: pass.contentType, outputUrl: pass.outputUrl };
+        console.log(`[face-swap] hybrid NB2 identity pass done designId=${designId}`);
+      } else {
+        console.warn(`[face-swap] hybrid NB2 pass failed designId=${designId} — using cdingram result as-is`);
+      }
     }
 
     // Sanity-check dimensions to catch collages / weirdly-shaped outputs.
