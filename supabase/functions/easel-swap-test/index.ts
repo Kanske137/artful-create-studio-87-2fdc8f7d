@@ -33,6 +33,7 @@ const ALLOWED_MODELS: Record<string, { official: boolean; version?: string }> = 
   "easel/advanced-face-swap": { official: true },
   "easel/ai-avatars": { official: true },
   "fofr/face-swap-with-ideogram": { official: true },
+  "google/nano-banana-2": { official: true },
   "cdingram/face-swap": {
     official: false,
     version: "d1d6ea8c8be89d664a07a457526f7128109dee7030fdac424788d762c71ed111",
