@@ -27,7 +27,12 @@ const ADMIN_EMAILS = ["akram@arthena.se"];
 // Allowlist: official = anropas via /models/<path>/predictions,
 // annars pinnad community-version via /predictions.
 const ALLOWED_MODELS: Record<string, { official: boolean; version?: string }> = {
+  // OBS: easel/advanced-face-swap är BORTTAGEN från Replicate (finns numera på
+  // fal.ai) — kvar i listan ifall den återkommer. ai-avatars är easels
+  // kvarvarande Replicate-modell.
   "easel/advanced-face-swap": { official: true },
+  "easel/ai-avatars": { official: true },
+  "fofr/face-swap-with-ideogram": { official: true },
   "cdingram/face-swap": {
     official: false,
     version: "d1d6ea8c8be89d664a07a457526f7128109dee7030fdac424788d762c71ed111",
@@ -63,12 +68,13 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const action: string = body?.action ?? "run";
     const model: string = typeof body?.model === "string" ? body.model : "";
-    const allowed = ALLOWED_MODELS[model];
-    if (!allowed) {
-      return json({ error: `model not allowlisted: ${model}` }, 400);
-    }
 
+    // Schema-läget är ren metadata-läsning — tillåt valfri modell-slug så vi
+    // kan inspektera kandidater utan redeploy. "run" kräver allowlist.
     if (action === "schema") {
+      if (!/^[a-z0-9_.-]+\/[a-z0-9_.-]+$/i.test(model)) {
+        return json({ error: `invalid model slug: ${model}` }, 400);
+      }
       const r = await fetch(`https://api.replicate.com/v1/models/${model}`, {
         headers: { Authorization: `Bearer ${REPLICATE_API_TOKEN}` },
       });
@@ -83,6 +89,10 @@ Deno.serve(async (req) => {
     }
 
     // action === "run"
+    const allowed = ALLOWED_MODELS[model];
+    if (!allowed) {
+      return json({ error: `model not allowlisted: ${model}` }, 400);
+    }
     const input = body?.input;
     if (!input || typeof input !== "object") return json({ error: "input required" }, 400);
 
