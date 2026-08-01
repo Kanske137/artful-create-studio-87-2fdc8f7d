@@ -46,6 +46,34 @@ function json(body: unknown, status = 200) {
   });
 }
 
+// Ladda ner Replicate-outputen och spara permanent i ai-references.
+async function uploadOutput(
+  outputUrl: string,
+  filenameRaw: unknown,
+): Promise<{ url: string; replicateOutputUrl: string }> {
+  const imgRes = await fetch(outputUrl);
+  if (!imgRes.ok) throw new Error(`Output fetch failed ${imgRes.status}`);
+  const bytes = new Uint8Array(await imgRes.arrayBuffer());
+  const contentType = imgRes.headers.get("content-type") ?? "image/png";
+  const ext = contentType.includes("png") ? "png" : contentType.includes("webp") ? "webp" : "jpg";
+  const safeName =
+    typeof filenameRaw === "string" && /^[a-z0-9-]{1,80}$/.test(filenameRaw)
+      ? filenameRaw
+      : crypto.randomUUID();
+  const path = `generated/swaptest/${safeName}.${ext}`;
+
+  const service = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+  const { error: upErr } = await service.storage
+    .from("ai-references")
+    .upload(path, bytes, { contentType, upsert: true });
+  if (upErr) throw new Error(`Upload failed: ${upErr.message}`);
+  const { data: pub } = service.storage.from("ai-references").getPublicUrl(path);
+  return { url: pub.publicUrl, replicateOutputUrl: outputUrl };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
@@ -88,7 +116,27 @@ Deno.serve(async (req) => {
       });
     }
 
-    // action === "run"
+    // action === "fetch": polla en redan skapad prediction EN gång; ladda upp
+    // om den är klar. Låter klienten loopa i korta anrop i stället för att
+    // hålla en edge-request öppen (Supabase idle-timeout 150s dödar långa).
+    if (action === "fetch") {
+      const predictionId = typeof body?.predictionId === "string" ? body.predictionId : "";
+      if (!/^[a-z0-9]{10,40}$/i.test(predictionId)) return json({ error: "predictionId required" }, 400);
+      const r = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
+        headers: { Authorization: `Bearer ${REPLICATE_API_TOKEN}` },
+      });
+      const p = await r.json();
+      if (!r.ok) return json({ error: `prediction fetch ${r.status}`, detail: p }, 502);
+      if (p.status !== "succeeded") {
+        return json({ status: p.status, error: p.error ?? null, logsTail: String(p.logs ?? "").slice(-400) });
+      }
+      const output = Array.isArray(p.output) ? p.output[0] : p.output;
+      if (typeof output !== "string" || !output) return json({ error: "succeeded but no output URL" }, 502);
+      const uploaded = await uploadOutput(output, body?.filename);
+      return json({ status: "succeeded", ...uploaded, predictTimeSec: p?.metrics?.predict_time ?? null });
+    }
+
+    // action === "run" | "start"
     const allowed = ALLOWED_MODELS[model];
     if (!allowed) {
       return json({ error: `model not allowlisted: ${model}` }, 400);
@@ -118,6 +166,11 @@ Deno.serve(async (req) => {
       );
     }
 
+    // "start" = fire-and-return: klienten pollar själv via action "fetch".
+    if (action === "start") {
+      return json({ predictionId: prediction.id, status: prediction.status });
+    }
+
     const deadline = Date.now() + 150_000;
     while (
       prediction.status !== "succeeded" &&
@@ -145,31 +198,10 @@ Deno.serve(async (req) => {
     if (typeof output !== "string" || !output) return json({ error: "no output URL" }, 502);
 
     // Ladda upp permanent så jämförelsebilderna överlever Replicates gallring.
-    const imgRes = await fetch(output);
-    if (!imgRes.ok) throw new Error(`Output fetch failed ${imgRes.status}`);
-    const bytes = new Uint8Array(await imgRes.arrayBuffer());
-    const contentType = imgRes.headers.get("content-type") ?? "image/png";
-    const ext = contentType.includes("png") ? "png" : contentType.includes("webp") ? "webp" : "jpg";
-    const safeName =
-      typeof body?.filename === "string" && /^[a-z0-9-]{1,80}$/.test(body.filename)
-        ? body.filename
-        : crypto.randomUUID();
-    const path = `generated/swaptest/${safeName}.${ext}`;
-
-    const service = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
-    const { error: upErr } = await service.storage
-      .from("ai-references")
-      .upload(path, bytes, { contentType, upsert: true });
-    if (upErr) throw new Error(`Upload failed: ${upErr.message}`);
-    const { data: pub } = service.storage.from("ai-references").getPublicUrl(path);
-
+    const uploaded = await uploadOutput(output, body?.filename);
     return json({
       model,
-      url: pub.publicUrl,
-      replicateOutputUrl: output,
+      ...uploaded,
       predictTimeSec: prediction?.metrics?.predict_time ?? null,
     });
   } catch (error) {
