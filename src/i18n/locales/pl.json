@@ -1,4 +1,9 @@
 {
+  "editor": {
+    "uploadFirstCta": "Prześlij swoje zdjęcie",
+    "uploadFirstCtaMulti": "Prześlijcie swoje zdjęcia",
+    "uploadFirstHint": "Zacznij tutaj – resztą zajmiemy się my"
+  },
   "editorError": {
     "templateNotFoundTitle": "Nie znaleziono szablonu",
     "templateNotFoundBody": "Nie znaleźliśmy szablonu dla tego produktu. Skontaktuj się z pomocą techniczną, jeśli problem nie ustąpi."

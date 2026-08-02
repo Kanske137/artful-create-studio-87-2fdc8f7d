@@ -1,4 +1,9 @@
 {
+  "editor": {
+    "uploadFirstCta": "Sube tu foto",
+    "uploadFirstCtaMulti": "Subid vuestras fotos",
+    "uploadFirstHint": "Empieza aquí: nosotros hacemos el resto"
+  },
   "editorError": {
     "templateNotFoundTitle": "Plantilla no encontrada",
     "templateNotFoundBody": "No encontramos una plantilla para este producto. Contacta con soporte si el problema persiste."

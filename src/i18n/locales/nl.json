@@ -1,4 +1,9 @@
 {
+  "editor": {
+    "uploadFirstCta": "Upload je foto",
+    "uploadFirstCtaMulti": "Upload jullie foto's",
+    "uploadFirstHint": "Begin hier – wij doen de rest"
+  },
   "editorError": {
     "templateNotFoundTitle": "Sjabloon niet gevonden",
     "templateNotFoundBody": "We konden geen sjabloon vinden voor dit product. Neem contact op met support als het probleem aanhoudt."

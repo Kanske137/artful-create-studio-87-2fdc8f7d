@@ -25,6 +25,17 @@ import {
 } from "@/lib/face-swap-cache";
 import { track } from "@/lib/analytics";
 
+// Engagemangs-events för produkter UTAN fotouppladdning (kartor/text/drink) —
+// utan dessa ser kartprodukter falskt "döda" ut i tratten (2026-08-02).
+// Engångs per lager och sidladdning: setLayerText fyrar per tangenttryck.
+const trackedEdits = new Set<string>();
+function trackEditOnce(type: string, layerId: string): void {
+  const k = `${type}:${layerId}`;
+  if (trackedEdits.has(k)) return;
+  trackedEdits.add(k);
+  track(type, { layerId });
+}
+
 interface ApplyPlaceArgs {
   placeName: string;
   center: [number, number];
@@ -1014,6 +1025,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!template) return set({ layoutId: nextLayoutId });
     const prevLayoutId = state.layoutId;
     if (prevLayoutId === nextLayoutId) return;
+    track("layout_changed", { layoutId: nextLayoutId, handle: config?.shopify_handle });
 
     const productType = config?.product_type;
     const freshLayerValues = hydrateLayerValues(template, state.orientation, productType, nextLayoutId);
@@ -1570,6 +1582,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   setLayerShowLabels: (id, v) => updateMap(set, get, id, { showLabels: v }),
 
   applyPlaceToLayer: (id, args) => {
+    trackEditOnce("map_edited", id);
     applyPlaceInternal(set, get, id, args, /* moveCenter */ true);
   },
   updateMapLayerFromPan: (id, args) => {
@@ -1577,7 +1590,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
   patchStarmapLayer: (id, patch) => patchStarmap(set, get, id, patch),
 
-  setLayerText: (id, t) => setLayerOverrideText(set, get, id, t),
+  setLayerText: (id, t) => {
+    trackEditOnce("text_edited", id);
+    setLayerOverrideText(set, get, id, t);
+  },
   setLayerTextFont: (id, f) => updateText(set, get, id, { font: f }),
   setLayerTextFontSizePt: (id, pt) => updateText(set, get, id, { fontSizePt: pt }),
   setLayerTextVisible: (id, v) => updateText(set, get, id, { visible: v }),

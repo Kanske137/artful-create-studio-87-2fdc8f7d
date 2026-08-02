@@ -1,4 +1,9 @@
 {
+  "editor": {
+    "uploadFirstCta": "Lataa kuvasi",
+    "uploadFirstCtaMulti": "Latatkaa kuvanne",
+    "uploadFirstHint": "Aloita tästä – me hoidamme loput"
+  },
   "editorError": {
     "templateNotFoundTitle": "Mallia ei löytynyt",
     "templateNotFoundBody": "Tälle tuotteelle ei löytynyt mallia. Ota yhteyttä tukeen, jos ongelma jatkuu."

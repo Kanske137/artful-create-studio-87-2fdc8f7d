@@ -1,4 +1,9 @@
 {
+  "editor": {
+    "uploadFirstCta": "Téléchargez votre photo",
+    "uploadFirstCtaMulti": "Téléchargez vos photos",
+    "uploadFirstHint": "Commencez ici – on s'occupe du reste"
+  },
   "editorError": {
     "templateNotFoundTitle": "Modèle introuvable",
     "templateNotFoundBody": "Nous n'avons pas trouvé de modèle pour ce produit. Contactez le support si le problème persiste."

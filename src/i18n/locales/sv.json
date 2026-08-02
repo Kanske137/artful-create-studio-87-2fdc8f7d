@@ -1,4 +1,9 @@
 {
+  "editor": {
+    "uploadFirstCta": "Ladda upp ditt foto",
+    "uploadFirstCtaMulti": "Ladda upp era foton",
+    "uploadFirstHint": "Börja här – vi gör resten"
+  },
   "editorError": {
     "templateNotFoundTitle": "Mallen kunde inte hittas",
     "templateNotFoundBody": "Vi hittade ingen mall för den här produkten. Kontakta support om problemet kvarstår."

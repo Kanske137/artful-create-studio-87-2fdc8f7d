@@ -1,4 +1,9 @@
 {
+  "editor": {
+    "uploadFirstCta": "Last opp bildet ditt",
+    "uploadFirstCtaMulti": "Last opp bildene deres",
+    "uploadFirstHint": "Start her – vi gjør resten"
+  },
   "editorError": {
     "templateNotFoundTitle": "Malen ble ikke funnet",
     "templateNotFoundBody": "Vi fant ingen mal for dette produktet. Kontakt support hvis problemet vedvarer."

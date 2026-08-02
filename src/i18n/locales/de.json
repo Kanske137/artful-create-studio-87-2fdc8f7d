@@ -1,4 +1,9 @@
 {
+  "editor": {
+    "uploadFirstCta": "Lade dein Foto hoch",
+    "uploadFirstCtaMulti": "Ladet eure Fotos hoch",
+    "uploadFirstHint": "Hier starten – wir machen den Rest"
+  },
   "editorError": {
     "templateNotFoundTitle": "Vorlage nicht gefunden",
     "templateNotFoundBody": "Wir konnten keine Vorlage für dieses Produkt finden. Bitte kontaktiere den Support, falls das Problem weiterhin besteht."

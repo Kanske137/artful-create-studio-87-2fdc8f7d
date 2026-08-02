@@ -1,4 +1,9 @@
 {
+  "editor": {
+    "uploadFirstCta": "Upload your photo",
+    "uploadFirstCtaMulti": "Upload your photos",
+    "uploadFirstHint": "Start here – we do the rest"
+  },
   "editorError": {
     "templateNotFoundTitle": "Template not found",
     "templateNotFoundBody": "We couldn't find a template for this product. Please contact support if the problem persists."

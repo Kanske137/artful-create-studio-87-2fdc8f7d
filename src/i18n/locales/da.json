@@ -1,4 +1,9 @@
 {
+  "editor": {
+    "uploadFirstCta": "Upload dit foto",
+    "uploadFirstCtaMulti": "Upload jeres fotos",
+    "uploadFirstHint": "Start her – vi klarer resten"
+  },
   "editorError": {
     "templateNotFoundTitle": "Skabelonen kunne ikke findes",
     "templateNotFoundBody": "Vi kunne ikke finde en skabelon til dette produkt. Kontakt support, hvis problemet fortsætter."

@@ -18,6 +18,7 @@ import {
   type ProductType,
 } from "@/lib/product-config";
 import { MapPreview } from "@/components/editor/MapPreview";
+import { UploadFirstCta } from "@/components/editor/UploadFirstCta";
 import { EditorShell } from "@/components/editor/EditorShell";
 import { GenerationFeedback } from "@/components/editor/GenerationFeedback";
 import { ReviewBadge } from "@/components/editor/ReviewBadge";
@@ -522,13 +523,18 @@ export default function EditorPage() {
 
 
   const previewNode = (
-    <MapPreview
-      frameColor={frameColor}
-      frameWidthCm={FRAME_WIDTH_CM}
-      hangerColor={hangerColor ?? undefined}
-      wrapCm={canvasDepthCm}
-      layersIncludeWrap={isCanvas && template?.canvasLayout?.coordSpace === "fullArea"}
-    />
+    // relative-wrapper för Steg 1-CTA:n som ligger ovanpå förhandsvisningen
+    // tills första fotot laddats upp (tratt-data: panelfliken hittas inte).
+    <div className="relative w-full">
+      <MapPreview
+        frameColor={frameColor}
+        frameWidthCm={FRAME_WIDTH_CM}
+        hangerColor={hangerColor ?? undefined}
+        wrapCm={canvasDepthCm}
+        layersIncludeWrap={isCanvas && template?.canvasLayout?.coordSpace === "fullArea"}
+      />
+      <UploadFirstCta />
+    </div>
   );
 
 

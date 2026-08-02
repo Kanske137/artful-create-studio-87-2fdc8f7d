@@ -1,4 +1,9 @@
 {
+  "editor": {
+    "uploadFirstCta": "Carica la tua foto",
+    "uploadFirstCtaMulti": "Caricate le vostre foto",
+    "uploadFirstHint": "Inizia qui: al resto pensiamo noi"
+  },
   "editorError": {
     "templateNotFoundTitle": "Modello non trovato",
     "templateNotFoundBody": "Non abbiamo trovato un modello per questo prodotto. Contatta il supporto se il problema persiste."
