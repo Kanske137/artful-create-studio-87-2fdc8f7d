@@ -7,6 +7,10 @@ import { supabase } from "@/integrations/supabase/client";
 export interface ShopifyMoney {
   amount: number;
   currencyCode: string;
+  /** Ordinarie (överstruket) pris när varianten är på rea — annars null.
+   *  Kommer från Shopifys compareAtPrice och är alltid i samma valuta som
+   *  amount. */
+  compareAt: number | null;
 }
 
 // Shopify @inContext lokaliserar BÅDE pris och option-värden ("Utförande"→"Design",
@@ -33,7 +37,7 @@ const CONTEXTUAL_QUERY = /* GraphQL */ `
   @inContext(country: $country) {
     productByHandle(handle: $handle) {
       variants(first: 100) {
-        edges { node { id price { amount currencyCode } } }
+        edges { node { id price { amount currencyCode } compareAtPrice { amount } } }
       }
     }
   }
@@ -43,6 +47,7 @@ interface VariantNode {
   id: string;
   selectedOptions: Array<{ name: string; value: string }>;
   price: { amount: string; currencyCode: string };
+  compareAtPrice: { amount: string } | null;
 }
 
 interface CacheEntry {
@@ -97,16 +102,26 @@ async function fetchVariants(handle: string, country: string): Promise<VariantNo
         cache.set(k, { ts: Date.now(), variants: [] });
         return [] as VariantNode[];
       }
-      const priceById = new Map<string, { amount: string; currencyCode: string }>();
+      const priceById = new Map<
+        string,
+        { price: { amount: string; currencyCode: string }; compareAtPrice: { amount: string } | null }
+      >();
       for (const e of contextual.variants?.edges ?? []) {
-        if (e?.node?.id && e.node.price) priceById.set(e.node.id, e.node.price);
+        if (e?.node?.id && e.node.price) {
+          priceById.set(e.node.id, { price: e.node.price, compareAtPrice: e.node.compareAtPrice ?? null });
+        }
       }
       const variants: VariantNode[] = [];
       for (const e of source.variants?.edges ?? []) {
         const node = e?.node;
-        const price = node?.id ? priceById.get(node.id) : null;
-        if (node && price) {
-          variants.push({ id: node.id, selectedOptions: node.selectedOptions ?? [], price });
+        const entry = node?.id ? priceById.get(node.id) : null;
+        if (node && entry) {
+          variants.push({
+            id: node.id,
+            selectedOptions: node.selectedOptions ?? [],
+            price: entry.price,
+            compareAtPrice: entry.compareAtPrice,
+          });
         }
       }
       cache.set(k, { ts: Date.now(), variants });
@@ -167,7 +182,19 @@ export async function getShopifyPrice(
   if (!variants) return null;
   const v = findVariant(variants, size, variantName);
   if (!v) return null;
-  return { amount: parseFloat(v.price.amount), currencyCode: v.price.currencyCode };
+  return {
+    amount: parseFloat(v.price.amount),
+    currencyCode: v.price.currencyCode,
+    compareAt: saleCompareAt(v),
+  };
+}
+
+/** Jämförpris endast när det är ett äkta rea-läge (compareAt > pris). */
+function saleCompareAt(v: VariantNode): number | null {
+  if (!v.compareAtPrice) return null;
+  const c = parseFloat(v.compareAtPrice.amount);
+  const p = parseFloat(v.price.amount);
+  return isFinite(c) && c > p ? c : null;
 }
 
 /** Get prices for many (size, variant) pairs in one call. Map keys = "size|variant". */
@@ -185,6 +212,7 @@ export async function getShopifyPrices(
       out.set(`${c.size}|${c.variant}`, {
         amount: parseFloat(v.price.amount),
         currencyCode: v.price.currencyCode,
+        compareAt: saleCompareAt(v),
       });
     }
   }

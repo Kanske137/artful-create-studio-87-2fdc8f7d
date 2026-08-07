@@ -1,4 +1,8 @@
 {
+  "sale": {
+    "badge": "REBAJAS -25%",
+    "campaign": "🔥 Oferta por tiempo limitado — 25 % en pósters y lienzos"
+  },
   "editor": {
     "uploadFirstCta": "Sube tu foto",
     "uploadFirstCtaMulti": "Subid vuestras fotos",

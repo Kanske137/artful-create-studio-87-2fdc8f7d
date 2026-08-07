@@ -1,4 +1,8 @@
 {
+  "sale": {
+    "badge": "UDSALG -25%",
+    "campaign": "🔥 Tidsbegrænset udsalg — 25 % på plakater & canvas"
+  },
   "editor": {
     "uploadFirstCta": "Upload dit foto",
     "uploadFirstCtaMulti": "Upload jeres fotos",

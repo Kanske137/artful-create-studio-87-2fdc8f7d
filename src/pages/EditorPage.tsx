@@ -117,6 +117,12 @@ export default function EditorPage() {
     : derivedFx
       ? formatMoney(currentPrice() * derivedFx.rate, derivedFx.currencyCode, shopCtx.locale)
       : formatPrice(currentPrice(), shopCtx);
+  // Rea-läge: Shopifys compareAtPrice (jämförpris) > pris → visa överstruket
+  // ordinarie pris + REA-badge i CTA:n. Styrs helt från Shopify — ta bort
+  // jämförpriserna där så försvinner rean här automatiskt.
+  const compareAtDisplay = livePrice?.compareAt
+    ? formatMoney(livePrice.compareAt, livePrice.currencyCode, shopCtx.locale)
+    : null;
 
   // All configs that belong to the same template (same template_slug). Passed
   // down so FormatSection can render its poster/canvas toggle without having
@@ -600,8 +606,14 @@ export default function EditorPage() {
         country={shopCtx.country}
         freeShippingDisplay={freeShipDisplay}
       />
+      {compareAtDisplay && (
+        <div className="mx-4 mb-1 rounded-md bg-red-50 border border-red-200 px-3 py-1.5 text-center text-xs font-semibold text-red-700">
+          {t("sale.campaign", { defaultValue: "🔥 Tillfällig utförsäljning — 25 % på posters & canvas" })}
+        </div>
+      )}
       <StickyCta
         price={displayPrice}
+        compareAtPrice={compareAtDisplay}
         summary={summary}
         loading={isAdding || isPreparing}
         disabled={!canAddToCart}

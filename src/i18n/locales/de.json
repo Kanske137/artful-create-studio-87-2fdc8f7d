@@ -1,4 +1,8 @@
 {
+  "sale": {
+    "badge": "SALE -25%",
+    "campaign": "🔥 Nur für kurze Zeit — 25 % Rabatt auf Poster & Canvas"
+  },
   "editor": {
     "uploadFirstCta": "Lade dein Foto hoch",
     "uploadFirstCtaMulti": "Ladet eure Fotos hoch",

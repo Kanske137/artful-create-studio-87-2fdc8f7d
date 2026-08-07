@@ -1,4 +1,8 @@
 {
+  "sale": {
+    "badge": "ALE -25%",
+    "campaign": "🔥 Rajoitetun ajan alennus — 25 % julisteista & kankaista"
+  },
   "editor": {
     "uploadFirstCta": "Lataa kuvasi",
     "uploadFirstCtaMulti": "Latatkaa kuvanne",

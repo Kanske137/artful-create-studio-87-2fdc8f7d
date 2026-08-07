@@ -5,6 +5,9 @@ import { useTranslation } from "react-i18next";
 
 interface Props {
   price: string;
+  /** Ordinarie pris (formaterat) när varianten är på rea — visas överstruket
+   *  bredvid reapriset tillsammans med REA-badgen. */
+  compareAtPrice?: string | null;
   summary?: string;
   loading?: boolean;
   disabled?: boolean;
@@ -17,7 +20,7 @@ interface Props {
   className?: string;
 }
 
-export function StickyCta({ price, summary, loading, disabled, disabledHint, onAdd, showCartHint, className }: Props) {
+export function StickyCta({ price, compareAtPrice, summary, loading, disabled, disabledHint, onAdd, showCartHint, className }: Props) {
   const { t } = useTranslation();
   const hintVisible = !!showCartHint && !loading && !disabled;
   return (
@@ -40,7 +43,17 @@ export function StickyCta({ price, summary, loading, disabled, disabledHint, onA
         {summary && (
           <div className="text-[10px] uppercase tracking-wider opacity-60 truncate">{summary}</div>
         )}
-        <div className="text-base md:text-lg font-semibold leading-tight">{price}</div>
+        {compareAtPrice ? (
+          <div className="flex items-center gap-2 leading-tight flex-wrap">
+            <span className="text-base md:text-lg font-semibold text-red-400">{price}</span>
+            <span className="text-xs md:text-sm line-through opacity-60">{compareAtPrice}</span>
+            <span className="rounded-sm bg-red-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+              {t("sale.badge", { defaultValue: "REA -25%" })}
+            </span>
+          </div>
+        ) : (
+          <div className="text-base md:text-lg font-semibold leading-tight">{price}</div>
+        )}
         {disabled && !loading && disabledHint && (
           <div className="text-[11px] opacity-85 leading-tight mt-0.5">{disabledHint}</div>
         )}

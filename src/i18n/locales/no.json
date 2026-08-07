@@ -1,4 +1,8 @@
 {
+  "sale": {
+    "badge": "SALG -25%",
+    "campaign": "🔥 Tidsbegrenset salg — 25 % på postere & canvas"
+  },
   "editor": {
     "uploadFirstCta": "Last opp bildet ditt",
     "uploadFirstCtaMulti": "Last opp bildene deres",

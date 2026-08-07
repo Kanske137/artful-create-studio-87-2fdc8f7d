@@ -1,4 +1,8 @@
 {
+  "sale": {
+    "badge": "WYPRZEDAŻ -25%",
+    "campaign": "🔥 Wyprzedaż czasowa — 25% na plakaty i canvas"
+  },
   "editor": {
     "uploadFirstCta": "Prześlij swoje zdjęcie",
     "uploadFirstCtaMulti": "Prześlijcie swoje zdjęcia",

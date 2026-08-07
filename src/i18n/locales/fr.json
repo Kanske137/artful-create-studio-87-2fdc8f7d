@@ -1,4 +1,8 @@
 {
+  "sale": {
+    "badge": "PROMO -25%",
+    "campaign": "🔥 Vente flash — 25 % sur les affiches & toiles"
+  },
   "editor": {
     "uploadFirstCta": "Téléchargez votre photo",
     "uploadFirstCtaMulti": "Téléchargez vos photos",

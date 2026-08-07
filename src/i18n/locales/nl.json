@@ -1,4 +1,8 @@
 {
+  "sale": {
+    "badge": "SALE -25%",
+    "campaign": "🔥 Tijdelijke uitverkoop — 25% op posters & canvas"
+  },
   "editor": {
     "uploadFirstCta": "Upload je foto",
     "uploadFirstCtaMulti": "Upload jullie foto's",
