@@ -143,8 +143,8 @@
     "stagePrep": "Förbereder din bild…",
     "stageUpload": "Laddar upp din bild…",
     "stageCreate": "Skapar din bild…",
-    "stageCreateLong": "Skapar din bild – tar ungefär en halv minut…",
-    "stageCreateLongPair": "Skapar er bild – kan ta upp till en minut…",
+    "stageCreateLong": "Skapar din bild i hög upplösning – kan ta upp till en minut…",
+    "stageCreateLongPair": "Skapar er bild i hög upplösning – kan ta drygt en minut…",
     "stageFetch": "Hämtar resultat…",
     "noResult": "Tjänsten returnerade ingen bild",
     "overlay": {

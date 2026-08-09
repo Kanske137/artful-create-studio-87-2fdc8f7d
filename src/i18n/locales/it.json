@@ -143,8 +143,8 @@
     "stagePrep": "Preparazione della tua immagine…",
     "stageUpload": "Caricamento della tua immagine…",
     "stageCreate": "Creazione della tua immagine…",
-    "stageCreateLong": "Creazione della tua immagine – richiede circa mezzo minuto…",
-    "stageCreateLongPair": "Creazione della vostra immagine – può richiedere fino a un minuto…",
+    "stageCreateLong": "Creazione della tua immagine in alta risoluzione – può richiedere fino a un minuto…",
+    "stageCreateLongPair": "Creazione della vostra immagine in alta risoluzione – poco più di un minuto…",
     "stageFetch": "Recupero risultato…",
     "noResult": "Il servizio non ha restituito nessuna immagine",
     "overlay": {

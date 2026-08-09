@@ -119,11 +119,16 @@ function buildSlotMappingText(slots: Array<{ id: string; position: string }>): s
 async function callNanoBananaOnce(params: {
   promptText: string;
   imageUrls: string[];
+  resolution?: "2K" | "4K";
 }): Promise<
   | { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
   | { ok: false; retriable: boolean; status: number; reason: string; userMessage: string }
 > {
-  const r = await runNanoBanana({ promptText: params.promptText, imageUrls: params.imageUrls });
+  const r = await runNanoBanana({
+    promptText: params.promptText,
+    imageUrls: params.imageUrls,
+    resolution: params.resolution,
+  });
   if (r.ok) return r;
   console.error("[multi-face-swap] replicate nano-banana error:", r.reason);
   return {
@@ -138,7 +143,7 @@ async function callNanoBananaOnce(params: {
   };
 }
 
-async function callNanoBanana(params: { promptText: string; imageUrls: string[] }) {
+async function callNanoBanana(params: { promptText: string; imageUrls: string[]; resolution?: "2K" | "4K" }) {
   const BACKOFF_MS = [4000, 8000];
   const MAX_ATTEMPTS = BACKOFF_MS.length + 1;
   let lastFail: { reason: string; userMessage: string; status: number } | null = null;
@@ -469,6 +474,7 @@ Deno.serve(async (req) => {
         : await callNanoBanana({
             promptText,
             imageUrls: [referenceImageUrl, ...portraitUrls],
+            resolution: "4K",
           });
 
     // Hybrid identity pass: NB2 på hela kompositen med båda porträtten.
@@ -486,6 +492,7 @@ Deno.serve(async (req) => {
         const pass = await callNanoBanana({
           promptText: HYBRID_PAIR_PROMPT,
           imageUrls: [compositeUrl, portraitUrls[0], portraitUrls[1]],
+          resolution: "4K",
         });
         if (pass.ok) {
           result = { ok: true, bytes: pass.bytes, contentType: pass.contentType, outputUrl: pass.outputUrl };

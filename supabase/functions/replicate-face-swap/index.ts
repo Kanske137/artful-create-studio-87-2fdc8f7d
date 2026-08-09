@@ -269,11 +269,16 @@ async function runReplicateFaceSwap(params: {
 async function callNanoBananaOnce(params: {
   promptText: string;
   imageUrls: string[];
+  resolution?: "2K" | "4K";
 }): Promise<
   | { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
   | { ok: false; retriable: boolean; status: number; reason: string; userMessage: string }
 > {
-  const r = await runNanoBanana({ promptText: params.promptText, imageUrls: params.imageUrls });
+  const r = await runNanoBanana({
+    promptText: params.promptText,
+    imageUrls: params.imageUrls,
+    resolution: params.resolution,
+  });
   if (r.ok) return r;
   console.error("[face-swap] replicate nano-banana error:", r.reason);
   return {
@@ -291,6 +296,7 @@ async function callNanoBananaOnce(params: {
 async function callNanoBanana(params: {
   promptText: string;
   imageUrls: string[];
+  resolution?: "2K" | "4K";
 }): Promise<
   { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
 > {
@@ -304,6 +310,7 @@ async function callNanoBanana(params: {
     const result = await callNanoBananaOnce({
       promptText: params.promptText,
       imageUrls: params.imageUrls,
+      resolution: params.resolution,
     });
 
     if (result.ok) {
@@ -360,6 +367,7 @@ async function runPetSwap(params: { referenceImageUrl: string; faceImageUrl: str
   return callNanoBanana({
     promptText,
     imageUrls: [params.referenceImageUrl, params.faceImageUrl],
+    resolution: "4K",
   });
 }
 
@@ -600,6 +608,7 @@ async function runRemoveBackground(params: {
   return callNanoBanana({
     promptText,
     imageUrls: [params.faceImageUrl],
+    resolution: "4K",
   });
 }
 
@@ -1102,6 +1111,7 @@ Deno.serve(async (req) => {
       const pass = await callNanoBanana({
         promptText: HYBRID_IDENTITY_PROMPT,
         imageUrls: [result.outputUrl, faceImageUrl],
+        resolution: "4K",
       });
       if (pass.ok) {
         result = { ok: true, bytes: pass.bytes, contentType: pass.contentType, outputUrl: pass.outputUrl };

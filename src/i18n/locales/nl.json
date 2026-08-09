@@ -143,8 +143,8 @@
     "stagePrep": "Je afbeelding voorbereiden…",
     "stageUpload": "Je afbeelding uploaden…",
     "stageCreate": "Je afbeelding maken…",
-    "stageCreateLong": "Je afbeelding maken – duurt ongeveer een halve minuut…",
-    "stageCreateLongPair": "Jullie afbeelding wordt gemaakt – kan tot een minuut duren…",
+    "stageCreateLong": "Je afbeelding wordt in hoge resolutie gemaakt – kan tot een minuut duren…",
+    "stageCreateLongPair": "Jullie afbeelding wordt in hoge resolutie gemaakt – kan iets meer dan een minuut duren…",
     "stageFetch": "Resultaat ophalen…",
     "noResult": "De service heeft geen afbeelding teruggegeven",
     "overlay": {

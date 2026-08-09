@@ -96,10 +96,10 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
   const result = aiPhotoResults[layer.id] ?? null;
 
   const [busy, setBusy] = useState(false);
-  // 2 personer = cdingram crop-composite + NB2-identitetspass (~40 s uppmätt,
+  // 2 personer = cdingram crop-composite + NB2-identitetspass i 4K (~55-65 s
   // + ansiktsdetektering ~10 s första gången per referens); 3-4 personer =
-  // ett enda NB2-anrop (~30 s).
-  const expectedSeconds = slots.length === 2 ? 60 : 30;
+  // ett enda NB2 4K-anrop (~40 s).
+  const expectedSeconds = slots.length === 2 ? 80 : 45;
 
   const cacheRef = useRef<Record<string, MultiFaceCacheEntry>>(loadMultiFaceCache());
 

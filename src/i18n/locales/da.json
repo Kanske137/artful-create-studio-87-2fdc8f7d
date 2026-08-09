@@ -143,8 +143,8 @@
     "stagePrep": "Forbereder dit billede…",
     "stageUpload": "Uploader dit billede…",
     "stageCreate": "Skaber dit billede…",
-    "stageCreateLong": "Skaber dit billede – tager cirka et halvt minut…",
-    "stageCreateLongPair": "Skaber jeres billede – kan tage op til et minut…",
+    "stageCreateLong": "Skaber dit billede i høj opløsning – kan tage op til et minut…",
+    "stageCreateLongPair": "Skaber jeres billede i høj opløsning – kan tage lidt over et minut…",
     "stageFetch": "Henter resultat…",
     "noResult": "Tjenesten returnerede intet billede",
     "overlay": {

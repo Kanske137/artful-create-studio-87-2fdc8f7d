@@ -154,16 +154,23 @@ export async function runReplicateRaw(
  *  källa för print-files-uppladdningen. */
 export const NANO_BANANA_MODEL = "google/nano-banana-2";
 
-export function runNanoBanana(params: { promptText: string; imageUrls: string[] }): Promise<ReplicateResult> {
+export function runNanoBanana(params: {
+  promptText: string;
+  imageUrls: string[];
+  /** "2K" (default) eller "4K". 4K (~3700×4600 px) används för slutbilder
+   *  sedan 2026-08-09 — tryckkvalitet för stora format + digitalförsäljning.
+   *  Kostnad: ~$0.10 (2K) vs ~$0.15 (4K) per bild; 4K tar ~15 s längre. */
+  resolution?: "2K" | "4K";
+}): Promise<ReplicateResult> {
   return runReplicateModel({
     model: NANO_BANANA_MODEL,
     input: {
       prompt: params.promptText,
       image_input: params.imageUrls,
-      resolution: "2K",
+      resolution: params.resolution ?? "2K",
       aspect_ratio: "match_input_image",
       output_format: "png",
     },
-    timeoutMs: 150_000,
+    timeoutMs: 180_000,
   });
 }

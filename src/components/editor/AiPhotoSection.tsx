@@ -176,9 +176,10 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
 
   const [busy, setBusy] = useState(false);
   const [stage, setStage] = useState<string | null>(null);
-  // Human kör hybrid-kedjan cdingram → Nano Banana 2 (~11s + ~20s + overhead);
-  // pet/removeBackground är ett enda NB2-anrop (~18s inkl retry-backoff).
-  const expectedSeconds = subjectKind === "human" ? 40 : 18;
+  // Human kör hybrid-kedjan cdingram → NB2 i 4K (~11s + ~35s + overhead);
+  // pet är ett NB2 4K-anrop (~35-40s); removeBackground går oftast flux-vägen
+  // (~25s). 4K sedan 2026-08-09 — tryckkvalitet stora format + digitalt.
+  const expectedSeconds = subjectKind === "human" ? 60 : subjectKind === "pet" ? 45 : 25;
 
   // Hash the face photo whenever it changes.
   useEffect(() => {
@@ -313,8 +314,10 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
         }
       }
 
-      // Human-hybriden tar ~35 s — informera kunden om den längre väntetiden.
-      const createStage = subjectKind === "human" ? t("ai.stageCreateLong") : t("ai.stageCreate");
+      // Human-hybriden (~50s) och pet-4K (~40s) tar upp mot en minut —
+      // informera kunden om väntetiden i stället för att undersälja den.
+      const createStage =
+        subjectKind === "human" || subjectKind === "pet" ? t("ai.stageCreateLong") : t("ai.stageCreate");
       setStage(createStage);
       updateAiJobStage(jobId, createStage);
       const res = await invokeWithSubscriberGate<{
