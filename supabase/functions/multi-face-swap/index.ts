@@ -522,7 +522,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
     // 4K-outputs kan överskrida bucketens storleksgräns → JPEG-fallback.
-    const fitted = await fitForUpload(result.bytes, result.contentType);
+    const fitted = fitForUpload(result.bytes, result.contentType);
     const ext = fitted.contentType.includes("png") ? "png" : "jpg";
     const path = `${designId}.${ext}`;
     const { error: upErr } = await supabase.storage

@@ -11,8 +11,6 @@
 // Kostnadskontroll är hela poängen med migrationen: ALL bildgenerering går
 // nu via REPLICATE_API_TOKEN och syns i Replicates dashboard/fakturering.
 
-import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
-
 export interface ReplicateOk {
   ok: true;
   bytes: Uint8Array;
@@ -141,28 +139,24 @@ export async function runReplicateModel(opts: ReplicateCallOpts): Promise<Replic
   };
 }
 
-/** Säkerställ att bilden ryms i lagrings-bucketen. 4K-PNG:er från Nano
- *  Banana 2 är ~20 MB och kan överskrida bucketens file_size_limit — då
- *  omkodas de till JPEG q95 (~3-6 MB, visuellt likvärdigt i tryck).
- *  Bilder under gränsen returneras orörda (förlustfri PNG behålls). */
-export async function fitForUpload(
+/** Storleksvakt före upload. INGEN lokal omkodning — imagescript-decode av en
+ *  4K-bild sprängde edge-funktionens CPU-tak (HTTP 546, 2026-08-09). Bilder
+ *  som skulle överskrida bucketgränsen ska undvikas vid källan i stället
+ *  (4K beställs som JPEG från Replicate, se runNanoBanana). Vakten loggar
+ *  bara så att en framtida regression syns i funktionsloggarna. */
+export function fitForUpload(
   bytes: Uint8Array,
   contentType: string,
   maxBytes = 14 * 1024 * 1024,
-): Promise<{ bytes: Uint8Array; contentType: string }> {
-  if (bytes.byteLength <= maxBytes) return { bytes, contentType };
-  try {
-    const img = await Image.decode(bytes);
-    const jpeg = await img.encodeJPEG(95);
-    console.log(
-      `[fitForUpload] ${Math.round(bytes.byteLength / 1e6)}MB ${contentType} → ` +
-        `${Math.round(jpeg.byteLength / 1e6)}MB image/jpeg (${img.width}x${img.height})`,
+): { bytes: Uint8Array; contentType: string } {
+  if (bytes.byteLength > maxBytes) {
+    console.warn(
+      `[fitForUpload] ${Math.round(bytes.byteLength / 1e6)}MB ${contentType} överskrider ` +
+        `${Math.round(maxBytes / 1e6)}MB — uppladdningen lär nekas av bucketgränsen. ` +
+        `Kontrollera att 4K beställs som JPEG från modellen.`,
     );
-    return { bytes: jpeg, contentType: "image/jpeg" };
-  } catch (e) {
-    console.warn("[fitForUpload] re-encode failed — uploading original:", e instanceof Error ? e.message : e);
-    return { bytes, contentType };
   }
+  return { bytes, contentType };
 }
 
 /** Kör en modell och returnera outputen RÅ (JSON/objekt) — för modeller som
@@ -185,17 +179,21 @@ export function runNanoBanana(params: {
   imageUrls: string[];
   /** "2K" (default) eller "4K". 4K (~3700×4600 px) används för slutbilder
    *  sedan 2026-08-09 — tryckkvalitet för stora format + digitalförsäljning.
-   *  Kostnad: ~$0.10 (2K) vs ~$0.15 (4K) per bild; 4K tar ~15 s längre. */
+   *  Kostnad: ~$0.10 (2K) vs ~$0.15 (4K) per bild; 4K tar ~15 s längre.
+   *  VIKTIGT: 4K levereras som JPEG från Replicate — en 4K-PNG är ~21 MB
+   *  (över print-files-bucketens 15 MB-gräns, Akrams beslut att behålla) och
+   *  lokal omkodning i edge-funktionen spränger CPU-taket (HTTP 546). */
   resolution?: "2K" | "4K";
 }): Promise<ReplicateResult> {
+  const resolution = params.resolution ?? "2K";
   return runReplicateModel({
     model: NANO_BANANA_MODEL,
     input: {
       prompt: params.promptText,
       image_input: params.imageUrls,
-      resolution: params.resolution ?? "2K",
+      resolution,
       aspect_ratio: "match_input_image",
-      output_format: "png",
+      output_format: resolution === "4K" ? "jpg" : "png",
     },
     timeoutMs: 180_000,
   });
