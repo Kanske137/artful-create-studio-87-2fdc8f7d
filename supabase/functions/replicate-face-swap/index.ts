@@ -39,7 +39,7 @@
 // toast instead of crashing on a non-2xx.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { NANO_BANANA_MODEL, runNanoBanana } from "../_shared/replicate.ts";
+import { NANO_BANANA_MODEL, runNanoBanana, fitForUpload } from "../_shared/replicate.ts";
 import { checkGenerationGate } from "../_shared/subscriber-gate.ts";
 // Deploy-markör 2026-07-21: analytics-loggning (generations-tabellen) aktiv.
 
@@ -1152,14 +1152,16 @@ Deno.serve(async (req) => {
     }
 
     // Upload to print-files so the customer gets a stable public URL.
+    // 4K-outputs kan överskrida bucketens storleksgräns → JPEG-fallback.
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    const ext = result.contentType.includes("png") ? "png" : "jpg";
+    const fitted = await fitForUpload(result.bytes, result.contentType);
+    const ext = fitted.contentType.includes("png") ? "png" : "jpg";
     const path = `${designId}.${ext}`;
 
     const { error: upErr } = await supabase.storage
       .from("print-files")
-      .upload(path, result.bytes, { contentType: result.contentType, upsert: true });
+      .upload(path, fitted.bytes, { contentType: fitted.contentType, upsert: true });
     if (upErr) {
       await genLogEnd(genId, {
         status: "failed",

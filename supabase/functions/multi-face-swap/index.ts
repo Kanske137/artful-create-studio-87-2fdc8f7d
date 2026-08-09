@@ -26,7 +26,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
-import { NANO_BANANA_MODEL, runNanoBanana, runReplicateModel, runReplicateRaw } from "../_shared/replicate.ts";
+import { NANO_BANANA_MODEL, runNanoBanana, runReplicateModel, runReplicateRaw, fitForUpload } from "../_shared/replicate.ts";
 import { checkGenerationGate } from "../_shared/subscriber-gate.ts";
 
 const corsHeaders = {
@@ -521,11 +521,13 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
-    const ext = result.contentType.includes("png") ? "png" : "jpg";
+    // 4K-outputs kan överskrida bucketens storleksgräns → JPEG-fallback.
+    const fitted = await fitForUpload(result.bytes, result.contentType);
+    const ext = fitted.contentType.includes("png") ? "png" : "jpg";
     const path = `${designId}.${ext}`;
     const { error: upErr } = await supabase.storage
       .from("print-files")
-      .upload(path, result.bytes, { contentType: result.contentType, upsert: true });
+      .upload(path, fitted.bytes, { contentType: fitted.contentType, upsert: true });
     if (upErr) {
       await genLogEnd(genId, {
         status: "failed",

@@ -11,6 +11,8 @@
 // Kostnadskontroll är hela poängen med migrationen: ALL bildgenerering går
 // nu via REPLICATE_API_TOKEN och syns i Replicates dashboard/fakturering.
 
+import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
+
 export interface ReplicateOk {
   ok: true;
   bytes: Uint8Array;
@@ -137,6 +139,30 @@ export async function runReplicateModel(opts: ReplicateCallOpts): Promise<Replic
     contentType: img.headers.get("content-type") ?? "image/png",
     outputUrl,
   };
+}
+
+/** Säkerställ att bilden ryms i lagrings-bucketen. 4K-PNG:er från Nano
+ *  Banana 2 är ~20 MB och kan överskrida bucketens file_size_limit — då
+ *  omkodas de till JPEG q95 (~3-6 MB, visuellt likvärdigt i tryck).
+ *  Bilder under gränsen returneras orörda (förlustfri PNG behålls). */
+export async function fitForUpload(
+  bytes: Uint8Array,
+  contentType: string,
+  maxBytes = 14 * 1024 * 1024,
+): Promise<{ bytes: Uint8Array; contentType: string }> {
+  if (bytes.byteLength <= maxBytes) return { bytes, contentType };
+  try {
+    const img = await Image.decode(bytes);
+    const jpeg = await img.encodeJPEG(95);
+    console.log(
+      `[fitForUpload] ${Math.round(bytes.byteLength / 1e6)}MB ${contentType} → ` +
+        `${Math.round(jpeg.byteLength / 1e6)}MB image/jpeg (${img.width}x${img.height})`,
+    );
+    return { bytes: jpeg, contentType: "image/jpeg" };
+  } catch (e) {
+    console.warn("[fitForUpload] re-encode failed — uploading original:", e instanceof Error ? e.message : e);
+    return { bytes, contentType };
+  }
 }
 
 /** Kör en modell och returnera outputen RÅ (JSON/objekt) — för modeller som
