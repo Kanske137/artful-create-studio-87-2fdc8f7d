@@ -167,11 +167,102 @@ export async function runReplicateRaw(
   return createAndPoll(opts);
 }
 
+/** Läs bildmått ur JPEG/PNG-headern. Returnerar null för okända format.
+ *  Ren header-parsning — INGEN avkodning av pixeldata (4K-decode spränger
+ *  edge-funktionens CPU-tak, se fitForUpload). */
+export function readImageSize(bytes: Uint8Array): { w: number; h: number } | null {
+  // PNG: 8-byte signatur, sedan IHDR med bredd/höjd som big-endian u32.
+  if (bytes.length > 24 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
+    const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    return { w: dv.getUint32(16), h: dv.getUint32(20) };
+  }
+  // JPEG: skanna SOF-markörerna.
+  if (bytes.length > 4 && bytes[0] === 0xff && bytes[1] === 0xd8) {
+    let i = 2;
+    while (i < bytes.length) {
+      if (bytes[i] !== 0xff) return null;
+      const marker = bytes[i + 1];
+      i += 2;
+      if (marker === 0xd8 || marker === 0xd9) return null;
+      const len = (bytes[i] << 8) | bytes[i + 1];
+      if (
+        (marker >= 0xc0 && marker <= 0xc3) ||
+        (marker >= 0xc5 && marker <= 0xc7) ||
+        (marker >= 0xc9 && marker <= 0xcb) ||
+        (marker >= 0xcd && marker <= 0xcf)
+      ) {
+        const h = (bytes[i + 3] << 8) | bytes[i + 4];
+        const w = (bytes[i + 5] << 8) | bytes[i + 6];
+        return { w, h };
+      }
+      i += len;
+    }
+  }
+  return null;
+}
+
+/** Bildformat som nano-banana-2 accepterar. Exakt enum ur Replicates 422-svar,
+ *  verifierad 2026-09-03. Allt annat ger HTTP 422 vid start. */
+const NANO_ASPECT_RATIOS: Array<{ label: string; value: number }> = [
+  { label: "1:8", value: 1 / 8 },
+  { label: "1:4", value: 1 / 4 },
+  { label: "9:16", value: 9 / 16 },
+  { label: "2:3", value: 2 / 3 },
+  { label: "3:4", value: 3 / 4 },
+  { label: "4:5", value: 4 / 5 },
+  { label: "1:1", value: 1 },
+  { label: "5:4", value: 5 / 4 },
+  { label: "4:3", value: 4 / 3 },
+  { label: "3:2", value: 3 / 2 },
+  { label: "16:9", value: 16 / 9 },
+  { label: "21:9", value: 21 / 9 },
+  { label: "4:1", value: 4 },
+  { label: "8:1", value: 8 },
+];
+
+/** Närmaste tillåtna nano-banana-format för ett givet bredd/höjd-förhållande. */
+export function nearestNanoAspect(ratio: number): string | null {
+  if (!isFinite(ratio) || ratio <= 0) return null;
+  let best = NANO_ASPECT_RATIOS[0];
+  let bestDiff = Infinity;
+  for (const c of NANO_ASPECT_RATIOS) {
+    // Jämför i log-rymden så avvikelsen mäts relativt, inte absolut.
+    const d = Math.abs(Math.log(ratio / c.value));
+    if (d < bestDiff) {
+      best = c;
+      bestDiff = d;
+    }
+  }
+  return best.label;
+}
+
+/** Hämta bara headern (64 kB) och läs ut bildens bredd/höjd-förhållande.
+ *  Används när vi bara har en URL till ankarbilden. Servrar som ignorerar
+ *  Range skickar hela bilden — då läser vi ändå bara headern. */
+export async function probeImageAspect(url: string): Promise<number | null> {
+  try {
+    const r = await fetch(url, { headers: { Range: "bytes=0-65535" } });
+    if (!r.ok && r.status !== 206) return null;
+    const size = readImageSize(new Uint8Array(await r.arrayBuffer()));
+    return size && size.h > 0 ? size.w / size.h : null;
+  } catch (e) {
+    console.warn("[probeImageAspect] misslyckades:", e instanceof Error ? e.message : e);
+    return null;
+  }
+}
+
 /** Nano Banana 2 (Gemini 3.1 Flash Image) via Replicate — exakt samma modell
  *  som tidigare anropades via Lovable AI Gateway, så alla förhandlade prompter
- *  fungerar oförändrat. 2K-upplösning för tryckkvalitet; aspect ratio följer
- *  input-bilden (referensen) precis som gateway-beteendet. PNG ut = förlustfri
- *  källa för print-files-uppladdningen. */
+ *  fungerar oförändrat. 2K-upplösning för tryckkvalitet; PNG ut = förlustfri
+ *  källa för print-files-uppladdningen.
+ *
+ *  FORMATFÄLLAN (rotorsak till kundklagomålet på order #1325, 2026-09-03):
+ *  `aspect_ratio: "match_input_image"` med FLERA input-bilder matchar INTE
+ *  referensen — i produktion följde outputen kundens telefonfoto (9:16) i
+ *  stället för konstverket (4:5). Editorns aiPhoto-lager renderar `cover`, så
+ *  den för höga bilden beskars ~40 % på höjden och kronan/händerna försvann i
+ *  tryckfilen. Skicka därför ALLTID `aspectRatio` (via nearestNanoAspect på
+ *  ankarbilden = bild #1) när anropet har mer än en input-bild. */
 export const NANO_BANANA_MODEL = "google/nano-banana-2";
 
 export function runNanoBanana(params: {
@@ -184,6 +275,9 @@ export function runNanoBanana(params: {
    *  (över print-files-bucketens 15 MB-gräns, Akrams beslut att behålla) och
    *  lokal omkodning i edge-funktionen spränger CPU-taket (HTTP 546). */
   resolution?: "2K" | "4K";
+  /** Explicit bildformat, t.ex. "4:5" (se nearestNanoAspect). Utelämnas →
+   *  "match_input_image", vilket bara är säkert med EN input-bild. */
+  aspectRatio?: string | null;
 }): Promise<ReplicateResult> {
   const resolution = params.resolution ?? "2K";
   return runReplicateModel({
@@ -192,7 +286,7 @@ export function runNanoBanana(params: {
       prompt: params.promptText,
       image_input: params.imageUrls,
       resolution,
-      aspect_ratio: "match_input_image",
+      aspect_ratio: params.aspectRatio ?? "match_input_image",
       output_format: resolution === "4K" ? "jpg" : "png",
     },
     timeoutMs: 180_000,

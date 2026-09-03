@@ -26,7 +26,16 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
-import { NANO_BANANA_MODEL, runNanoBanana, runReplicateModel, runReplicateRaw, fitForUpload } from "../_shared/replicate.ts";
+import {
+  NANO_BANANA_MODEL,
+  runNanoBanana,
+  runReplicateModel,
+  runReplicateRaw,
+  fitForUpload,
+  readImageSize,
+  nearestNanoAspect,
+  probeImageAspect,
+} from "../_shared/replicate.ts";
 import { checkGenerationGate } from "../_shared/subscriber-gate.ts";
 
 const corsHeaders = {
@@ -52,15 +61,22 @@ const CROP_FEATHER_PX = 24;
 // vänster→höger-ordning som slot-mappningen). Helbildspasset korrigerar även
 // hud utanför cropparna (händer/armar). Misslyckas passet används
 // cdingram-kompositen som förut. Avstängbart via ?hybrid=off.
+// Prompten härdad 2026-09-03, samma två fel som i replicate-face-swap
+// (se den filens kommentar): NB2 zoomade in referensen så delar hamnade
+// utanför bild, och referenskonstverkets egna örhängen/piercingar följde med
+// fast kundfotot saknade dem.
 const HYBRID_PAIR_PROMPT = [
-  "Image #1 is a portrait artwork of TWO people where face swaps have already been performed. Image #2 is a photograph of the person on the LEFT in image #1. Image #3 is a photograph of the person on the RIGHT in image #1.",
+  "Image #1 is a portrait artwork of TWO people where face swaps have already been performed. Image #2 is a photograph of the person on the LEFT in image #1. Image #3 is a photograph of the person on the RIGHT in image #1. Images #2 and #3 are provided ONLY as identity references.",
+  "This is a LOCAL RETOUCH of image #1, not a re-composition. Reproduce image #1 exactly as it is and change ONLY the identity details listed below.",
+  "FRAMING - ABSOLUTE RULE: never zoom in, zoom out, crop, pan, rotate, mirror or re-center. Both people, their headwear and every object in image #1 must keep exactly the same size, position and margins to all four edges as in image #1. Nothing that is fully visible in image #1 (crowns, hats, hair, shoulders, arms, hands, props, furniture, background) may be enlarged, pushed out of frame or cut off at any edge. The framing, crop, camera distance, pose, background and lighting of images #2 and #3 are IRRELEVANT and must never influence the output.",
   "For EACH of the two people, correct image #1 so their identity fully matches their own photograph:",
   "1. Transfer the exact hairstyle, hair color and hair length from their photo - including whether the hair is worn loose or tied up - adapted naturally around/under any headwear in image #1. If a person is bald in their photo, make them bald in image #1.",
-  "2. Transfer each person's facial hair (or lack of it), glasses (if worn), and all jewelry/piercings visible in their photo (earrings, nose rings, etc.).",
-  "3. Adjust ALL visible skin of each person in image #1 (face, neck, ears, hands) to the same skin tone as in their own photo. Never mix the two persons' attributes.",
-  "Keep EVERYTHING ELSE in image #1 completely unchanged: headwear/crowns, clothing, outfit accessories, background, lighting, art style, composition, framing and aspect ratio.",
+  "2. Transfer each person's facial hair (or lack of it) from their photo.",
+  "3. Accessories on the face, ears and head must match each person's own photo EXACTLY: glasses, earrings, ear/nose/lip/eyebrow piercings and any other facial jewelry. Add ONLY what is clearly visible in that person's photo. If their photo shows no glasses, no earrings and no piercings, that person must have none in the output - REMOVE any earring, piercing or glasses they wear in image #1. NEVER invent accessories their photo does not show.",
+  "4. Adjust ALL visible skin of each person in image #1 (face, neck, ears, hands) to the same skin tone as in their own photo. Never mix the two persons' attributes.",
+  "Keep EVERYTHING ELSE in image #1 completely unchanged: headwear/crowns, clothing, the costumes' own jewelry (necklaces, chains, brooches, collars), background, props, lighting, art style, composition, framing and aspect ratio.",
   "The result must remain ONE coherent artwork in the exact art style of image #1 - no photo-collage look.",
-  "Return ONE single edited image with the same aspect ratio as image #1.",
+  "Return ONE single edited image with the same aspect ratio AND the same framing as image #1.",
 ].join("\n");
 
 // ---------- analytics: generations-logg (Fas 2) ----------
@@ -120,6 +136,7 @@ async function callNanoBananaOnce(params: {
   promptText: string;
   imageUrls: string[];
   resolution?: "2K" | "4K";
+  aspectRatio?: string | null;
 }): Promise<
   | { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
   | { ok: false; retriable: boolean; status: number; reason: string; userMessage: string }
@@ -128,6 +145,7 @@ async function callNanoBananaOnce(params: {
     promptText: params.promptText,
     imageUrls: params.imageUrls,
     resolution: params.resolution,
+    aspectRatio: params.aspectRatio,
   });
   if (r.ok) return r;
   console.error("[multi-face-swap] replicate nano-banana error:", r.reason);
@@ -143,7 +161,12 @@ async function callNanoBananaOnce(params: {
   };
 }
 
-async function callNanoBanana(params: { promptText: string; imageUrls: string[]; resolution?: "2K" | "4K" }) {
+async function callNanoBanana(params: {
+  promptText: string;
+  imageUrls: string[];
+  resolution?: "2K" | "4K";
+  aspectRatio?: string | null;
+}) {
   const BACKOFF_MS = [4000, 8000];
   const MAX_ATTEMPTS = BACKOFF_MS.length + 1;
   let lastFail: { reason: string; userMessage: string; status: number } | null = null;
@@ -468,6 +491,17 @@ Deno.serve(async (req) => {
       reference_image_url: referenceImageUrl,
     });
 
+    // Referensens bildformat är facit för ALLA nano-anrop här: med flera
+    // inputbilder matchar "match_input_image" inte referensen utan kan följa
+    // ett av kundfotona (9:16-telefonbild → lagrets cover-rendering klipper
+    // bort toppen/botten, se order #1325).
+    const refAspect = await probeImageAspect(referenceImageUrl);
+    const refAspectRatio = refAspect ? nearestNanoAspect(refAspect) : null;
+    console.log(
+      `[multi-face-swap] referens ${refAspect ? refAspect.toFixed(3) : "okänd"} → ` +
+        `aspectRatio=${refAspectRatio ?? "match_input_image"}`,
+    );
+
     let result =
       engine === "cdingram"
         ? await runCdingramTwoFaceSwap({ referenceImageUrl, portraitUrls, designId })
@@ -475,6 +509,7 @@ Deno.serve(async (req) => {
             promptText,
             imageUrls: [referenceImageUrl, ...portraitUrls],
             resolution: "4K",
+            aspectRatio: refAspectRatio,
           });
 
     // Hybrid identity pass: NB2 på hela kompositen med båda porträtten.
@@ -489,14 +524,32 @@ Deno.serve(async (req) => {
           .upload(hybridPath, result.bytes, { contentType: result.contentType, upsert: true });
         if (hupErr) throw new Error(`hybrid composite upload failed: ${hupErr.message}`);
         const compositeUrl = db.storage.from("cart-previews").getPublicUrl(hybridPath).data.publicUrl;
+        // Kompositen är pixelidentisk med referensen, så dess format är facit.
+        const baseDims = readImageSize(result.bytes);
+        const baseAspect =
+          baseDims && baseDims.h > 0 ? baseDims.w / baseDims.h : refAspect;
         const pass = await callNanoBanana({
           promptText: HYBRID_PAIR_PROMPT,
           imageUrls: [compositeUrl, portraitUrls[0], portraitUrls[1]],
           resolution: "4K",
+          aspectRatio: baseAspect ? nearestNanoAspect(baseAspect) : refAspectRatio,
         });
         if (pass.ok) {
-          result = { ok: true, bytes: pass.bytes, contentType: pass.contentType, outputUrl: pass.outputUrl };
-          console.log(`[multi-face-swap] hybrid NB2 identity pass done designId=${designId}`);
+          // Skyddsnät: ändrat bildformat = ändrad komposition → behåll
+          // cdingram-kompositen, som alltid har referensens ram.
+          const passDims = readImageSize(pass.bytes);
+          const passAspect = passDims && passDims.h > 0 ? passDims.w / passDims.h : null;
+          const drift = baseAspect && passAspect ? Math.abs(passAspect - baseAspect) / baseAspect : 0;
+          if (drift > 0.06) {
+            console.warn(
+              `[multi-face-swap] hybrid NB2 pass ändrade bildformatet ${baseAspect?.toFixed(3)} → ` +
+                `${passAspect?.toFixed(3)} (${(drift * 100).toFixed(0)} %) designId=${designId} — ` +
+                `kasserar passet och använder kompositen`,
+            );
+          } else {
+            result = { ok: true, bytes: pass.bytes, contentType: pass.contentType, outputUrl: pass.outputUrl };
+            console.log(`[multi-face-swap] hybrid NB2 identity pass done designId=${designId}`);
+          }
         } else {
           console.warn(`[multi-face-swap] hybrid NB2 pass failed designId=${designId} — using composite as-is`);
         }

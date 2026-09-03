@@ -39,7 +39,14 @@
 // toast instead of crashing on a non-2xx.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { NANO_BANANA_MODEL, runNanoBanana, fitForUpload } from "../_shared/replicate.ts";
+import {
+  NANO_BANANA_MODEL,
+  runNanoBanana,
+  fitForUpload,
+  readImageSize,
+  nearestNanoAspect,
+  probeImageAspect,
+} from "../_shared/replicate.ts";
 import { checkGenerationGate } from "../_shared/subscriber-gate.ts";
 // Deploy-markör 2026-07-21: analytics-loggning (generations-tabellen) aktiv.
 
@@ -62,15 +69,30 @@ const FACE_SWAP_MODEL_NAME = "cdingram/face-swap";
 // testfall (flint+glasögon, genusbyte, dreadlocks, fräknar m.m.).
 // Misslyckas passet efter retries används cdingram-resultatet som förut —
 // hellre dagens kvalitet än ett fel. Avstängbart via ?hybrid=off (test/debug).
+//
+// Prompten härdad 2026-09-03 efter två kundklagomål på order #1325
+// (drottning- + renässansposter):
+//   (a) NB2 KOMPONERADE OM bilden — den blandade in kundfotots närbilds-
+//       beskärning och zoomade in referensen ~1,5× så kronan/axlarna hamnade
+//       utanför bild. Därav FRAMING-blocket högst upp + den explicita
+//       "image #2 är ENBART identitetsreferens, dess beskärning är irrelevant".
+//   (b) Örhänge/smycken som satt på REFERENSKONSTVERKET (t.ex. venetianska
+//       ädlingens guldörhänge) följde med fast kunden inte bar något — regel 3
+//       säger nu att ansikts-/öronsmycken ska matcha kundfotot EXAKT, inklusive
+//       att tas BORT när fotot saknar dem. Kostymens smycken (halsband,
+//       brosch, krage) räknas INTE dit och lämnas orörda.
 const HYBRID_IDENTITY_PROMPT = [
-  "Image #1 is a portrait artwork where a face swap has already been performed. Image #2 is a photograph of the actual person.",
-  "Correct image #1 so the person's identity fully matches image #2:",
-  "1. Transfer the exact hairstyle, hair color and hair length from image #2 - including whether the hair is worn loose or tied up - adapted naturally around/under any headwear in image #1. If the person in image #2 is bald, make them bald in image #1.",
-  "2. Transfer the facial hair (or lack of it), glasses (if worn), and all jewelry/piercings visible in image #2 (earrings, nose rings, etc.).",
-  "3. Adjust ALL visible skin in image #1 (face, neck, ears, hands) to the same skin tone as in image #2.",
-  "Keep EVERYTHING ELSE in image #1 completely unchanged: headwear/crown, clothing, outfit accessories, background, lighting, art style, composition, framing and aspect ratio.",
+  "Image #1 is a portrait artwork where a face swap has already been performed. Image #2 is a photograph of the actual person, provided ONLY as an identity reference.",
+  "This is a LOCAL RETOUCH of image #1, not a re-composition. Reproduce image #1 exactly as it is and change ONLY the identity details listed below.",
+  "FRAMING - ABSOLUTE RULE: never zoom in, zoom out, crop, pan, rotate, mirror or re-center. The head, body, headwear and every object in image #1 must keep exactly the same size, position and margins to all four edges as in image #1. Nothing that is fully visible in image #1 (crown, hat, hair, shoulders, arms, hands, props, furniture, background) may be enlarged, pushed out of frame or cut off at any edge. The framing, crop, camera distance, pose, background and lighting of image #2 are IRRELEVANT and must never influence the output.",
+  "Corrections to make - identity only:",
+  "1. Hair: transfer the exact hairstyle, hair color and hair length from image #2 - including whether the hair is worn loose or tied up - adapted naturally around/under any headwear in image #1. If the person in image #2 is bald, make them bald in image #1.",
+  "2. Transfer the facial hair (or lack of it) from image #2.",
+  "3. Accessories on the face, ears and head must match image #2 EXACTLY: glasses, earrings, ear/nose/lip/eyebrow piercings and any other facial jewelry. Add ONLY what is clearly visible in image #2. If image #2 shows no glasses, no earrings and no piercings, the output must have none either - REMOVE any earring, piercing or glasses that the person wears in image #1. NEVER invent accessories that image #2 does not show.",
+  "4. Adjust ALL visible skin in image #1 (face, neck, ears, hands) to the same skin tone as in image #2.",
+  "Keep EVERYTHING ELSE in image #1 completely unchanged: headwear/crown, clothing, the costume's own jewelry (necklaces, chains, brooches, collars), background, props, lighting, art style, composition, framing and aspect ratio.",
   "The result must remain ONE coherent artwork in the exact art style of image #1 - no photo-collage look.",
-  "Return ONE single edited image with the same aspect ratio as image #1.",
+  "Return ONE single edited image with the same aspect ratio AND the same framing as image #1.",
 ].join("\n");
 
 function jsonResponse(body: unknown, status = 200) {
@@ -121,39 +143,6 @@ function fallbackResponse(userMessage: string, internal: string) {
     fallback: true,
     userMessage,
   });
-}
-
-// Decode JPEG/PNG/WebP dimensions. Returns null when the format isn't
-// recognised — we then skip the dimension sanity check.
-function readImageSize(bytes: Uint8Array): { w: number; h: number } | null {
-  // PNG: 8-byte signature, then IHDR with width/height as big-endian u32.
-  if (bytes.length > 24 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
-    const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    return { w: dv.getUint32(16), h: dv.getUint32(20) };
-  }
-  // JPEG: scan SOF markers for size.
-  if (bytes.length > 4 && bytes[0] === 0xff && bytes[1] === 0xd8) {
-    let i = 2;
-    while (i < bytes.length) {
-      if (bytes[i] !== 0xff) return null;
-      const marker = bytes[i + 1];
-      i += 2;
-      if (marker === 0xd8 || marker === 0xd9) return null;
-      const len = (bytes[i] << 8) | bytes[i + 1];
-      if (
-        (marker >= 0xc0 && marker <= 0xc3) ||
-        (marker >= 0xc5 && marker <= 0xc7) ||
-        (marker >= 0xc9 && marker <= 0xcb) ||
-        (marker >= 0xcd && marker <= 0xcf)
-      ) {
-        const h = (bytes[i + 3] << 8) | bytes[i + 4];
-        const w = (bytes[i + 5] << 8) | bytes[i + 6];
-        return { w, h };
-      }
-      i += len;
-    }
-  }
-  return null;
 }
 
 // ---------- Route 1: Replicate human face-swap ----------
@@ -270,6 +259,7 @@ async function callNanoBananaOnce(params: {
   promptText: string;
   imageUrls: string[];
   resolution?: "2K" | "4K";
+  aspectRatio?: string | null;
 }): Promise<
   | { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
   | { ok: false; retriable: boolean; status: number; reason: string; userMessage: string }
@@ -278,6 +268,7 @@ async function callNanoBananaOnce(params: {
     promptText: params.promptText,
     imageUrls: params.imageUrls,
     resolution: params.resolution,
+    aspectRatio: params.aspectRatio,
   });
   if (r.ok) return r;
   console.error("[face-swap] replicate nano-banana error:", r.reason);
@@ -297,6 +288,7 @@ async function callNanoBanana(params: {
   promptText: string;
   imageUrls: string[];
   resolution?: "2K" | "4K";
+  aspectRatio?: string | null;
 }): Promise<
   { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
 > {
@@ -311,6 +303,7 @@ async function callNanoBanana(params: {
       promptText: params.promptText,
       imageUrls: params.imageUrls,
       resolution: params.resolution,
+      aspectRatio: params.aspectRatio,
     });
 
     if (result.ok) {
@@ -356,7 +349,9 @@ async function runPetSwap(params: { referenceImageUrl: string; faceImageUrl: str
 
   const promptText = [
     `You are editing image #1 (the reference scene). Image #2 is a photograph of the customer's own pet (a cat or a dog).`,
+    `Image #2 is provided ONLY as an identity reference — its framing, crop, camera distance, pose, background and lighting are IRRELEVANT and must never influence the output.`,
     `Replace the pet that appears in image #1 with the specific pet from image #2 — keep the unique markings, fur color/pattern, breed traits, eye color, ear shape and overall identity from image #2.`,
+    `FRAMING — ABSOLUTE RULE: never zoom in, zoom out, crop, pan, rotate, mirror or re-center. The animal, its headwear/costume and every object in image #1 must keep exactly the same size, position and margins to all four edges as in image #1. Nothing that is fully visible in image #1 (crown, hat, ears, body, props, background) may be enlarged, pushed out of frame or cut off at any edge.`,
     `Keep EVERYTHING ELSE from image #1 unchanged: the costume/clothing, props, background, lighting, camera angle, art style, composition, framing, and aspect ratio. Do not change the pose unless required to make the new pet fit naturally.`,
     `Return ONE single edited image (NOT a collage, NOT side-by-side, NOT a comparison). Output must have the same aspect ratio as image #1.`,
     adminPromptLine,
@@ -364,10 +359,21 @@ async function runPetSwap(params: { referenceImageUrl: string; faceImageUrl: str
     .filter(Boolean)
     .join("\n");
 
+  // Samma formatfälla som i human-hybriden: två inputbilder gör
+  // "match_input_image" tvetydigt och outputen kan följa kundens foto. Lås
+  // formatet till referensscenen (bild #1).
+  const refAspect = await probeImageAspect(params.referenceImageUrl);
+  const aspectRatio = refAspect ? nearestNanoAspect(refAspect) : null;
+  console.log(
+    `[face-swap] pet swap aspectRatio=${aspectRatio ?? "match_input_image"} ` +
+      `(referens ${refAspect ? refAspect.toFixed(3) : "okänd"})`,
+  );
+
   return callNanoBanana({
     promptText,
     imageUrls: [params.referenceImageUrl, params.faceImageUrl],
     resolution: "4K",
+    aspectRatio,
   });
 }
 
@@ -605,10 +611,19 @@ async function runRemoveBackground(params: {
   }
 
   console.log("[runRemoveBackground] promptText\n" + promptText);
+  // Enda inputbilden är kundens foto, så "match_input_image" ger kundfotots
+  // format — inte lagrets. Har klienten skickat lagrets mått låser vi formatet
+  // dit i stället, så cover-renderingen slipper beskära resultatet.
+  const rbAspect =
+    params.targetAspectRatio && params.targetAspectRatio > 0
+      ? nearestNanoAspect(params.targetAspectRatio)
+      : null;
+  console.log(`[runRemoveBackground] aspectRatio=${rbAspect ?? "match_input_image"}`);
   return callNanoBanana({
     promptText,
     imageUrls: [params.faceImageUrl],
     resolution: "4K",
+    aspectRatio: rbAspect,
   });
 }
 
@@ -1108,14 +1123,42 @@ Deno.serve(async (req) => {
     // hudton mot kundens foto. Misslyckas passet behålls cdingram-resultatet
     // (graceful degradation) — genereringen felar aldrig på det här steget.
     if (subjectKind === "human" && hybridEnabled) {
+      // Lås passets bildformat till KONSTVERKETS (cdingram-resultatet = bild
+      // #1). Med "match_input_image" och två inputbilder följde outputen
+      // kundens telefonfoto i stället — 9:16 i stället för 4:5 — och lagrets
+      // cover-rendering klippte bort ~40 % av höjden (order #1325).
+      const baseDims = readImageSize(result.bytes);
+      const baseAspect = baseDims && baseDims.h > 0 ? baseDims.w / baseDims.h : null;
+      const passAspect = baseAspect ? nearestNanoAspect(baseAspect) : null;
+      console.log(
+        `[face-swap] hybrid pass designId=${designId} baseDims=${baseDims ? `${baseDims.w}x${baseDims.h}` : "(unknown)"} ` +
+          `aspectRatio=${passAspect ?? "match_input_image"}`,
+      );
+
       const pass = await callNanoBanana({
         promptText: HYBRID_IDENTITY_PROMPT,
         imageUrls: [result.outputUrl, faceImageUrl],
         resolution: "4K",
+        aspectRatio: passAspect,
       });
       if (pass.ok) {
-        result = { ok: true, bytes: pass.bytes, contentType: pass.contentType, outputUrl: pass.outputUrl };
-        console.log(`[face-swap] hybrid NB2 identity pass done designId=${designId}`);
+        // Skyddsnät: driver formatet ändå iväg (modellen kan ignorera flaggan)
+        // är cdingram-resultatet det säkra valet — rätt komposition väger
+        // tyngre än identitetsputsen.
+        const passDims = readImageSize(pass.bytes);
+        const passAspectActual = passDims && passDims.h > 0 ? passDims.w / passDims.h : null;
+        const drift =
+          baseAspect && passAspectActual ? Math.abs(passAspectActual - baseAspect) / baseAspect : 0;
+        if (drift > 0.06) {
+          console.warn(
+            `[face-swap] hybrid NB2 pass ändrade bildformatet ${baseAspect?.toFixed(3)} → ` +
+              `${passAspectActual?.toFixed(3)} (${(drift * 100).toFixed(0)} %) designId=${designId} — ` +
+              `kasserar passet och använder cdingram-resultatet`,
+          );
+        } else {
+          result = { ok: true, bytes: pass.bytes, contentType: pass.contentType, outputUrl: pass.outputUrl };
+          console.log(`[face-swap] hybrid NB2 identity pass done designId=${designId}`);
+        }
       } else {
         console.warn(`[face-swap] hybrid NB2 pass failed designId=${designId} — using cdingram result as-is`);
       }
