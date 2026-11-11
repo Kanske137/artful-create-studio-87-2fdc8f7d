@@ -362,6 +362,7 @@ export default function EditorPage() {
       layoutId,
       orientation,
       hiddenLayerIds,
+      isRaceTemplate ? raceState : null,
     );
     const baseTemplateInput = {
       template: printableTemplate,

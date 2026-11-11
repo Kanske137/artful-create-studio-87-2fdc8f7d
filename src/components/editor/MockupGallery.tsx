@@ -52,6 +52,7 @@ export function MockupGallery() {
   const raceFields = useRaceStore((s) => s.fields);
   const raceShow = useRaceStore((s) => s.show);
   const raceRouteColor = useRaceStore((s) => s.routeColor);
+  const raceSplits = useRaceStore((s) => s.splits);
   const [slots, setSlots] = useState<MockupSlot[]>([]);
   const [snapshotUrl, setSnapshotUrl] = useState<string | null>(null);
   const [snapshotLoading, setSnapshotLoading] = useState(false);
@@ -91,7 +92,10 @@ export function MockupGallery() {
         const isRace = !!template.productOptions.raceOptions?.enabled;
         const newSnapshot = await renderTemplateSnapshot({
           // Dolda lager med i mockuperna var en bugg — samma underlag som trycket.
-          template: buildPrintableTemplate(template, config.product_type, layoutId, orientation, hiddenLayerIds),
+          template: buildPrintableTemplate(template, config.product_type, layoutId, orientation, hiddenLayerIds, {
+            route: raceRoute,
+            splits: raceSplits,
+          }),
           race: isRace
             ? {
                 route: raceRoute,
@@ -99,6 +103,7 @@ export function MockupGallery() {
                 show: raceShow,
                 routeColor: raceRouteColor,
                 locale: raceLocaleFor(i18n.language),
+                splits: raceSplits,
               }
             : null,
           orientation,
@@ -187,7 +192,7 @@ export function MockupGallery() {
     photoSources, photoAiResults,
     aiPhotoResults,
     hiddenLayerIds,
-    raceRoute, raceFields, raceShow, raceRouteColor, i18n.language,
+    raceRoute, raceFields, raceShow, raceRouteColor, raceSplits, i18n.language,
   ]);
 
   // Bygg en enhetlig lista av "slots" i den ordning vi vill visa dem.

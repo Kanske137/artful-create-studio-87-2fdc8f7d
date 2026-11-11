@@ -32,6 +32,7 @@ const typeLabel: Record<TemplateLayer["type"], string> = {
   starmap: "Stjärnkarta",
   elevation: "Höjdprofil",
   raceStats: "Loppstatistik",
+  splits: "Kilometertider",
 };
 
 export default function LayerList({

@@ -11,10 +11,10 @@ import { TextLayerView } from "./layers/TextLayerView";
 import { substituteTokensWithSpans, buildEffectiveTextWithSpans } from "@/lib/text-typography";
 import { ShapeLayerView } from "./layers/ShapeLayerView";
 import StarmapLayerView from "./layers/StarmapLayerView";
-import { RaceElevationView, RaceStatsView } from "./layers/RaceLayerViews";
+import { RaceElevationView, RaceSplitsView, RaceStatsView } from "./layers/RaceLayerViews";
 import { useRaceStore, raceLocaleFor } from "@/stores/raceStore";
 import { elevationSeries } from "@/lib/race/geo";
-import { raceFieldText, raceStatItems } from "@/lib/race/derive";
+import { raceFieldText, raceInactiveLayerIds, raceStatItems } from "@/lib/race/derive";
 import type { RaceRenderInput } from "@/lib/race/types";
 import { overlayAvoidPct } from "@/lib/race/route-map";
 import {
@@ -316,6 +316,7 @@ export function MapPreview({
   const raceShow = useRaceStore((s) => s.show);
   const raceRouteColor = useRaceStore((s) => s.routeColor);
   const raceFitNonce = useRaceStore((s) => s.fitNonce);
+  const raceSplits = useRaceStore((s) => s.splits);
   const race: RaceRenderInput = useMemo(
     () => ({
       route: raceRoute,
@@ -323,8 +324,9 @@ export function MapPreview({
       show: raceShow,
       routeColor: raceRouteColor,
       locale: raceLocaleFor(i18n.language),
+      splits: raceSplits,
     }),
-    [raceRoute, raceFields, raceShow, raceRouteColor, i18n.language],
+    [raceRoute, raceFields, raceShow, raceRouteColor, i18n.language, raceSplits],
   );
   const raceElevation = useMemo(
     () => (raceRoute?.ele ? elevationSeries(raceRoute.coords, raceRoute.ele) : []),
@@ -403,8 +405,13 @@ export function MapPreview({
     (contentVariantId && storeTemplate?.contentVariants?.find((v) => v.id === contentVariantId)) || null;
   const withVariant = (l: TemplateLayer): TemplateLayer =>
     activeVariant ? (applyContentVariant(l, activeVariant) as TemplateLayer) : l;
+  // Lopplager utan data (kilometertider utan GPX-tider m.m.) ritas inte.
+  const raceInactive = storeTemplate?.productOptions.raceOptions?.enabled
+    ? raceInactiveLayerIds(allLayers, race)
+    : new Set<string>();
   const visibleLayers = (whiteMarginEnabled ? allLayers : allLayers.filter((l) => l.type !== "margin"))
     .filter(notHidden)
+    .filter((l) => !raceInactive.has(l.id))
     .map(withVariant);
   const layers = [
     ...visibleLayers.filter((l) => l.type !== "margin"),
@@ -1091,6 +1098,22 @@ export function MapPreview({
                 <RaceElevationView
                   layer={l}
                   series={raceElevation}
+                  routeColor={race.routeColor ?? baseColor}
+                  canvasShortPx={frontShortPx}
+                />
+              </div>
+            );
+          }
+
+          if (l.type === "splits") {
+            const routeMap = layers.find((x) => x.type === "map" && x.defaults.routeStyle);
+            const baseColor =
+              routeMap && routeMap.type === "map" ? routeMap.defaults.routeStyle!.color : "#FC4C02";
+            return (
+              <div key={l.id} style={{ ...wrapStyle, pointerEvents: "none" }}>
+                <RaceSplitsView
+                  layer={l}
+                  splits={race.splits ?? []}
                   routeColor={race.routeColor ?? baseColor}
                   canvasShortPx={frontShortPx}
                 />

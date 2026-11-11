@@ -108,6 +108,12 @@ describe("Lopptavlans kundpanel", () => {
     loadRaceTemplate();
   });
 
+  /** En bana med höjddata (krävs för att höjdprofilen ska kunna slås på). */
+  const withRoute = () =>
+    useRaceStore.setState({
+      route: { coords: [[18, 59], [18.01, 59.01]], ele: [1, 2], distanceKm: 1.2, bbox: [[18, 59], [18.01, 59.01]] },
+    });
+
   it("startmallen döljer foto, höjdprofil och egen rad från början", () => {
     const hidden = useEditorStore.getState().hiddenLayerIds;
     expect(hidden[RACE_LAYER_IDS.photo]).toBe(true);
@@ -141,6 +147,7 @@ describe("Lopptavlans kundpanel", () => {
 
   it("reglagen döljer lager och flödet flyttar upp det som ligger under", () => {
     const y = (id: string) => useEditorStore.getState().templateLayers().find((l) => l.id === id)!.yPct;
+    withRoute();
     render(<RaceDetailsPanel />);
     // Etiketten omsluter reglaget — klick på texten växlar det.
     click(byText("Höjdprofil", "span"));
@@ -152,6 +159,7 @@ describe("Lopptavlans kundpanel", () => {
   });
 
   it("bakgrundsbyte byter stil men behåller kundens av/på-val", () => {
+    withRoute();
     render(<RaceDetailsPanel />);
     click(byText("Höjdprofil", "span"));
     click(byText("Sand", "span"));
@@ -159,6 +167,21 @@ describe("Lopptavlans kundpanel", () => {
     expect(useEditorStore.getState().hiddenLayerIds[RACE_LAYER_IDS.elevation]).toBeUndefined();
     const map = useEditorStore.getState().templateLayers().find((l) => l.type === "map");
     expect(map?.id).toBe("race-map-sand");
+  });
+
+  it("kilometertider kan bara slås på när GPX-filen har tider", async () => {
+    const { container } = render(<RaceDetailsPanel />);
+    expect(byText("Kilometertider", "span")).toBeNull();
+    cleanup();
+    const r = render(<RacePickerPanel />);
+    const input = r.container.querySelector('input[type="file"]') as HTMLInputElement;
+    await changeFile(input, gpxFile());
+    await waitFor(() => expect(useRaceStore.getState().splits?.length).toBe(14));
+    cleanup();
+    render(<RaceDetailsPanel />);
+    click(byText("Kilometertider", "span"));
+    expect(useEditorStore.getState().hiddenLayerIds[RACE_LAYER_IDS.splits]).toBeUndefined();
+    void container;
   });
 
   it("statistikvärden slås av och på individuellt", () => {

@@ -607,6 +607,10 @@ export default function DesignerPage() {
                 <Timer className="h-3.5 w-3.5 mr-1.5" />
                 Lägg till loppstatistik
               </Button>
+              <Button size="sm" variant="outline" onClick={() => addLayer("splits")}>
+                <Timer className="h-3.5 w-3.5 mr-1.5" />
+                Lägg till kilometertider
+              </Button>
               <Button size="sm" variant="outline" onClick={() => addLayer("text")}>
                 <Type className="h-3.5 w-3.5 mr-1.5" />
                 Lägg till text

@@ -4,6 +4,8 @@
 // mockuper, så att allt kunden ser bygger på samma underlag.
 import { mutateActiveLayoutBlock } from "./freeform-layers";
 import type { Orientation, Template } from "./template-schema";
+import { getActiveLayoutBlock } from "./template-schema";
+import { raceInactiveLayerIds } from "./race/derive";
 
 export function buildPrintableTemplate(
   template: Template,
@@ -11,10 +13,16 @@ export function buildPrintableTemplate(
   layoutId: string | null | undefined,
   orientation: Orientation,
   hiddenLayerIds: Record<string, true>,
+  race?: { route: { ele: number[] | null } | null; splits?: unknown[] | null } | null,
 ): Template {
-  if (Object.keys(hiddenLayerIds).length === 0) return template;
+  // Lopplager utan data räknas som dolda (ingen tom yta i trycket).
+  const inactive =
+    race && template.productOptions.raceOptions?.enabled
+      ? raceInactiveLayerIds(getActiveLayoutBlock(template, productType, layoutId)[orientation].layers, race)
+      : new Set<string>();
+  if (Object.keys(hiddenLayerIds).length === 0 && inactive.size === 0) return template;
   return mutateActiveLayoutBlock(template, productType, layoutId, orientation, (ls) =>
-    ls.filter((l) => !hiddenLayerIds[l.id]),
+    ls.filter((l) => !hiddenLayerIds[l.id] && !inactive.has(l.id)),
   );
 }
 

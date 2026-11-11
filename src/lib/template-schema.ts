@@ -442,6 +442,25 @@ export const raceStatsDefaultsSchema = z.object({
 });
 export type RaceStatsDefaults = z.infer<typeof raceStatsDefaultsSchema>;
 
+// Kilometertider: liggande staplar uppifrån och ned, km för km (bara när
+// kundens GPX har tidsstämplar). Stapelns längd = fart (längre = snabbare).
+export const splitsDefaultsSchema = z.object({
+  /** Stapelfärg. Utelämnad ⇒ ruttens färg. */
+  color: hexColorSchema.optional(),
+  labelColor: hexColorSchema,
+  font: z.string().min(1),
+  labelSizePt: z.number().positive().max(40),
+  /** Stapelns tjocklek som andel av radens höjd. */
+  barFill: z.number().min(0.15).max(0.95).default(0.55),
+  /** Visa tempot vid varje stapel. */
+  showPace: z.boolean().default(true),
+  /** Streckad linje vid snittempot. */
+  showAverage: z.boolean().default(true),
+  /** Per km, per 5 km, eller automatiskt (per 5 km över 25 rader). */
+  group: z.enum(["auto", "1", "5"]).default("auto"),
+});
+export type SplitsDefaults = z.infer<typeof splitsDefaultsSchema>;
+
 // ---------- flödesgrupper (valfria fält utan hål) ----------
 // En lodrät stapel av lager inom ett område. Dolda (eller borttagna) lager
 // hoppas över och lagren under flyttar upp; `grow`-lager (t.ex. kartan) tar
@@ -527,6 +546,10 @@ export const raceStatsLayerSchema = layerBase.extend({
   type: z.literal("raceStats"),
   defaults: raceStatsDefaultsSchema,
 });
+export const splitsLayerSchema = layerBase.extend({
+  type: z.literal("splits"),
+  defaults: splitsDefaultsSchema,
+});
 
 export const layerSchema = z.discriminatedUnion("type", [
   mapLayerSchema,
@@ -540,6 +563,7 @@ export const layerSchema = z.discriminatedUnion("type", [
   starmapLayerSchema,
   elevationLayerSchema,
   raceStatsLayerSchema,
+  splitsLayerSchema,
 ]);
 export type TemplateLayer = z.infer<typeof layerSchema>;
 export type LayerType = TemplateLayer["type"];

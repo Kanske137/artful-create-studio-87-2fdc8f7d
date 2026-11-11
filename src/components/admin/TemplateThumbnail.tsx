@@ -14,8 +14,8 @@ import MapLayerPreview from "./MapLayerPreview";
 import TextLayerPreview from "./TextLayerPreview";
 import { ShapeLayerView } from "@/components/editor/layers/ShapeLayerView";
 import StarmapLayerView from "@/components/editor/layers/StarmapLayerView";
-import { RaceElevationView, RaceStatsView } from "@/components/editor/layers/RaceLayerViews";
-import { SAMPLE_ELEVATION, SAMPLE_STATS } from "@/lib/race/sample";
+import { RaceElevationView, RaceSplitsView, RaceStatsView } from "@/components/editor/layers/RaceLayerViews";
+import { SAMPLE_ELEVATION, SAMPLE_SPLITS, SAMPLE_STATS } from "@/lib/race/sample";
 
 type LayoutOverride = {
   defaultLayout: Template["defaultLayout"];
@@ -122,6 +122,13 @@ export default function TemplateThumbnail({
           return (
             <div key={layer.id} style={style}>
               <RaceElevationView layer={layer} series={SAMPLE_ELEVATION} routeColor="#FC4C02" canvasShortPx={Math.min(width, height)} />
+            </div>
+          );
+        }
+        if (layer.type === "splits") {
+          return (
+            <div key={layer.id} style={style}>
+              <RaceSplitsView layer={layer} splits={SAMPLE_SPLITS} routeColor="#FC4C02" canvasShortPx={Math.min(width, height)} />
             </div>
           );
         }

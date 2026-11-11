@@ -238,13 +238,14 @@ type RaceTextField = NonNullable<Extract<TemplateLayer, { type: "text" }>["defau
 
 /** Lager kunden kan slå av/på från loppanelen, i visningsordning. */
 function toggleableLayers(layers: TemplateLayer[]) {
-  const order: Record<string, number> = { finishTime: 0, raceStats: 1, elevation: 2, runnerName: 3, subtitle: 4, date: 5, customLine: 6, photo: 7 };
+  const order: Record<string, number> = { finishTime: 0, raceStats: 1, splits: 2, elevation: 3, runnerName: 4, subtitle: 5, date: 6, customLine: 7, photo: 8 };
   const out: Array<{ layer: TemplateLayer; key: string }> = [];
   for (const l of layers) {
     if (l.locks.visibility) continue;
     if (l.type === "photo") out.push({ layer: l, key: "photo" });
     else if (l.type === "elevation") out.push({ layer: l, key: "elevation" });
     else if (l.type === "raceStats") out.push({ layer: l, key: "raceStats" });
+    else if (l.type === "splits") out.push({ layer: l, key: "splits" });
     else if (l.type === "text" && l.defaults.raceField && l.defaults.raceField !== "title") {
       out.push({ layer: l, key: l.defaults.raceField });
     }
@@ -261,6 +262,7 @@ const TOGGLE_LABEL_KEY: Record<string, string> = {
   date: "race.show.date",
   customLine: "race.show.customLine",
   finishTime: "race.show.time",
+  splits: "race.show.splits",
 };
 
 function ToggleRow({ label, checked, onChange, indent }: { label: string; checked: boolean; onChange: (v: boolean) => void; indent?: boolean }) {
@@ -273,7 +275,7 @@ function ToggleRow({ label, checked, onChange, indent }: { label: string; checke
 }
 
 export function RaceDetailsPanel({ mapStyleSlot }: { mapStyleSlot?: React.ReactNode }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const templateLayers = useEditorStore((s) => s.templateLayers);
   const hiddenLayerIds = useEditorStore((s) => s.hiddenLayerIds);
   const setLayerVisible = useEditorStore((s) => s.setLayerVisible);
@@ -290,13 +292,16 @@ export function RaceDetailsPanel({ mapStyleSlot }: { mapStyleSlot?: React.ReactN
     return { id: l.id, name: l.name || mapStyleLabel(styleId), bg: mapStylePreviewBg(styleId) };
   });
   const activeLayout = layoutId ?? DEFAULT_LAYOUT_ID;
-  const { fields, show, routeColor, source } = useRaceStore();
+  const { fields, show, routeColor, source, route, splits } = useRaceStore();
   const setField = useRaceStore((s) => s.setField);
   const setShow = useRaceStore((s) => s.setShow);
   const setRouteColor = useRaceStore((s) => s.setRouteColor);
 
   const layers = templateLayers();
-  const toggles = toggleableLayers(layers);
+  // Kilometertider kräver GPX med tider, höjdprofil kräver höjddata.
+  const toggles = toggleableLayers(layers).filter(
+    ({ key }) => (key !== "splits" || !!splits?.length) && (key !== "elevation" || !!route?.ele),
+  );
   const fieldsInTemplate = new Set(
     layers.flatMap((l) => (l.type === "text" && l.defaults.raceField ? [l.defaults.raceField as RaceTextField] : [])),
   );
@@ -360,6 +365,29 @@ export function RaceDetailsPanel({ mapStyleSlot }: { mapStyleSlot?: React.ReactN
                 placeholder={t("race.finishTimePlaceholder")}
                 inputMode="numeric"
                 aria-invalid={timeInvalid}
+              />
+            </div>
+          )}
+          {statKeys.includes("distance") && (
+            <div className="space-y-1">
+              <Label className="text-xs">{t("race.distanceField")}</Label>
+              <Input
+                value={fields.distanceKm}
+                onChange={(e) => setField("distanceKm", e.target.value)}
+                placeholder={route ? formatDistance(route.distanceKm, raceLocaleFor(i18n.language)).replace(" km", "") : ""}
+                inputMode="decimal"
+              />
+            </div>
+          )}
+          {statKeys.includes("pace") && (
+            <div className="space-y-1">
+              <Label className="text-xs">{t("race.paceField")}</Label>
+              <Input
+                value={fields.pace}
+                onChange={(e) => setField("pace", e.target.value)}
+                placeholder={t("race.pacePlaceholder")}
+                inputMode="numeric"
+                maxLength={8}
               />
             </div>
           )}

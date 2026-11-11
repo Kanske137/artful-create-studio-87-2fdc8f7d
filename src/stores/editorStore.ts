@@ -7,6 +7,7 @@ import { getActiveLayoutBlock, getAllLayouts } from "@/lib/template-schema";
 import { applyFlowLayout } from "@/lib/flow-layout";
 import type { Bounds } from "@/lib/race/types";
 import { useRaceStore } from "@/stores/raceStore";
+import { raceInactiveLayerIds } from "@/lib/race/derive";
 import { resolveTemplate } from "@/lib/template-migrate";
 import { clampLayerRect } from "@/lib/layer-utils";
 import {
@@ -1689,8 +1690,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const { template, orientation, config, hiddenLayerIds } = get();
     if (!template) return [];
     const block = getActiveLayoutBlock(template, config?.product_type, get().layoutId)[orientation];
+    // Lopplager utan data (t.ex. kilometertider utan GPX-tider) räknas som dolda.
+    const inactive = template.productOptions.raceOptions?.enabled
+      ? raceInactiveLayerIds(block.layers, useRaceStore.getState())
+      : new Set<string>();
     // Flödesgrupper: dolda lager lämnar inget hål (no-op utan block.flow).
-    const flowed = applyFlowLayout(block.layers, block.flow, (id) => !!hiddenLayerIds[id]);
+    const flowed = applyFlowLayout(block.layers, block.flow, (id) => !!hiddenLayerIds[id] || inactive.has(id));
     return [...flowed].sort((a, b) => a.zIndex - b.zIndex);
   },
   firstMapLayerId: () => {

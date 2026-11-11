@@ -177,34 +177,43 @@ export function paddedBounds(bbox: Bounds, frac = 0.08): Bounds {
 export interface AvoidPct {
   top: number;
   bottom: number;
+  left?: number;
+  right?: number;
 }
 
 /** Luft mellan banan och text/foto som ligger ovanpå kartan (% av kartans höjd). */
 const AVOID_GAP_PCT = 4;
 
 /**
- * Hur mycket av kartans överkant/underkant som täcks av synliga lager ovanpå
- * den (rubrik, statistik, namn, foto …), i % av kartans höjd. Lager i övre
- * halvan räknas till toppen, lager i nedre halvan till botten. Banan anpassas
- * sedan till ytan däremellan, så att den aldrig hamnar under text eller foto.
+ * Hur mycket av kartans kanter som täcks av synliga lager ovanpå den
+ * (rubrik, statistik, namn, foto, kilometertider …), i % av kartan. Höga,
+ * smala lager (sidokolumner) räknas till vänster/höger kant, övriga till
+ * topp/botten. Banan anpassas sedan till den fria ytan däremellan.
  */
 export function overlayAvoidPct(
   layers: Array<{ id: string; type: string; xPct: number; yPct: number; wPct: number; hPct: number; zIndex: number }>,
   map: { id: string; xPct: number; yPct: number; wPct: number; hPct: number; zIndex: number },
 ): AvoidPct {
-  let top = 0;
-  let bottom = 0;
+  let top = 0, bottom = 0, left = 0, right = 0;
   for (const l of layers) {
     if (l.id === map.id || l.type === "margin" || l.zIndex <= map.zIndex) continue;
     const overlapX = Math.min(l.xPct + l.wPct, map.xPct + map.wPct) - Math.max(l.xPct, map.xPct);
     const overlapY = Math.min(l.yPct + l.hPct, map.yPct + map.hPct) - Math.max(l.yPct, map.yPct);
     if (overlapX <= 0 || overlapY <= 0) continue;
-    const rel = (y: number) => ((y - map.yPct) / map.hPct) * 100;
-    const centre = rel(l.yPct + l.hPct / 2);
-    if (centre < 50) top = Math.max(top, rel(l.yPct + l.hPct));
-    else bottom = Math.max(bottom, 100 - rel(l.yPct));
+    const relY = (y: number) => ((y - map.yPct) / map.hPct) * 100;
+    const relX = (x: number) => ((x - map.xPct) / map.wPct) * 100;
+    const isColumn = (l.hPct / map.hPct) * 100 > 25 && (l.wPct / map.wPct) * 100 < 40;
+    if (isColumn) {
+      const cx = relX(l.xPct + l.wPct / 2);
+      if (cx < 50) left = Math.max(left, relX(l.xPct + l.wPct));
+      else right = Math.max(right, 100 - relX(l.xPct));
+      continue;
+    }
+    const centre = relY(l.yPct + l.hPct / 2);
+    if (centre < 50) top = Math.max(top, relY(l.yPct + l.hPct));
+    else bottom = Math.max(bottom, 100 - relY(l.yPct));
   }
-  return { top: Math.max(0, top), bottom: Math.max(0, bottom) };
+  return { top: Math.max(0, top), bottom: Math.max(0, bottom), left: Math.max(0, left), right: Math.max(0, right) };
 }
 
 /** Fit-padding i px för en kartruta: ruttstilens minimum + fri yta kring överliggande lager. */
@@ -217,12 +226,15 @@ export function routeFitPaddingPx(
   const base = style?.fitPaddingPct ?? { top: 4, right: 4, bottom: 4, left: 4 };
   const top = Math.max(base.top, avoid && avoid.top > 0 ? avoid.top + AVOID_GAP_PCT : 0);
   const bottom = Math.max(base.bottom, avoid && avoid.bottom > 0 ? avoid.bottom + AVOID_GAP_PCT : 0);
-  // Lämna alltid minst 20 % av höjden åt banan.
-  const scale = top + bottom > 80 ? 80 / (top + bottom) : 1;
+  const left = Math.max(base.left, avoid?.left ? avoid.left + AVOID_GAP_PCT : 0);
+  const right = Math.max(base.right, avoid?.right ? avoid.right + AVOID_GAP_PCT : 0);
+  // Lämna alltid minst 20 % av höjden och bredden åt banan.
+  const sv = top + bottom > 80 ? 80 / (top + bottom) : 1;
+  const sh = left + right > 80 ? 80 / (left + right) : 1;
   return {
-    top: Math.round(((top * scale) / 100) * h),
-    right: Math.round((base.right / 100) * w),
-    bottom: Math.round(((bottom * scale) / 100) * h),
-    left: Math.round((base.left / 100) * w),
+    top: Math.round(((top * sv) / 100) * h),
+    right: Math.round(((right * sh) / 100) * w),
+    bottom: Math.round(((bottom * sv) / 100) * h),
+    left: Math.round(((left * sh) / 100) * w),
   };
 }

@@ -201,7 +201,15 @@ describe("banan hålls fri från text och foto", () => {
   });
 
   it("ignorerar lager under kartan", () => {
-    expect(overlayAvoidPct([map, L("bg", 0, 100, 0)], map)).toEqual({ top: 0, bottom: 0 });
+    expect(overlayAvoidPct([map, L("bg", 0, 100, 0)], map)).toEqual({ top: 0, bottom: 0, left: 0, right: 0 });
+  });
+
+  it("höga smala lager (kilometertider) räknas till sidan", () => {
+    const col = { id: "splits", type: "splits", xPct: 8, yPct: 33, wPct: 24, hPct: 34, zIndex: 17 };
+    const a = overlayAvoidPct([map, col, L("title", 8, 11)], map);
+    expect(a.left).toBeCloseTo(32);
+    expect(a.top).toBeCloseTo(19);
+    expect(a.bottom).toBe(0);
   });
 
   it("lägger luft runt överliggande lager men lämnar plats åt banan", () => {
@@ -210,5 +218,52 @@ describe("banan hålls fri från text och foto", () => {
     expect(p.bottom).toBe(340);
     const tight = routeFitPaddingPx(undefined, 1000, 1000, { top: 60, bottom: 50 });
     expect(tight.top + tight.bottom).toBeLessThanOrEqual(800);
+  });
+});
+
+import { computeSplits } from "./gpx";
+import { groupSplits } from "./render-splits";
+import { effectiveDistanceKm, raceInactiveLayerIds } from "./derive";
+
+describe("kilometertider", () => {
+  // Rak linje: 0,001° lat ≈ 111 m, en punkt var 30:e sekund ⇒ ~4:30/km.
+  const pts = line(120);
+  const t0 = Date.parse("2026-05-30T10:00:00Z");
+  const times = pts.map((_, i) => t0 + i * 30_000);
+
+  it("räknar tid per hel km och tar med sista delen", () => {
+    const s = computeSplits(pts, times)!;
+    expect(s.length).toBe(14); // 13,2 km ⇒ 13 hela + 0,2
+    expect(s[0]!.km).toBe(1);
+    expect(s[0]!.seconds).toBeCloseTo(1000 / 111.2 * 30, -1);
+    expect(s[s.length - 1]!.distKm).toBeLessThan(1);
+    const total = s.reduce((a, x) => a + x.seconds, 0);
+    expect(total).toBeCloseTo(119 * 30, 0);
+  });
+
+  it("saknar tider ⇒ inga kilometertider", () => {
+    expect(computeSplits(pts, pts.map(() => null))).toBeNull();
+  });
+
+  it("slår ihop per 5 km för långa lopp", () => {
+    const s = Array.from({ length: 42 }, (_, i) => ({ km: i + 1, distKm: 1, seconds: 300 }));
+    const g = groupSplits(s, "auto");
+    expect(g.length).toBe(9);
+    expect(g[0]).toEqual({ km: 5, distKm: 5, seconds: 1500 });
+    expect(groupSplits(s.slice(0, 10), "auto").length).toBe(10);
+  });
+
+  it("lager utan data räknas som dolda", () => {
+    const layers = [{ id: "s", type: "splits" }, { id: "e", type: "elevation" }, { id: "m", type: "map" }];
+    expect([...raceInactiveLayerIds(layers, { route: null, splits: null })]).toEqual(["s", "e"]);
+    expect([...raceInactiveLayerIds(layers, { route: { ele: [1] }, splits: [{}] })]).toEqual([]);
+  });
+
+  it("egen distans går före banans", () => {
+    const base = { route: { coords: line(3), ele: null, distanceKm: 42.61, bbox: [[0, 0], [1, 1]] as [[number, number], [number, number]] }, fields: { ...EMPTY_RACE_FIELDS }, show: { ...DEFAULT_RACE_SHOW }, routeColor: null, locale: "sv" as const };
+    expect(effectiveDistanceKm(base)).toBe(42.61);
+    expect(effectiveDistanceKm({ ...base, fields: { ...base.fields, distanceKm: "42,195" } })).toBe(42.195);
+    const items = raceStatItems(["distance", "pace"], { ...base, fields: { ...base.fields, distanceKm: "42,195", finishTime: "3:45:12", pace: "5:15" } });
+    expect(items.map((i) => i.value)).toEqual(["42,195 km", "5:15 /km"]);
   });
 });

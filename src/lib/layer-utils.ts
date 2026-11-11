@@ -544,6 +544,27 @@ export function createLayer(type: LayerType, existing: TemplateLayer[]): Templat
         },
         locks: defaultLocks({ content: true, visibility: false }),
       };
+    case "splits":
+      return {
+        ...base,
+        xPct: 8,
+        yPct: 30,
+        wPct: 24,
+        hPct: 36,
+        type: "splits",
+        name: `Kilometertider ${countOfType(existing, "splits") + 1}`,
+        hiddenByDefault: true,
+        defaults: {
+          labelColor: "#6B6B6B",
+          font: "Inter",
+          labelSizePt: 6,
+          barFill: 0.55,
+          showPace: true,
+          showAverage: true,
+          group: "auto",
+        },
+        locks: defaultLocks({ content: true, visibility: false }),
+      };
   }
 }
 

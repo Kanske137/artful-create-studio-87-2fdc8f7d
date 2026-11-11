@@ -35,7 +35,9 @@ function fitToRoute(map: mapboxgl.Map, route: RaceRoute, opts: RouteRenderOption
 }
 
 const avoidKeyOf = (o: RouteRenderOptions | null | undefined) =>
-  o?.avoidPct ? `${o.avoidPct.top.toFixed(1)}/${o.avoidPct.bottom.toFixed(1)}` : "";
+  o?.avoidPct
+    ? [o.avoidPct.top, o.avoidPct.bottom, o.avoidPct.left ?? 0, o.avoidPct.right ?? 0].map((v) => v.toFixed(1)).join("/")
+    : "";
 
 interface Props {
   layerId: string;

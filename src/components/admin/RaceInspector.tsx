@@ -225,3 +225,41 @@ export function HiddenByDefaultToggle({ layer, onChange }: { layer: TemplateLaye
     </label>
   );
 }
+
+export function SplitsInspector({ layer, update }: { layer: Extract<TemplateLayer, { type: "splits" }>; update: Update }) {
+  const d = layer.defaults;
+  return (
+    <div className="space-y-3 border-t pt-4">
+      <Heading>Kilometertider</Heading>
+      <p className="text-xs text-muted-foreground">Visas bara när kundens GPX-fil har tider (t.ex. export från Strava).</p>
+      <div className="grid grid-cols-2 gap-3">
+        <Row label="Typsnitt"><FontSelect value={d.font} onChange={(font) => update({ font })} /></Row>
+        <Row label="Textstorlek (pt)">
+          <Input type="number" step={0.5} value={d.labelSizePt} onChange={(e) => Number(e.target.value) > 0 && update({ labelSizePt: Number(e.target.value) })} className="h-8" />
+        </Row>
+        <Row label="Textfärg"><ColorInput value={d.labelColor} onChange={(labelColor) => update({ labelColor })} /></Row>
+        <Row label="Stapeltjocklek (0,15–0,95)">
+          <Input type="number" step={0.05} min={0.15} max={0.95} value={d.barFill} onChange={(e) => update({ barFill: Number(e.target.value) })} className="h-8" />
+        </Row>
+      </div>
+      <Row label="Gruppering">
+        <Select value={d.group} onValueChange={(group) => update({ group })}>
+          <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="auto">Automatiskt (per 5 km vid långa lopp)</SelectItem>
+            <SelectItem value="1">Per km</SelectItem>
+            <SelectItem value="5">Per 5 km</SelectItem>
+          </SelectContent>
+        </Select>
+      </Row>
+      <label className="flex items-center justify-between gap-3">
+        <span className="text-sm">Visa tempo per rad</span>
+        <Switch checked={d.showPace} onCheckedChange={(showPace) => update({ showPace })} />
+      </label>
+      <label className="flex items-center justify-between gap-3">
+        <span className="text-sm">Linje vid snittempo</span>
+        <Switch checked={d.showAverage} onCheckedChange={(showAverage) => update({ showAverage })} />
+      </label>
+    </div>
+  );
+}

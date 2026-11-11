@@ -28,6 +28,7 @@ export const RACE_LAYER_IDS = {
   name: "race-name",
   subtitle: "race-subtitle",
   custom: "race-custom",
+  splits: "race-splits",
 } as const;
 
 export const raceMapLayerId = (styleKey: string) => `race-map-${styleKey}`;
@@ -121,6 +122,7 @@ interface Geometry {
   name: Rect;
   subtitle: Rect;
   custom: Rect;
+  splits: Rect;
   fitPaddingPct: { top: number; right: number; bottom: number; left: number };
 }
 
@@ -139,6 +141,8 @@ const GEOMETRY: Record<"portrait" | "landscape", Geometry> = {
     name: { xPct: 38, yPct: 0, wPct: 54, hPct: 4.6 },
     subtitle: { xPct: 38, yPct: 0, wPct: 54, hPct: 2.4 },
     custom: { xPct: 38, yPct: 0, wPct: 54, hPct: 2.4 },
+    // Vänsterkolumn mellan rubrikblocket och fotot.
+    splits: { xPct: 8, yPct: 33, wPct: 24, hPct: 34 },
     fitPaddingPct: { top: 8, right: 9, bottom: 8, left: 9 },
   },
   landscape: {
@@ -153,6 +157,8 @@ const GEOMETRY: Record<"portrait" | "landscape", Geometry> = {
     name: { xPct: 44, yPct: 0, wPct: 48, hPct: 6.4 },
     subtitle: { xPct: 44, yPct: 0, wPct: 48, hPct: 3.2 },
     custom: { xPct: 44, yPct: 0, wPct: 48, hPct: 3.2 },
+    // Högerkolumn mellan sluttiden och namnet.
+    splits: { xPct: 72, yPct: 22, wPct: 20, hPct: 44 },
     fitPaddingPct: { top: 8, right: 8, bottom: 8, left: 8 },
   },
 };
@@ -242,6 +248,26 @@ function layers(o: "portrait" | "landscape", p: Palette): TemplateLayer[] {
       locks: toggleOnly(),
       // Staplar — eget formspråk (inte en fylld kurva).
       defaults: { style: "bars", fillOpacity: 0.22, thicknessMm: 0.5 },
+    },
+    {
+      id: ids.splits,
+      name: "Kilometertider",
+      type: "splits",
+      ...g.splits,
+      rotation: 0,
+      zIndex: 17,
+      hiddenByDefault: true,
+      locks: toggleOnly(),
+      defaults: {
+        labelColor: p.muted,
+        font: FONT,
+        labelSizePt: 6,
+        barFill: 0.62,
+        showPace: true,
+        showAverage: true,
+        // Km för km, även för maraton (tunna staplar, etikett var 5:e km).
+        group: "1",
+      },
     },
     raceText(ids.name, "Namn", g.name, 14, {
       field: "runnerName", placeholder: "Ditt namn", sizePt: P ? 20 : 22, color: p.ink, align: "right",

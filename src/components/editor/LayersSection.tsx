@@ -96,6 +96,7 @@ const LAYER_TYPE_ICON: Record<TemplateLayer["type"], LucideIcon> = {
   starmap: Sparkles,
   elevation: Mountain,
   raceStats: Timer,
+  splits: Timer,
 };
 
 const MAX_LAYERS = 12;

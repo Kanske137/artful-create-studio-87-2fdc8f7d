@@ -454,10 +454,14 @@
       "bib": "Bib number",
       "placement": "Placement",
       "startFinish": "Start and finish",
-      "kmMarkers": "Km markers"
+      "kmMarkers": "Km markers",
+      "splits": "Km splits"
     },
     "look": "Look",
     "routeColor": "Route colour",
-    "background": "Background"
+    "background": "Background",
+    "distanceField": "Distance (km)",
+    "paceField": "Pace (min/km)",
+    "pacePlaceholder": "Calculated"
   }
 }

@@ -1,6 +1,7 @@
 // Exempeldata för adminens förhandsvisning av lopptavlans lager, så att
 // mallen kan designas med realistiskt innehåll innan något lopp är valt.
 import type { RaceStatItem } from "./derive";
+import type { RaceSplit } from "./types";
 
 /** Mjuk, kuperad profil (ungefär som ett stadsmaraton). */
 export const SAMPLE_ELEVATION: number[] = Array.from({ length: 160 }, (_, i) => {
@@ -14,4 +15,14 @@ export const SAMPLE_STATS: RaceStatItem[] = [
   { key: "pace", label: "TEMPO", value: "5:20 /km" },
   { key: "bib", label: "STARTNR", value: "12345" },
   { key: "placement", label: "PLACERING", value: "4 812" },
+];
+
+/** Ett jämnt maraton med lite tröttare sista mil (för adminens förhandsvisning). */
+export const SAMPLE_SPLITS: RaceSplit[] = [
+  ...Array.from({ length: 42 }, (_, i) => ({
+    km: i + 1,
+    distKm: 1,
+    seconds: 318 + 9 * Math.sin(i * 0.9) + (i > 30 ? (i - 30) * 4 : 0) - (i === 41 ? 20 : 0),
+  })),
+  { km: 42.2, distKm: 0.195, seconds: 58 },
 ];

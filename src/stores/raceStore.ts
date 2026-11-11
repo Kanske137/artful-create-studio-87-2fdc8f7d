@@ -17,6 +17,7 @@ import {
   type RaceRoute,
   type RaceShow,
   type RaceSource,
+  type RaceSplit,
 } from "@/lib/race/types";
 
 interface RaceStoreState {
@@ -24,6 +25,8 @@ interface RaceStoreState {
   raceId: string | null;
   courseYear: number | null;
   route: RaceRoute | null;
+  /** Kilometertider (bara från GPX med tidsstämplar). */
+  splits: RaceSplit[] | null;
   fields: RaceFields;
   show: RaceShow;
   /** Kundens ruttfärg; null ⇒ mallens standard. */
@@ -48,6 +51,7 @@ const initial = {
   raceId: null,
   courseYear: null,
   route: null,
+  splits: null,
   fields: EMPTY_RACE_FIELDS,
   show: DEFAULT_RACE_SHOW,
   routeColor: null,
@@ -68,7 +72,9 @@ export const useRaceStore = create<RaceStoreState>((set, get) => ({
       raceId: race.id,
       courseYear: year,
       route,
-      fields: { ...prev.fields, title: race.name, city: race.city },
+      splits: null,
+      // Egen distans gäller GPX-mätningar — nollställ vid katalogval.
+      fields: { ...prev.fields, title: race.name, city: race.city, distanceKm: "" },
       fitNonce: prev.fitNonce + 1,
       loading: false,
       error: null,
@@ -84,6 +90,7 @@ export const useRaceStore = create<RaceStoreState>((set, get) => ({
       raceId: null,
       courseYear: null,
       route: result.route,
+      splits: result.splits,
       fields: {
         ...f,
         // Byt bara ut titel/ort om de kom från ett katalogval — kundens egna
@@ -111,7 +118,7 @@ export const useRaceStore = create<RaceStoreState>((set, get) => ({
 /** Ögonblicksbild för rendering (editor, mockup, kundvagn, tryck). */
 export function raceRenderInput(locale: "sv" | "en"): RaceRenderInput {
   const s = useRaceStore.getState();
-  return { route: s.route, fields: s.fields, show: s.show, routeColor: s.routeColor, locale };
+  return { route: s.route, fields: s.fields, show: s.show, routeColor: s.routeColor, locale, splits: s.splits };
 }
 
 /** Loppetiketternas språk utifrån editorns språk. */

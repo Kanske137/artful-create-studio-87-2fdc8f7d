@@ -75,3 +75,17 @@ export const RACE_STAT_LABELS: Record<RaceLocale, Record<RaceStatKey, string>> =
   sv: { distance: "DISTANS", time: "TID", pace: "TEMPO", bib: "STARTNR", placement: "PLACERING" },
   en: { distance: "DISTANCE", time: "TIME", pace: "PACE", bib: "BIB", placement: "PLACE" },
 };
+
+/** "42,195", "42.2", "21,1 km" → km. Null om ogiltigt. */
+export function parseDistanceKm(input: string): number | null {
+  const m = /^\s*(\d{1,3}(?:[.,]\d{1,3})?)\s*(km)?\s*$/i.exec(input);
+  if (!m) return null;
+  const v = parseFloat(m[1]!.replace(",", "."));
+  return v > 0 ? v : null;
+}
+
+/** Sekunder per km → "5:20". */
+export function formatPaceShort(secPerKm: number): string {
+  const s = Math.round(secPerKm);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}

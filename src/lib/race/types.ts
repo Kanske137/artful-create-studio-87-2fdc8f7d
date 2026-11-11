@@ -18,6 +18,15 @@ export type RaceCategory = "marathon" | "half" | "10k" | "5k" | "trail" | "ultra
 
 export type RaceSource = "catalog" | "gpx";
 
+/** En kilometertid (eller del av sista kilometern) ur GPX-filens tidsstämplar. */
+export interface RaceSplit {
+  /** Kilometer som delsträckan slutar på (1, 2, … eller t.ex. 42,2 för sista). */
+  km: number;
+  /** Delsträckans längd i km (1 utom ev. sista). */
+  distKm: number;
+  seconds: number;
+}
+
 /** Kundens fält i loppanelen. Tom sträng = inte ifyllt. */
 export interface RaceFields {
   title: string;
@@ -30,6 +39,10 @@ export interface RaceFields {
   bib: string;
   placement: string;
   customLine: string;
+  /** Egen distans i km (t.ex. "42,195" när klockan mätte 42,6). Tom = banans. */
+  distanceKm: string;
+  /** Eget tempo (t.ex. "5:20"). Tom = räknas ut från tid och distans. */
+  pace: string;
 }
 
 /** Vad som visas på tavlan utöver hela lager (som styrs via hiddenLayerIds). */
@@ -62,6 +75,8 @@ export const EMPTY_RACE_FIELDS: RaceFields = {
   bib: "",
   placement: "",
   customLine: "",
+  distanceKm: "",
+  pace: "",
 };
 
 /** Allt renderingen (editor, mockup, tryck) behöver om loppet. */
@@ -72,4 +87,6 @@ export interface RaceRenderInput {
   /** Kundens ruttfärg, eller null ⇒ mallens standard. */
   routeColor: string | null;
   locale: "sv" | "en";
+  /** Kilometertider (bara från GPX med tidsstämplar). */
+  splits?: RaceSplit[] | null;
 }

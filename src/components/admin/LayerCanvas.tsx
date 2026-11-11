@@ -25,8 +25,8 @@ import TextLayerPreview from "./TextLayerPreview";
 import { LineLayerView, MarginLayerView } from "@/components/editor/layers/StaticLayers";
 import { ShapeLayerView } from "@/components/editor/layers/ShapeLayerView";
 import StarmapLayerView from "@/components/editor/layers/StarmapLayerView";
-import { RaceElevationView, RaceStatsView } from "@/components/editor/layers/RaceLayerViews";
-import { SAMPLE_ELEVATION, SAMPLE_STATS } from "@/lib/race/sample";
+import { RaceElevationView, RaceSplitsView, RaceStatsView } from "@/components/editor/layers/RaceLayerViews";
+import { SAMPLE_ELEVATION, SAMPLE_SPLITS, SAMPLE_STATS } from "@/lib/race/sample";
 import { AcrylicCornerOverlay } from "@/components/editor/AcrylicCornerOverlay";
 
 const SNAP_PCT = 1.25;
@@ -176,6 +176,8 @@ export default function LayerCanvas({
           />
         );
       }
+      case "splits":
+        return <RaceSplitsView layer={layer} splits={SAMPLE_SPLITS} routeColor="#FC4C02" canvasShortPx={Math.min(size.w, size.h)} />;
       case "raceStats":
         return (
           <RaceStatsView

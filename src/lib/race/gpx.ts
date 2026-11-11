@@ -2,7 +2,7 @@
 // aldrig upp. Stödjer spår (trkpt) och rutter (rtept); export från Strava,
 // Garmin Connect m.fl. är GPX 1.1 med spår.
 import { boundsOf, cumulativeKm, fillGaps, simplifyToMax } from "./geo";
-import type { LngLat, RaceRoute } from "./types";
+import type { LngLat, RaceRoute, RaceSplit } from "./types";
 
 export type GpxErrorCode = "not-xml" | "not-gpx" | "no-points" | "too-few-points";
 
@@ -91,6 +91,41 @@ function localDateISO(ms: number): string {
   return `${y}-${m}-${day}`;
 }
 
+/**
+ * Kilometertider ur tidsstämplarna (förfluten tid mellan varje hel kilometer,
+ * linjärt interpolerat). Sista, ofullständiga kilometern tas med om den är
+ * minst 100 m. Null om filen saknar tider (t.ex. en planerad rutt).
+ */
+export function computeSplits(coords: LngLat[], times: Array<number | null>): RaceSplit[] | null {
+  const idx: number[] = [];
+  for (let i = 0; i < coords.length; i++) if (typeof times[i] === "number") idx.push(i);
+  if (idx.length < 10 || idx.length < coords.length * 0.8) return null;
+  const pts = idx.map((i) => coords[i]!);
+  const ts = idx.map((i) => times[i] as number);
+  const cum = cumulativeKm(pts);
+  const total = cum[cum.length - 1]!;
+  if (total < 1 || ts[ts.length - 1]! <= ts[0]!) return null;
+  const timeAt = (km: number): number => {
+    let j = 1;
+    while (j < cum.length - 1 && cum[j]! < km) j++;
+    const seg = cum[j]! - cum[j - 1]!;
+    const t = seg > 0 ? (km - cum[j - 1]!) / seg : 0;
+    return ts[j - 1]! + (ts[j]! - ts[j - 1]!) * Math.min(1, Math.max(0, t));
+  };
+  const out: RaceSplit[] = [];
+  let prevT = ts[0]!;
+  for (let k = 1; k <= Math.floor(total); k++) {
+    const t = timeAt(k);
+    out.push({ km: k, distKm: 1, seconds: Math.max(1, (t - prevT) / 1000) });
+    prevT = t;
+  }
+  const rest = total - Math.floor(total);
+  if (rest >= 0.1) {
+    out.push({ km: Math.round(total * 10) / 10, distKm: rest, seconds: Math.max(1, (ts[ts.length - 1]! - prevT) / 1000) });
+  }
+  return out.length ? out : null;
+}
+
 export interface GpxRouteResult {
   route: RaceRoute;
   name: string | null;
@@ -98,6 +133,8 @@ export interface GpxRouteResult {
   dateISO: string | null;
   /** Total tid första → sista tidsstämpel, sekunder, annars null. */
   elapsedSec: number | null;
+  /** Kilometertider, eller null om filen saknar tider. */
+  splits: RaceSplit[] | null;
 }
 
 /** Bygg en ritbar bana av en tolkad GPX: full distans + förenklad geometri. */
@@ -132,6 +169,7 @@ export function routeFromGpx(parsed: ParsedGpx, maxPoints = 800): GpxRouteResult
     name: parsed.name,
     dateISO: first !== null ? localDateISO(first) : null,
     elapsedSec: first !== null && last !== null && last > first ? Math.round((last - first) / 1000) : null,
+    splits: computeSplits(coords, keepIdx.map((i) => parsed.times[i] ?? null)),
   };
 }
 

@@ -38,6 +38,7 @@ import { elevationSeries } from "./race/geo";
 import { raceFieldText, raceStatItems } from "./race/derive";
 import { drawElevationProfile } from "./race/render-elevation";
 import { drawRaceStats, ensureRaceStatsFonts } from "./race/render-stats";
+import { drawSplits } from "./race/render-splits";
 import type { Bounds, RaceRenderInput, RaceRoute } from "./race/types";
 
 /** Samma luft runt banan som editorns första anpassning (MapLayerInstance). */
@@ -1137,6 +1138,19 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
           input.race?.routeColor ?? baseColor,
           Math.min(frontPxW, frontPxH),
         );
+      }
+    } else if (layer.type === "splits") {
+      const sp = input.race?.splits;
+      if (sp && sp.length) {
+        const routeMap = layers.find((x) => x.type === "map" && x.defaults.routeStyle);
+        const baseColor =
+          routeMap && routeMap.type === "map" ? routeMap.defaults.routeStyle!.color : "#FC4C02";
+        try {
+          await document.fonts?.load(`500 20px "${layer.defaults.font}"`);
+        } catch {
+          /* fallback-font */
+        }
+        drawSplits(ctx, rect, sp, layer.defaults, input.race?.routeColor ?? baseColor, Math.min(frontPxW, frontPxH));
       }
     } else if (layer.type === "raceStats") {
       if (input.race) {

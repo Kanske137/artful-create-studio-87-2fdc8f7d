@@ -6,6 +6,8 @@ import type { TemplateLayer } from "@/lib/template-schema";
 import type { RaceStatItem } from "@/lib/race/derive";
 import { drawElevationProfile } from "@/lib/race/render-elevation";
 import { drawRaceStats, ensureRaceStatsFonts } from "@/lib/race/render-stats";
+import { drawSplits } from "@/lib/race/render-splits";
+import type { RaceSplit } from "@/lib/race/types";
 
 /** Gemensam canvas som följer layoutstorleken × devicePixelRatio. */
 function useLayerCanvas(
@@ -79,4 +81,30 @@ export function RaceStatsView({ layer, items, canvasShortPx }: StatsProps) {
     [layer, itemsKey, canvasShortPx],
   );
   return <canvas ref={ref} className="w-full h-full block" aria-label="Loppstatistik" />;
+}
+
+interface SplitsProps {
+  layer: Extract<TemplateLayer, { type: "splits" }>;
+  splits: RaceSplit[];
+  routeColor: string;
+  canvasShortPx: number;
+}
+
+export function RaceSplitsView({ layer, splits, routeColor, canvasShortPx }: SplitsProps) {
+  const key = splits.map((s) => `${s.km}:${Math.round(s.seconds)}`).join("|");
+  const ref = useLayerCanvas(
+    async (ctx, w, h, scale) => {
+      if (typeof document !== "undefined" && document.fonts) {
+        try {
+          await document.fonts.load(`500 20px "${layer.defaults.font}"`);
+        } catch {
+          /* fallback-font */
+        }
+      }
+      ctx.clearRect(0, 0, w, h);
+      drawSplits(ctx, { x: 0, y: 0, w, h }, splits, layer.defaults, routeColor, canvasShortPx * scale);
+    },
+    [layer, key, routeColor, canvasShortPx],
+  );
+  return <canvas ref={ref} className="w-full h-full block" aria-label="Kilometertider" />;
 }

@@ -454,10 +454,14 @@
       "bib": "Startnummer",
       "placement": "Placering",
       "startFinish": "Start och mål",
-      "kmMarkers": "Km-markeringar"
+      "kmMarkers": "Km-markeringar",
+      "splits": "Kilometertider"
     },
     "look": "Utseende",
     "routeColor": "Färg på rutten",
-    "background": "Bakgrund"
+    "background": "Bakgrund",
+    "distanceField": "Distans (km)",
+    "paceField": "Tempo (min/km)",
+    "pacePlaceholder": "Räknas ut"
   }
 }

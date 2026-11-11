@@ -46,6 +46,7 @@ import {
   RaceFieldInspector,
   RaceStatsInspector,
   RouteStyleInspector,
+  SplitsInspector,
 } from "./RaceInspector";
 
 interface Props {
@@ -255,6 +256,9 @@ export default function LayerInspector({ config, layer, allLayers, onChange, onL
       )}
       {layer.type === "raceStats" && (
         <RaceStatsInspector layer={layer} update={(p) => updateDefaults(p as never)} />
+      )}
+      {layer.type === "splits" && (
+        <SplitsInspector layer={layer} update={(p) => updateDefaults(p as never)} />
       )}
       <HiddenByDefaultToggle layer={layer} onChange={onChange} />
 
