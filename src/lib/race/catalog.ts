@@ -42,6 +42,14 @@ export const RACE_CATALOG: RaceDef[] = [
   { id: "midnattsloppet-malmo", name: "Midnattsloppet", city: "Malmö", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["midnattsloppet malmö"], courses: [{ year: 2026, file: "midnattsloppet-malmo-2026.json" }] },
   { id: "ultravasan-45", name: "Ultravasan 45", city: "Oxberg–Mora", country: "Sverige", category: "ultra", distanceKm: 45, aliases: ["vasaloppet", "ultravasan"], courses: [{ year: 2026, file: "ultravasan-45-2026.json" }] },
   { id: "trailvasan-30", name: "Trailvasan 30", city: "Oxberg–Mora", country: "Sverige", category: "trail", distanceKm: 30, aliases: ["vasaloppet", "trailvasan"], courses: [{ year: 2026, file: "trailvasan-30-2026.json" }] },
+  { id: "helsingborg-marathon", name: "Helsingborg Marathon", city: "Helsingborg", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["hbgm", "maraton helsingborg"], courses: [{ year: 2026, file: "helsingborg-marathon-2026.json" }] },
+  { id: "helsingborg-halvmarathon", name: "Helsingborg Half Marathon", city: "Helsingborg", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["hbgm", "halvmaraton helsingborg"], courses: [{ year: 2026, file: "helsingborg-halvmarathon-2026.json" }] },
+  { id: "premiarhalvan", name: "Premiärhalvan", city: "Stockholm", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["adidas premiärhalvan", "djurgården"], courses: [{ year: 2026, file: "premiarhalvan-2026.json" }] },
+  { id: "premiarmilen", name: "Premiärmilen", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["adidas premiärmilen", "norra djurgården"], courses: [{ year: 2025, file: "premiarmilen-2025.json" }] },
+  { id: "uppsala-marathon", name: "Uppsala Marathon", city: "Uppsala", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["maraton uppsala"], courses: [{ year: 2026, file: "uppsala-marathon-2026.json" }] },
+  { id: "uppsala-halvmarathon", name: "Uppsala Halvmarathon", city: "Uppsala", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton uppsala", "uppsala marathon"], courses: [{ year: 2026, file: "uppsala-halvmarathon-2026.json" }] },
+  { id: "fjallmaraton-45", name: "Fjällmaraton", city: "Årefjällen", country: "Sverige", category: "trail", distanceKm: 45, aliases: ["kia fjällmaraton", "fjällmaraton 45", "åre", "vålådalen"], courses: [{ year: 2026, file: "fjallmaraton-45-2026.json" }] },
+  { id: "fjallmaraton-27", name: "Fjällmaraton 27K", city: "Årefjällen", country: "Sverige", category: "trail", distanceKm: 27, aliases: ["salomon 27k", "fjällmaraton", "ottsjö", "åre"], courses: [{ year: 2026, file: "fjallmaraton-27-2026.json" }] },
 ];
 
 export const RACE_CATEGORY_LABELS: Record<RaceCategory | "all", { sv: string; en: string }> = {
