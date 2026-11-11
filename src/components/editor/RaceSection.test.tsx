@@ -119,7 +119,8 @@ describe("Lopptavlans kundpanel", () => {
   it("spärrar beställning tills ett lopp eller en GPX-fil valts", async () => {
     expect(useEditorStore.getState().orderBlockReason()).toBe("race");
     const { container } = render(<RacePickerPanel />);
-    expect(byText(/Inga lopp i listan än/)).not.toBeNull();
+    // Loppisten visar katalogens lopp som har en ritad bana.
+    expect(byText("Göteborgsvarvet", "span")).not.toBeNull();
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     await changeFile(input, gpxFile());
     await waitFor(() => expect(useRaceStore.getState().route).not.toBeNull());
