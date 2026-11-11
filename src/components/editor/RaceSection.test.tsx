@@ -125,8 +125,9 @@ describe("Lopptavlans kundpanel", () => {
   it("spärrar beställning tills ett lopp eller en GPX-fil valts", async () => {
     expect(useEditorStore.getState().orderBlockReason()).toBe("race");
     const { container } = render(<RacePickerPanel />);
-    // Loppisten visar katalogens lopp som har en ritad bana.
-    expect(byText("Göteborgsvarvet", "span")).not.toBeNull();
+    // Maratontavlan förfiltrerar listan på maraton: Stockholm Marathon syns, halvmaran inte.
+    expect(byText("Stockholm Marathon", "span")).not.toBeNull();
+    expect(byText("Göteborgsvarvet", "span")).toBeNull();
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     await changeFile(input, gpxFile());
     await waitFor(() => expect(useRaceStore.getState().route).not.toBeNull());
