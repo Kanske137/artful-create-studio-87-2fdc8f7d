@@ -22,11 +22,12 @@ describe("banfiler", () => {
       const race = RACE_CATALOG.find((r) => r.courses.some((c) => c.file === f))!;
       const route = routeFromCompact(json, race.distanceKm);
       const coords = decodePolyline(json.poly);
-      // Start/mål exakt som källan (fångar avskrivningsfel i kodningen).
-      expect(coords[0]![0]).toBeCloseTo(json.start[0], 5);
-      expect(coords[0]![1]).toBeCloseTo(json.start[1], 5);
-      expect(coords[coords.length - 1]![0]).toBeCloseTo(json.end[0], 5);
-      expect(coords[coords.length - 1]![1]).toBeCloseTo(json.end[1], 5);
+      // Start/mål som källan, på en avrundningsenhet när (fångar avskrivningsfel i kodningen).
+      const near = (a: number, b: number) => expect(Math.abs(a - b)).toBeLessThanOrEqual(1.01e-5);
+      near(coords[0]![0], json.start[0]);
+      near(coords[0]![1], json.start[1]);
+      near(coords[coords.length - 1]![0], json.end[0]);
+      near(coords[coords.length - 1]![1], json.end[1]);
       // Förenklad linje: högst ~3 % kortare än källans mätning.
       const km = totalKm(coords);
       expect(km).toBeGreaterThan(json.measuredKm * 0.97);

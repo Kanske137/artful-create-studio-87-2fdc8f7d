@@ -1,8 +1,11 @@
-// Loppkatalogen. Metadata här; banorna som GeoJSON i public/races/ och
-// laddas först när kunden väljer loppet (editorn blir inte tyngre).
+// Loppkatalogen. Metadata här; banorna ligger i public/races/<id>-<år>.json
+// (kompakt format: Google encoded polyline + höjd i hela meter) och laddas
+// först när kunden väljer loppet, så editorn blir inte tyngre.
 //
-// Lägga till ett lopp: rita banan i /admin/races, lägg filen i
-// public/races/<id>-<år>.geojson och lägg till en `courses`-rad nedan.
+// Lägga till ett lopp: hämta arrangörens officiella GPX/KML/KMZ med
+// tools/route-extract.mjs (körs i webbläsaren på arrangörens sida), spara med
+// tools/save-course.mjs och lägg till en `courses`-rad nedan.
+// src/lib/race/courses.test.ts kontrollerar varje banfil.
 // Ett lopp utan banor visas inte i väljaren.
 import { boundsOf } from "./geo";
 import type { LngLat, RaceCategory, RaceRoute } from "./types";
@@ -30,11 +33,15 @@ export interface RaceDef {
 export const RACE_CATALOG: RaceDef[] = [
   { id: "stockholm-marathon", name: "Stockholm Marathon", city: "Stockholm", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["maraton stockholm"], courses: [{ year: 2026, file: "stockholm-marathon-2026.json" }] },
   { id: "goteborgsvarvet", name: "Göteborgsvarvet", city: "Göteborg", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["varvet"], courses: [{ year: 2026, file: "goteborgsvarvet-2026.json" }] },
-  { id: "stockholm-halvmarathon", name: "Stockholm Halvmarathon", city: "Stockholm", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton stockholm"], courses: [] },
-  { id: "lidingoloppet-30", name: "Lidingöloppet", city: "Lidingö", country: "Sverige", category: "trail", distanceKm: 30, aliases: ["lidingö"], courses: [] },
-  { id: "midnattsloppet-stockholm", name: "Midnattsloppet", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, courses: [] },
+  { id: "stockholm-halvmarathon", name: "Stockholm Halvmarathon", city: "Stockholm", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton stockholm"], courses: [{ year: 2026, file: "stockholm-halvmarathon-2026.json" }] },
+  { id: "lidingoloppet-30", name: "Lidingöloppet", city: "Lidingö", country: "Sverige", category: "trail", distanceKm: 30, aliases: ["lidingö"], courses: [{ year: 2026, file: "lidingoloppet-30-2026.json" }] },
+  { id: "midnattsloppet-stockholm", name: "Midnattsloppet", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, courses: [{ year: 2026, file: "midnattsloppet-stockholm-2026.json" }] },
   { id: "tjejmilen", name: "Tjejmilen", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, courses: [] },
-  { id: "ultravasan-90", name: "Ultravasan 90", city: "Sälen–Mora", country: "Sverige", category: "ultra", distanceKm: 90, aliases: ["vasaloppet", "ultravasan"], courses: [] },
+  { id: "ultravasan-90", name: "Ultravasan 90", city: "Sälen–Mora", country: "Sverige", category: "ultra", distanceKm: 92, aliases: ["vasaloppet", "ultravasan"], courses: [{ year: 2026, file: "ultravasan-90-2026.json" }] },
+  { id: "midnattsloppet-goteborg", name: "Midnattsloppet", city: "Göteborg", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["midnattsloppet göteborg"], courses: [{ year: 2026, file: "midnattsloppet-goteborg-2026.json" }] },
+  { id: "midnattsloppet-malmo", name: "Midnattsloppet", city: "Malmö", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["midnattsloppet malmö"], courses: [{ year: 2026, file: "midnattsloppet-malmo-2026.json" }] },
+  { id: "ultravasan-45", name: "Ultravasan 45", city: "Oxberg–Mora", country: "Sverige", category: "ultra", distanceKm: 45, aliases: ["vasaloppet", "ultravasan"], courses: [{ year: 2026, file: "ultravasan-45-2026.json" }] },
+  { id: "trailvasan-30", name: "Trailvasan 30", city: "Oxberg–Mora", country: "Sverige", category: "trail", distanceKm: 30, aliases: ["vasaloppet", "trailvasan"], courses: [{ year: 2026, file: "trailvasan-30-2026.json" }] },
 ];
 
 export const RACE_CATEGORY_LABELS: Record<RaceCategory | "all", { sv: string; en: string }> = {
