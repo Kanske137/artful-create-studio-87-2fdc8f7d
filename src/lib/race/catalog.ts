@@ -29,7 +29,7 @@ export interface RaceDef {
 
 export const RACE_CATALOG: RaceDef[] = [
   { id: "stockholm-marathon", name: "Stockholm Marathon", city: "Stockholm", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["maraton stockholm"], courses: [] },
-  { id: "goteborgsvarvet", name: "Göteborgsvarvet", city: "Göteborg", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["varvet"], courses: [] },
+  { id: "goteborgsvarvet", name: "Göteborgsvarvet", city: "Göteborg", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["varvet"], courses: [{ year: 2026, file: "goteborgsvarvet-2026.json" }] },
   { id: "stockholm-halvmarathon", name: "Stockholm Halvmarathon", city: "Stockholm", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton stockholm"], courses: [] },
   { id: "lidingoloppet-30", name: "Lidingöloppet", city: "Lidingö", country: "Sverige", category: "trail", distanceKm: 30, aliases: ["lidingö"], courses: [] },
   { id: "midnattsloppet-stockholm", name: "Midnattsloppet", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, courses: [] },
@@ -98,6 +98,59 @@ export function productHandleForCategory(category: RaceCategory): string {
 }
 
 // ---------- banfiler ----------
+// Två format stöds: kompakt banfil (.json, se tools/route-extract.mjs) med
+// Google encoded polyline (1e5) + höjd i hela meter, och GeoJSON (.geojson).
+
+function decodeValues(str: string): number[] {
+  const out: number[] = [];
+  let i = 0;
+  while (i < str.length) {
+    let shift = 0, result = 0, b: number;
+    do {
+      b = str.charCodeAt(i++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20 && i < str.length);
+    out.push(result & 1 ? ~(result >> 1) : result >> 1);
+  }
+  return out;
+}
+
+export function decodePolyline(str: string): LngLat[] {
+  const d = decodeValues(str);
+  const out: LngLat[] = [];
+  let lat = 0, lng = 0;
+  for (let i = 0; i + 1 < d.length; i += 2) {
+    lat += d[i]!;
+    lng += d[i + 1]!;
+    out.push([lng / 1e5, lat / 1e5]);
+  }
+  return out;
+}
+
+export function decodeElevation(str: string): number[] {
+  let v = 0;
+  return decodeValues(str).map((dv) => (v += dv));
+}
+
+interface CompactCourse {
+  v: 1;
+  poly: string;
+  ele?: string | null;
+}
+
+/** Tolka en kompakt banfil. */
+export function routeFromCompact(json: CompactCourse, distanceKm: number): RaceRoute {
+  const coords = decodePolyline(json.poly);
+  if (coords.length < 2) throw new Error("Banfilen saknar en giltig linje.");
+  const ele = json.ele ? decodeElevation(json.ele) : null;
+  return {
+    coords,
+    ele: ele && ele.length === coords.length ? ele : null,
+    distanceKm,
+    bbox: boundsOf(coords),
+  };
+}
 
 interface CourseFeature {
   type: "Feature";
@@ -127,5 +180,8 @@ export async function loadCourse(race: RaceDef, year?: number | null): Promise<R
   if (!course) throw new Error(`Ingen bana ritad för ${race.name} ännu.`);
   const res = await fetch(`/races/${course.file}`);
   if (!res.ok) throw new Error(`Kunde inte hämta banan för ${race.name}.`);
-  return routeFromGeoJson(await res.json(), race.distanceKm);
+  const json = await res.json();
+  return json && typeof json.poly === "string"
+    ? routeFromCompact(json as CompactCourse, race.distanceKm)
+    : routeFromGeoJson(json, race.distanceKm);
 }
