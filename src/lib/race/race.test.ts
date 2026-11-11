@@ -267,3 +267,44 @@ describe("kilometertider", () => {
     expect(items.map((i) => i.value)).toEqual(["42,195 km", "5:15 /km"]);
   });
 });
+
+import { Encoder, Profile } from "@garmin/fitsdk";
+import { isFitBytes, parseFit } from "./gpx";
+
+describe("TCX och FIT", () => {
+  const pts = line(40);
+  const t0 = Date.parse("2026-05-30T10:00:00Z");
+
+  it("läser TCX med tider och höjd", () => {
+    const tps = pts.map(([lon, lat], i) =>
+      `<Trackpoint><Time>${new Date(t0 + i * 20_000).toISOString()}</Time><Position><LatitudeDegrees>${lat}</LatitudeDegrees><LongitudeDegrees>${lon}</LongitudeDegrees></Position><AltitudeMeters>${20 + (i % 5)}</AltitudeMeters></Trackpoint>`,
+    ).join("");
+    const xml = `<?xml version="1.0"?><TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"><Activities><Activity Sport="Running"><Lap><Track><Trackpoint><Time>${new Date(t0).toISOString()}</Time></Trackpoint>${tps}</Track></Lap></Activity></Activities></TrainingCenterDatabase>`;
+    const r = routeFromGpx(parseGpx(xml));
+    expect(r.route.distanceKm).toBeCloseTo(4.33, 1);
+    expect(r.elapsedSec).toBe(39 * 20);
+    expect(r.splits?.length).toBe(5);
+    expect(r.route.ele).not.toBeNull();
+  });
+
+  it("läser FIT (Garmins format) med Garmins SDK", async () => {
+    const enc = new Encoder();
+    // SDK:ns typer för meddelandefält är snäva — testdata skickas som unknown.
+    const mesg = (m: Record<string, unknown>) => m as never;
+    enc.onMesg(Profile.MesgNum.FILE_ID, mesg({ type: "activity", manufacturer: "garmin", product: 0, timeCreated: new Date(t0), serialNumber: 1234 }));
+    pts.forEach(([lon, lat], i) => {
+      enc.onMesg(Profile.MesgNum.RECORD, mesg({
+        timestamp: new Date(t0 + i * 20_000),
+        positionLat: Math.round(lat / (180 / 2 ** 31)),
+        positionLong: Math.round(lon / (180 / 2 ** 31)),
+        enhancedAltitude: 20 + (i % 5),
+      }));
+    });
+    const bytes = enc.close();
+    expect(isFitBytes(bytes)).toBe(true);
+    const r = routeFromGpx(await parseFit(bytes));
+    expect(r.route.distanceKm).toBeCloseTo(4.33, 1);
+    expect(r.dateISO).toBe("2026-05-30");
+    expect(r.splits?.length).toBe(5);
+  });
+});

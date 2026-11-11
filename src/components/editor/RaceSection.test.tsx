@@ -142,7 +142,7 @@ describe("Lopptavlans kundpanel", () => {
     const { container } = render(<RacePickerPanel />);
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     await changeFile(input, new File(["<kml></kml>"], "fel.kml"));
-    await waitFor(() => expect(container.querySelector('[role="alert"]')?.textContent).toMatch(/inte vara en GPX-fil/));
+    await waitFor(() => expect(container.querySelector('[role="alert"]')?.textContent).toMatch(/inte vara en GPX-, TCX- eller FIT-fil/));
   });
 
   it("reglagen döljer lager och flödet flyttar upp det som ligger under", () => {

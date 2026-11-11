@@ -1,6 +1,8 @@
-// GPX-läsning för lopptavlan. Körs helt i kundens webbläsare — filen laddas
-// aldrig upp. Stödjer spår (trkpt) och rutter (rtept); export från Strava,
-// Garmin Connect m.fl. är GPX 1.1 med spår.
+// Läsning av kundens aktivitetsfil för lopptavlan. Körs helt i kundens
+// webbläsare — filen laddas aldrig upp. Stödjer GPX (spår/rutter; Strava,
+// Garmin, Apple-exportappar m.fl.), TCX (Garmin/Polar m.fl.) och FIT
+// (Garmins originalformat; läses med Garmins officiella SDK, laddas först
+// när en FIT-fil väljs).
 import { boundsOf, cumulativeKm, fillGaps, simplifyToMax } from "./geo";
 import type { LngLat, RaceRoute, RaceSplit } from "./types";
 
@@ -15,14 +17,14 @@ export class GpxError extends Error {
 
 export const GPX_ERROR_MESSAGES: Record<"sv" | "en", Record<GpxErrorCode, string>> = {
   sv: {
-    "not-xml": "Filen kunde inte läsas. Välj en GPX-fil exporterad från t.ex. Strava eller Garmin.",
-    "not-gpx": "Det här verkar inte vara en GPX-fil. Exportera loppet som GPX och försök igen.",
+    "not-xml": "Filen kunde inte läsas. Välj en GPX-, TCX- eller FIT-fil exporterad från t.ex. Strava, Garmin eller Apple Watch.",
+    "not-gpx": "Det här verkar inte vara en GPX-, TCX- eller FIT-fil. Exportera aktiviteten och försök igen.",
     "no-points": "Filen innehåller ingen rutt. Kontrollera att du exporterat själva aktiviteten.",
     "too-few-points": "Rutten i filen är för kort för att kunna ritas upp.",
   },
   en: {
-    "not-xml": "The file could not be read. Choose a GPX file exported from e.g. Strava or Garmin.",
-    "not-gpx": "This doesn't look like a GPX file. Export the race as GPX and try again.",
+    "not-xml": "The file could not be read. Choose a GPX, TCX or FIT file exported from e.g. Strava, Garmin or Apple Watch.",
+    "not-gpx": "This doesn't look like a GPX, TCX or FIT file. Export the activity and try again.",
     "no-points": "The file contains no route. Make sure you exported the activity itself.",
     "too-few-points": "The route in the file is too short to draw.",
   },
@@ -53,6 +55,7 @@ export function parseGpx(xml: string): ParsedGpx {
   }
   if (doc.getElementsByTagName("parsererror").length > 0) throw new GpxError("not-xml");
   const root = doc.documentElement;
+  if (root?.localName === "TrainingCenterDatabase") return parseTcxDocument(root);
   if (!root || root.localName !== "gpx") throw new GpxError("not-gpx");
 
   let pts = Array.from(root.getElementsByTagNameNS("*", "trkpt"));
@@ -81,6 +84,63 @@ export function parseGpx(xml: string): ParsedGpx {
   const trk = root.getElementsByTagNameNS("*", "trk")[0] ?? root.getElementsByTagNameNS("*", "rte")[0];
   const name = (trk && textOf(trk, "name")) || null;
   return { name, coords, ele, times };
+}
+
+/** TCX: Trackpoint med Time, Position (Latitude/LongitudeDegrees) och AltitudeMeters. */
+function parseTcxDocument(root: Element): ParsedGpx {
+  const coords: LngLat[] = [];
+  const ele: Array<number | null> = [];
+  const times: Array<number | null> = [];
+  for (const tp of Array.from(root.getElementsByTagNameNS("*", "Trackpoint"))) {
+    const lat = parseFloat(textOf(tp, "LatitudeDegrees") ?? "");
+    const lon = parseFloat(textOf(tp, "LongitudeDegrees") ?? "");
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue; // punkter utan GPS (t.ex. paus)
+    coords.push([lon, lat]);
+    const e = parseFloat(textOf(tp, "AltitudeMeters") ?? "");
+    ele.push(Number.isFinite(e) ? e : null);
+    const t = textOf(tp, "Time");
+    const ms = t ? Date.parse(t) : NaN;
+    times.push(Number.isFinite(ms) ? ms : null);
+  }
+  if (coords.length === 0) throw new GpxError("no-points");
+  if (coords.length < MIN_POINTS) throw new GpxError("too-few-points");
+  const name = textOf(root, "Notes") ?? null;
+  return { name, coords, ele, times };
+}
+
+const SEMICIRCLE_TO_DEG = 180 / 2 ** 31;
+
+/** FIT (binär). Garmins SDK laddas först här, så editorn blir inte tyngre. */
+export async function parseFit(bytes: Uint8Array): Promise<ParsedGpx> {
+  const { Decoder, Stream } = await import("@garmin/fitsdk");
+  const decoder = new Decoder(Stream.fromByteArray(Array.from(bytes)));
+  if (!decoder.isFIT()) throw new GpxError("not-gpx");
+  const { messages } = decoder.read({ convertDateTimesToDates: true });
+  const records = ((messages as Record<string, unknown[]>).recordMesgs ?? []) as Array<{
+    positionLat?: number;
+    positionLong?: number;
+    enhancedAltitude?: number;
+    altitude?: number;
+    timestamp?: Date;
+  }>;
+  const coords: LngLat[] = [];
+  const ele: Array<number | null> = [];
+  const times: Array<number | null> = [];
+  for (const r of records) {
+    if (typeof r.positionLat !== "number" || typeof r.positionLong !== "number") continue;
+    coords.push([r.positionLong * SEMICIRCLE_TO_DEG, r.positionLat * SEMICIRCLE_TO_DEG]);
+    const e = r.enhancedAltitude ?? r.altitude;
+    ele.push(typeof e === "number" && Number.isFinite(e) ? e : null);
+    times.push(r.timestamp instanceof Date ? r.timestamp.getTime() : null);
+  }
+  if (coords.length === 0) throw new GpxError("no-points");
+  if (coords.length < MIN_POINTS) throw new GpxError("too-few-points");
+  return { name: null, coords, ele, times };
+}
+
+/** FIT-filer har ".FIT" på byte 8–11. */
+export function isFitBytes(b: Uint8Array): boolean {
+  return b.length > 12 && b[8] === 0x2e && b[9] === 0x46 && b[10] === 0x49 && b[11] === 0x54;
 }
 
 function localDateISO(ms: number): string {
@@ -175,7 +235,21 @@ export function routeFromGpx(parsed: ParsedGpx, maxPoints = 800): GpxRouteResult
 
 /** Läs en File (från <input type=file>) hela vägen till en ritbar bana. */
 export async function readGpxFile(file: File): Promise<GpxRouteResult> {
+  const head = new Uint8Array(await readAsBuffer(file.slice(0, 16)));
+  if (isFitBytes(head) || /\.fit$/i.test(file.name)) {
+    return routeFromGpx(await parseFit(new Uint8Array(await readAsBuffer(file))));
+  }
   return routeFromGpx(parseGpx(await readAsText(file)));
+}
+
+function readAsBuffer(blob: Blob): Promise<ArrayBuffer> {
+  if (typeof blob.arrayBuffer === "function") return blob.arrayBuffer();
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result as ArrayBuffer);
+    r.onerror = () => reject(r.error ?? new Error("read failed"));
+    r.readAsArrayBuffer(blob);
+  });
 }
 
 /** Blob.text() saknas i äldre webbläsare — fall tillbaka på FileReader. */

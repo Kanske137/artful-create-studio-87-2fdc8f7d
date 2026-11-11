@@ -198,7 +198,7 @@ export function RacePickerPanel() {
           <input
             ref={fileRef}
             type="file"
-            accept=".gpx,application/gpx+xml,application/xml,text/xml"
+            accept=".gpx,.tcx,.fit,application/gpx+xml,application/vnd.garmin.tcx+xml,application/xml,text/xml,application/octet-stream"
             className="hidden"
             onChange={(e) => void onFile(e.target.files?.[0])}
           />
