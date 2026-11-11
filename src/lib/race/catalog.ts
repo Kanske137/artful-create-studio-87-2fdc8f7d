@@ -1,0 +1,131 @@
+// Loppkatalogen. Metadata här; banorna som GeoJSON i public/races/ och
+// laddas först när kunden väljer loppet (editorn blir inte tyngre).
+//
+// Lägga till ett lopp: rita banan i /admin/races, lägg filen i
+// public/races/<id>-<år>.geojson och lägg till en `courses`-rad nedan.
+// Ett lopp utan banor visas inte i väljaren.
+import { boundsOf } from "./geo";
+import type { LngLat, RaceCategory, RaceRoute } from "./types";
+
+export interface RaceCourse {
+  /** Första året banan gäller (banor ändras mellan år). */
+  year: number;
+  /** Filnamn i public/races/. */
+  file: string;
+}
+
+export interface RaceDef {
+  id: string;
+  name: string;
+  city: string;
+  country: string;
+  category: RaceCategory;
+  /** Officiell distans. */
+  distanceKm: number;
+  /** Extra sökord i väljaren. */
+  aliases?: string[];
+  courses: RaceCourse[];
+}
+
+export const RACE_CATALOG: RaceDef[] = [
+  { id: "stockholm-marathon", name: "Stockholm Marathon", city: "Stockholm", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["maraton stockholm"], courses: [] },
+  { id: "goteborgsvarvet", name: "Göteborgsvarvet", city: "Göteborg", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["varvet"], courses: [] },
+  { id: "stockholm-halvmarathon", name: "Stockholm Halvmarathon", city: "Stockholm", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton stockholm"], courses: [] },
+  { id: "lidingoloppet-30", name: "Lidingöloppet", city: "Lidingö", country: "Sverige", category: "trail", distanceKm: 30, aliases: ["lidingö"], courses: [] },
+  { id: "midnattsloppet-stockholm", name: "Midnattsloppet", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, courses: [] },
+  { id: "tjejmilen", name: "Tjejmilen", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, courses: [] },
+  { id: "ultravasan-90", name: "Ultravasan 90", city: "Sälen–Mora", country: "Sverige", category: "ultra", distanceKm: 90, aliases: ["vasaloppet", "ultravasan"], courses: [] },
+];
+
+export const RACE_CATEGORY_LABELS: Record<RaceCategory | "all", { sv: string; en: string }> = {
+  all: { sv: "Alla", en: "All" },
+  marathon: { sv: "Maraton", en: "Marathon" },
+  half: { sv: "Halvmaraton", en: "Half marathon" },
+  "10k": { sv: "10 km", en: "10K" },
+  "5k": { sv: "5 km", en: "5K" },
+  trail: { sv: "Terräng", en: "Trail" },
+  ultra: { sv: "Ultra", en: "Ultra" },
+  other: { sv: "Övrigt", en: "Other" },
+};
+
+/** Lopp som har minst en ritad bana — bara de visas för kunden. */
+export function availableRaces(): RaceDef[] {
+  return RACE_CATALOG.filter((r) => r.courses.length > 0);
+}
+
+/** Senaste banan som gällde ett visst år (eller den nyaste). */
+export function courseFor(race: RaceDef, year?: number | null): RaceCourse | null {
+  const sorted = [...race.courses].sort((a, b) => b.year - a.year);
+  if (!sorted.length) return null;
+  if (!year) return sorted[0]!;
+  return sorted.find((c) => c.year <= year) ?? sorted[sorted.length - 1]!;
+}
+
+/** Kategori utifrån distans (används för GPX och kundvagnsprodukt). */
+export function categoryForDistance(km: number): RaceCategory {
+  if (km >= 41.5 && km <= 43.5) return "marathon";
+  if (km >= 20.6 && km <= 21.6) return "half";
+  if (km >= 9.5 && km <= 10.6) return "10k";
+  if (km >= 4.7 && km <= 5.3) return "5k";
+  if (km > 43.5) return "ultra";
+  return "other";
+}
+
+// ---------- produkter ----------
+// Tre Shopify-produkter delar EN mall (lopptavla). Kundvagnen får alltid den
+// produkt som matchar det valda loppets kategori — samma mönster som
+// drinktavlorna.
+
+export const RACE_MASTER_HANDLE = "lopptavla";
+
+/** Produkter som läser sin layout från huvudmallen. */
+export const RACE_TEMPLATE_ALIASES: Record<string, string> = {
+  maratontavla: RACE_MASTER_HANDLE,
+  halvmaratontavla: RACE_MASTER_HANDLE,
+};
+
+/** Förvalt filter i loppväljaren per produkt. */
+export const RACE_DEFAULT_FILTER: Record<string, RaceCategory | "all"> = {
+  maratontavla: "marathon",
+  halvmaratontavla: "half",
+  lopptavla: "all",
+};
+
+export function productHandleForCategory(category: RaceCategory): string {
+  if (category === "marathon") return "maratontavla";
+  if (category === "half") return "halvmaratontavla";
+  return RACE_MASTER_HANDLE;
+}
+
+// ---------- banfiler ----------
+
+interface CourseFeature {
+  type: "Feature";
+  geometry: { type: "LineString"; coordinates: Array<[number, number] | [number, number, number]> };
+}
+
+/** Tolka en banfil (GeoJSON Feature/FeatureCollection med en LineString). */
+export function routeFromGeoJson(json: unknown, distanceKm: number): RaceRoute {
+  const feat: CourseFeature | undefined =
+    (json as { type?: string })?.type === "FeatureCollection"
+      ? (json as { features: CourseFeature[] }).features?.[0]
+      : (json as CourseFeature);
+  const raw = feat?.geometry?.type === "LineString" ? feat.geometry.coordinates : null;
+  if (!raw || raw.length < 2) throw new Error("Banfilen saknar en giltig linje.");
+  const coords: LngLat[] = raw.map((c) => [c[0], c[1]]);
+  const hasEle = raw.every((c) => c.length >= 3 && Number.isFinite(c[2]));
+  return {
+    coords,
+    ele: hasEle ? raw.map((c) => c[2] as number) : null,
+    distanceKm,
+    bbox: boundsOf(coords),
+  };
+}
+
+export async function loadCourse(race: RaceDef, year?: number | null): Promise<RaceRoute> {
+  const course = courseFor(race, year);
+  if (!course) throw new Error(`Ingen bana ritad för ${race.name} ännu.`);
+  const res = await fetch(`/races/${course.file}`);
+  if (!res.ok) throw new Error(`Kunde inte hämta banan för ${race.name}.`);
+  return routeFromGeoJson(await res.json(), race.distanceKm);
+}

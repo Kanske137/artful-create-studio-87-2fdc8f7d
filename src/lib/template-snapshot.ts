@@ -32,6 +32,17 @@ import {
 } from "./text-typography";
 import { iconSvgString } from "./map-icon-catalog";
 import { renderStarmap } from "./starmap-render";
+import { applyFlowLayout } from "./flow-layout";
+import { applyRouteToMap, paddedBounds, type RouteRenderOptions } from "./race/route-map";
+import { elevationSeries } from "./race/geo";
+import { raceFieldText, raceStatItems } from "./race/derive";
+import { drawElevationProfile } from "./race/render-elevation";
+import { drawRaceStats, ensureRaceStatsFonts } from "./race/render-stats";
+import type { Bounds, RaceRenderInput, RaceRoute } from "./race/types";
+
+/** Samma luft runt banan som editorns första anpassning (MapLayerInstance). */
+const ROUTE_FIT_FRAC = 0.06;
+const ROUTE_FIT_PAD_SHARE = 0.04;
 
 export interface TemplateSnapshotInput {
   template: Template;
@@ -46,6 +57,9 @@ export interface TemplateSnapshotInput {
   /** Aktiv innehållsvariant (t.ex. vald drink) — löser bild/accentfärg ur
    *  template.contentVariants vid rendering. */
   contentVariantId?: string | null;
+
+  /** Lopptavla: bana, kundens fält och reglage. Utelämnad ⇒ inga loppdata. */
+  race?: RaceRenderInput | null;
 
   // Per-layer values keyed by layer id. When provided, these override the
   // legacy live* fields. Falls back to layer.defaults when missing.
@@ -179,6 +193,10 @@ async function drawMapLayer(
     styleId: string;
     showLabels: boolean;
     shape: string;
+    /** Ruttkarta: anpassa kartan till exakt detta utsnitt i stället för center/zoom. */
+    bounds?: Bounds | null;
+    /** Ruttkarta: banan som ska ritas i kartan. */
+    route?: { route: RaceRoute; opts: RouteRenderOptions } | null;
   },
 ): Promise<void> {
   const container = createOffscreen(rect.w, rect.h);
@@ -189,11 +207,20 @@ async function drawMapLayer(
 
   let map: mapboxgl.Map | null = null;
   try {
+    // Ruttkarta: exakt samma geografiska utsnitt som kunden såg, oavsett
+    // pixelstorlek (center/zoom skulle visa ett större område i högupplöst tryck).
+    const fit = opts.bounds
+      ? { bounds: opts.bounds, fitBoundsOptions: { padding: 0 } }
+      : opts.route
+        ? {
+            bounds: paddedBounds(opts.route.route.bbox, ROUTE_FIT_FRAC),
+            fitBoundsOptions: { padding: Math.round(Math.min(rect.w, rect.h) * ROUTE_FIT_PAD_SHARE) },
+          }
+        : { center: opts.center, zoom: opts.zoom };
     map = new mapboxgl.Map({
       container: mapDiv,
       style: styleUrl(opts.styleId),
-      center: opts.center,
-      zoom: opts.zoom,
+      ...fit,
       interactive: false,
       attributionControl: false,
       preserveDrawingBuffer: true,
@@ -211,6 +238,12 @@ async function drawMapLayer(
         resolve();
       });
     });
+
+    if (opts.route) {
+      // Ruttlagren läggs efter att stilen laddats; nästa idle-väntan nedan
+      // ser till att de hunnit ritas innan canvasen läses av.
+      applyRouteToMap(map, opts.route.route, opts.route.opts);
+    }
 
     try {
       const style = map.getStyle();
@@ -818,7 +851,10 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
 
   // Sort layers by zIndex
   const layout = getActiveLayoutBlock(input.template, input.productType, input.layoutId)[input.orientation];
-  const sortedByZ = [...layout.layers].sort((a, b) => a.zIndex - b.zIndex);
+  // Flödesgrupper: lager som filtrerats bort (dolda) lämnar inget hål —
+  // samma uträkning som editorns förhandsvisning.
+  const flowedLayers = applyFlowLayout(layout.layers, layout.flow);
+  const sortedByZ = [...flowedLayers].sort((a, b) => a.zIndex - b.zIndex);
   // Margin must always render visually on top of all other layers, regardless
   // of its zIndex. Reorder so margin layers are drawn last.
   const allLayers = [
@@ -893,7 +929,30 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
       const styleId = mv ? mv.styleId : isLive ? input.liveMapStyleId : layer.defaults.styleId;
       const showLabels = mv ? mv.showLabels : isLive ? input.liveShowLabels : layer.defaults.showLabels;
       const shape = mv ? mv.shape : isLive ? input.liveMapShape : layer.defaults.shape;
-      await drawMapLayer(ctx, rect, { center, zoom, styleId, showLabels, shape });
+      const routeStyle = layer.defaults.routeStyle;
+      const raceRoute = routeStyle ? input.race?.route ?? null : null;
+      const routeRender =
+        routeStyle && raceRoute && input.race
+          ? {
+              route: raceRoute,
+              opts: {
+                style: routeStyle,
+                color: input.race.routeColor ?? routeStyle.color,
+                showStartFinish: input.race.show.startFinish,
+                showKmMarkers: input.race.show.kmMarkers,
+                canvasShortPx: Math.min(frontPxW, frontPxH),
+              },
+            }
+          : null;
+      await drawMapLayer(ctx, rect, {
+        center,
+        zoom,
+        styleId,
+        showLabels,
+        shape,
+        bounds: routeStyle ? mv?.viewBounds ?? null : null,
+        route: routeRender,
+      });
       const icons = (mv?.icons ?? []) as MapIcon[];
       await drawMapIcons(ctx, rect, shape, icons, center, zoom);
     } else if (layer.type === "text") {
@@ -933,7 +992,12 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
                 dateISO: mLv.dateISO,
               }
             : null;
-      const overrideText = tv?.overrideText ?? (isLive ? input.liveText ?? null : null);
+      let overrideText = tv?.overrideText ?? (isLive ? input.liveText ?? null : null);
+      if (layer.defaults.raceField) {
+        // Lopptavla: samma värde som editorn visar (tomt ⇒ placeholder).
+        const v = input.race ? raceFieldText(layer.defaults.raceField, input.race) : "";
+        overrideText = v ? (layer.defaults.raceFieldUppercase ? v.toLocaleUpperCase("sv-SE") : v) : null;
+      }
       const { text, spans } = buildEffectiveTextWithSpans(layer.defaults, place, overrideText);
       drawTextLayer(ctx, rect, layer, text, font, Math.min(frontPxW, frontPxH), tv?.fontSizePt ?? null, spans);
     } else if (layer.type === "image") {
@@ -1050,6 +1114,33 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
           shape: layer.defaults.shape,
         },
       );
+    } else if (layer.type === "elevation") {
+      // Lopptavla: samma renderare som editorns RaceElevationView.
+      const r = input.race?.route;
+      if (r?.ele) {
+        const routeMap = layers.find((x) => x.type === "map" && x.defaults.routeStyle);
+        const baseColor =
+          routeMap && routeMap.type === "map" ? routeMap.defaults.routeStyle!.color : "#FC4C02";
+        drawElevationProfile(
+          ctx,
+          rect,
+          elevationSeries(r.coords, r.ele),
+          layer.defaults,
+          input.race?.routeColor ?? baseColor,
+          Math.min(frontPxW, frontPxH),
+        );
+      }
+    } else if (layer.type === "raceStats") {
+      if (input.race) {
+        await ensureRaceStatsFonts(layer.defaults);
+        drawRaceStats(
+          ctx,
+          rect,
+          raceStatItems(layer.defaults.items, input.race),
+          layer.defaults,
+          Math.min(frontPxW, frontPxH),
+        );
+      }
     } else if (layer.type === "margin") {
       // Margin frames the FRONT zone only — never the wrap/bleed band. This
       // matches the editor's dashed "Synlig framsida" rectangle and keeps the

@@ -508,6 +508,41 @@ export function createLayer(type: LayerType, existing: TemplateLayer[]): Templat
           style: true,
         }),
       };
+    case "elevation":
+      return {
+        ...base,
+        xPct: 10,
+        yPct: 72,
+        wPct: 80,
+        hPct: 8,
+        type: "elevation",
+        name: `Höjdprofil ${countOfType(existing, "elevation") + 1}`,
+        defaults: { fillOpacity: 0.18, thicknessMm: 0.6 },
+        // Kunden kan bara slå av/på (via loppanelen).
+        locks: defaultLocks({ content: true, visibility: false }),
+      };
+    case "raceStats":
+      return {
+        ...base,
+        xPct: 10,
+        yPct: 82,
+        wPct: 80,
+        hPct: 7,
+        type: "raceStats",
+        name: `Loppstatistik ${countOfType(existing, "raceStats") + 1}`,
+        defaults: {
+          items: ["distance", "time", "pace", "bib", "placement"],
+          valueFont: "Inter",
+          labelFont: "Inter",
+          valueSizePt: 16,
+          labelSizePt: 6.5,
+          color: "#111111",
+          letterSpacingEm: 0.08,
+          dividers: true,
+          arrange: "auto",
+        },
+        locks: defaultLocks({ content: true, visibility: false }),
+      };
   }
 }
 

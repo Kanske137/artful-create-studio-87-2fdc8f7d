@@ -14,6 +14,8 @@ import MapLayerPreview from "./MapLayerPreview";
 import TextLayerPreview from "./TextLayerPreview";
 import { ShapeLayerView } from "@/components/editor/layers/ShapeLayerView";
 import StarmapLayerView from "@/components/editor/layers/StarmapLayerView";
+import { RaceElevationView, RaceStatsView } from "@/components/editor/layers/RaceLayerViews";
+import { SAMPLE_ELEVATION, SAMPLE_STATS } from "@/lib/race/sample";
 
 type LayoutOverride = {
   defaultLayout: Template["defaultLayout"];
@@ -111,6 +113,24 @@ export default function TemplateThumbnail({
                 allLayers={layers}
                 height={h}
                 width={w}
+                canvasShortPx={Math.min(width, height)}
+              />
+            </div>
+          );
+        }
+        if (layer.type === "elevation") {
+          return (
+            <div key={layer.id} style={style}>
+              <RaceElevationView layer={layer} series={SAMPLE_ELEVATION} routeColor="#FC4C02" canvasShortPx={Math.min(width, height)} />
+            </div>
+          );
+        }
+        if (layer.type === "raceStats") {
+          return (
+            <div key={layer.id} style={style}>
+              <RaceStatsView
+                layer={layer}
+                items={SAMPLE_STATS.filter((it) => layer.defaults.items.includes(it.key)).slice(0, 3)}
                 canvasShortPx={Math.min(width, height)}
               />
             </div>

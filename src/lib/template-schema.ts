@@ -69,8 +69,23 @@ export const mapDefaultsSchema = z.object({
   placeName: z.string().optional(),
   city: z.string().optional(),
   country: z.string().optional(),
+  /** Lopptavla: när satt är detta en ruttkarta. Rutten (från loppkatalogen
+   *  eller kundens GPX) ritas som linjelager i själva Mapbox-kartan, och
+   *  tryckfilen återskapar exakt det utsnitt kunden såg (viewBounds). */
+  routeStyle: z
+    .object({
+      /** Standardfärg — kunden kan byta via productOptions.raceOptions.routeColors. */
+      color: hexColorSchema.default("#FC4C02"),
+      /** A4-relativa mm (samma skalning som text/linjer): växer med tavlan. */
+      thicknessMm: z.number().positive().max(20).default(1.6),
+      /** Ljus kontur runt linjen — för mörka kartstilar. */
+      casing: z.boolean().default(false),
+      casingColor: hexColorSchema.default("#FFFFFF"),
+    })
+    .optional(),
 });
 export type MapDefaults = z.infer<typeof mapDefaultsSchema>;
+export type RouteStyle = NonNullable<MapDefaults["routeStyle"]>;
 
 export const imageDefaultsSchema = z.object({
   url: z.string().url().optional(),
@@ -285,6 +300,12 @@ export const textDefaultsSchema = z.object({
   // exact position + line-grouping; tokens not present in `text` are appended
   // on their own lines in order.
   linkedTokens: z.array(linkedTextTokenSchema).optional(),
+  // Lopptavla: texten styrs av loppets data (titel, ort · år, löparens namn,
+  // datum, egen rad) via loppanelen i stället för att kunden skriver i lagret.
+  // Tomt värde ⇒ mallens placeholder-text visas.
+  raceField: z.enum(["title", "subtitle", "runnerName", "date", "customLine"]).optional(),
+  /** Skriv loppvärdet med versaler (t.ex. "STOCKHOLM MARATHON"). */
+  raceFieldUppercase: z.boolean().optional(),
   // DEPRECATED — kept for back-compat. Migrated to `linkedTokens`.
   linkedMapFields: z
     .object({
@@ -367,6 +388,67 @@ export const starmapDefaultsSchema = z.object({
 });
 export type StarmapDefaults = z.infer<typeof starmapDefaultsSchema>;
 
+// ---------- lopptavla: höjdprofil + statistikrad ----------
+// Ritas av delade canvas-funktioner (src/lib/race/render-*.ts) — identiska i
+// editor och tryckfil, samma princip som stjärnkartan.
+export const elevationDefaultsSchema = z.object({
+  /** Linjefärg. Utelämnad ⇒ ruttens färg (följer kundens val). */
+  color: hexColorSchema.optional(),
+  /** Ytans färg under kurvan. Utelämnad ⇒ samma som linjen. */
+  fillColor: hexColorSchema.optional(),
+  fillOpacity: z.number().min(0).max(1).default(0.18),
+  /** A4-relativa mm. */
+  thicknessMm: z.number().positive().max(10).default(0.6),
+});
+export type ElevationDefaults = z.infer<typeof elevationDefaultsSchema>;
+
+export const raceStatKeySchema = z.enum(["distance", "time", "pace", "bib", "placement"]);
+export type RaceStatKey = z.infer<typeof raceStatKeySchema>;
+
+export const raceStatsDefaultsSchema = z.object({
+  /** Ordning på värdena. Kunden slår av/på enskilda via loppanelen. */
+  items: z.array(raceStatKeySchema).min(1).default(["distance", "time", "pace", "bib", "placement"]),
+  valueFont: z.string().min(1),
+  labelFont: z.string().min(1),
+  valueSizePt: z.number().positive().max(200),
+  labelSizePt: z.number().positive().max(100),
+  color: hexColorSchema,
+  labelColor: hexColorSchema.optional(),
+  letterSpacingEm: z.number().min(-0.2).max(1).default(0.08),
+  /** Tunna avdelare mellan värdena. */
+  dividers: z.boolean().default(true),
+  dividerColor: hexColorSchema.optional(),
+  /** "row" = sida vid sida, "column" = lista uppifrån, "auto" = rad om
+   *  lagret är bredare än det är högt. */
+  arrange: z.enum(["row", "column", "auto"]).default("auto"),
+});
+export type RaceStatsDefaults = z.infer<typeof raceStatsDefaultsSchema>;
+
+// ---------- flödesgrupper (valfria fält utan hål) ----------
+// En lodrät stapel av lager inom ett område. Dolda (eller borttagna) lager
+// hoppas över och lagren under flyttar upp; `grow`-lager (t.ex. kartan) tar
+// den lediga ytan. Räknas ut av src/lib/flow-layout.ts på ALLA renderställen.
+export const flowGroupSchema = z.object({
+  id: z.string().min(1),
+  xPct: z.number().min(0).max(100),
+  yPct: z.number().min(0).max(100),
+  wPct: z.number().min(0).max(100),
+  hPct: z.number().min(0).max(100),
+  /** Lucka mellan synliga lager, % av framsidans höjd. */
+  gapPct: z.number().min(0).max(20).default(0),
+  /** Placering av överbliven yta när inget lager växer. */
+  align: z.enum(["start", "center", "end"]).default("start"),
+  items: z
+    .array(
+      z.object({
+        layerId: z.string().min(1),
+        grow: z.boolean().optional(),
+      }),
+    )
+    .min(1),
+});
+export type FlowGroup = z.infer<typeof flowGroupSchema>;
+
 // ---------- layer base + discriminated union ----------
 const layerBase = z.object({
   id: z.string().min(1),
@@ -378,6 +460,9 @@ const layerBase = z.object({
   rotation: z.number().min(-360).max(360).default(0),
   zIndex: z.number().int(),
   locks: layerLocksSchema,
+  /** Lagret är dolt när kunden öppnar editorn (kan slås på, t.ex. foto på
+   *  lopptavlan). Kräver locks.visibility=false för att kunden ska nå det. */
+  hiddenByDefault: z.boolean().optional(),
 });
 
 export const mapLayerSchema = layerBase.extend({
@@ -416,6 +501,14 @@ export const starmapLayerSchema = layerBase.extend({
   type: z.literal("starmap"),
   defaults: starmapDefaultsSchema,
 });
+export const elevationLayerSchema = layerBase.extend({
+  type: z.literal("elevation"),
+  defaults: elevationDefaultsSchema,
+});
+export const raceStatsLayerSchema = layerBase.extend({
+  type: z.literal("raceStats"),
+  defaults: raceStatsDefaultsSchema,
+});
 
 export const layerSchema = z.discriminatedUnion("type", [
   mapLayerSchema,
@@ -427,6 +520,8 @@ export const layerSchema = z.discriminatedUnion("type", [
   aiPhotoLayerSchema,
   shapeLayerSchema,
   starmapLayerSchema,
+  elevationLayerSchema,
+  raceStatsLayerSchema,
 ]);
 export type TemplateLayer = z.infer<typeof layerSchema>;
 export type LayerType = TemplateLayer["type"];
@@ -436,6 +531,8 @@ export const orientationLayoutSchema = z.object({
   aspect: aspectSchema,
   background: z.object({ color: hexColorSchema }),
   layers: z.array(layerSchema),
+  /** Valfria flödesgrupper — se flowGroupSchema. Saknas ⇒ oförändrat beteende. */
+  flow: z.array(flowGroupSchema).optional(),
 });
 export type OrientationLayout = z.infer<typeof orientationLayoutSchema>;
 
@@ -513,6 +610,15 @@ export const productOptionsSchema = z.object({
   /** Font families the customer is allowed to choose from in the editor.
    *  When missing/empty the customer sees the full FONT_CATALOG. */
   allowedFonts: z.array(z.string()).optional(),
+  /** Lopptavla: när enabled visas loppanelen (loppväljare, GPX, fält). */
+  raceOptions: z
+    .object({
+      enabled: z.boolean(),
+      allowGpx: z.boolean().default(true),
+      /** Ruttfärger kunden kan välja mellan. Första = standard. */
+      routeColors: z.array(hexColorSchema).default(["#FC4C02"]),
+    })
+    .optional(),
 });
 export type ProductOptions = z.infer<typeof productOptionsSchema>;
 

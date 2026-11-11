@@ -10,7 +10,7 @@
 // product_configs. Publish stamps `publishedAt` and runs zod validation.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ChevronDown, Eye, Image as ImageIcon, Loader2, MapPin, Minus, Save, Send, Shapes, Sparkle, Square, Type, Undo2, Zap } from "lucide-react";
+import { ArrowLeft, ChevronDown, Eye, Image as ImageIcon, Loader2, MapPin, Minus, Mountain, Save, Send, Shapes, Sparkle, Square, Timer, Type, Undo2, Zap } from "lucide-react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -593,6 +593,14 @@ export default function DesignerPage() {
               <Button size="sm" variant="outline" onClick={() => addLayer("starmap")}>
                 <Sparkle className="h-3.5 w-3.5 mr-1.5" />
                 Lägg till stjärnhimmel
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => addLayer("elevation")}>
+                <Mountain className="h-3.5 w-3.5 mr-1.5" />
+                Lägg till höjdprofil
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => addLayer("raceStats")}>
+                <Timer className="h-3.5 w-3.5 mr-1.5" />
+                Lägg till loppstatistik
               </Button>
               <Button size="sm" variant="outline" onClick={() => addLayer("text")}>
                 <Type className="h-3.5 w-3.5 mr-1.5" />

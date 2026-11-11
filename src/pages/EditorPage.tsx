@@ -36,7 +36,9 @@ import { getPrintFileUrl } from "@/lib/print-pipeline";
 import { resolveShopifyVariantId } from "@/lib/shopify-variant-resolver";
 import { hangerColorFromVariant } from "@/lib/mockup-scenes";
 import { FRAME_FRONT_CM, CANVAS_BLEED_CM, canvasWrapExtCm } from "@/lib/gelato-geometry";
-import { mutateActiveLayoutBlock } from "@/lib/freeform-layers";
+import { buildPrintableTemplate, withTemplateAlias } from "@/lib/printable-template";
+import { RACE_CATALOG, RACE_TEMPLATE_ALIASES, categoryForDistance, productHandleForCategory } from "@/lib/race/catalog";
+import { raceLocaleFor, raceRenderInput, useRaceStore } from "@/stores/raceStore";
 import { ensureSession, getSessionKey, track } from "@/lib/analytics";
 import { SubscriberGateDialog } from "@/components/editor/SubscriberGateDialog";
 import { toast } from "sonner";
@@ -101,7 +103,7 @@ export default function EditorPage() {
     setShopifyVariantId,
     setShopifyVariantResolving,
   } = useEditorStore();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const shopCtx = useShopContextStore();
   const addItem = useCartStore((s) => s.addItem);
   const isAdding = useCartStore((s) => s.isLoading);
@@ -243,7 +245,8 @@ export default function EditorPage() {
     const active = resolveConfigForHandle(configs, handleParam, typeParam);
     if (active) {
       setNotFound(false);
-      setConfig(active);
+      // Maratontavla/Halvmaratontavla läser layouten från Lopptavla.
+      setConfig(withTemplateAlias(active, configs, RACE_TEMPLATE_ALIASES));
     } else {
       setNotFound(true);
     }
@@ -263,7 +266,7 @@ export default function EditorPage() {
     nextParams.set("handle", newHandle);
     nextParams.set("type", nextTypeParam);
     setParams(nextParams, { replace: true });
-    setConfig(next);
+    setConfig(withTemplateAlias(next, configs, RACE_TEMPLATE_ALIASES));
     // Ny mall → börja om onboarding-guidningen.
     useOnboardingStore.getState().reset();
   };
@@ -332,20 +335,30 @@ export default function EditorPage() {
     const dedicatedConfig = selectedVariantId
       ? configs.find((c) => c.shopify_handle === `${selectedVariantId}-tavla`)
       : undefined;
-    const effectiveHandle = dedicatedConfig?.shopify_handle ?? config.shopify_handle;
-    const effectiveTitle = dedicatedConfig?.title ?? config.title;
+    // Lopptavla: kundvagnen får produkten som matchar loppets kategori
+    // (maraton → Maratontavla osv.), oavsett vilken produktsida kunden kom från.
+    const isRaceTemplate = !!template.productOptions.raceOptions?.enabled;
+    const raceState = useRaceStore.getState();
+    const raceCategory = isRaceTemplate && raceState.route
+      ? (raceState.source === "catalog"
+          ? RACE_CATALOG.find((r) => r.id === raceState.raceId)?.category
+          : undefined) ?? categoryForDistance(raceState.route.distanceKm)
+      : null;
+    const raceConfig = raceCategory
+      ? configs.find((c) => c.shopify_handle === productHandleForCategory(raceCategory))
+      : undefined;
+    const effectiveHandle = raceConfig?.shopify_handle ?? dedicatedConfig?.shopify_handle ?? config.shopify_handle;
+    const effectiveTitle = raceConfig?.title ?? dedicatedConfig?.title ?? config.title;
 
     // Strip hidden layers from the template before snapshot/print so the
     // customer's "öga av"-val faktiskt syns i tryckfilen och kundvagnsbilden.
-    const printableTemplate = Object.keys(hiddenLayerIds).length
-      ? mutateActiveLayoutBlock(
-          template,
-          config.product_type,
-          layoutId,
-          orientation,
-          (ls) => ls.filter((l) => !hiddenLayerIds[l.id]),
-        )
-      : template;
+    const printableTemplate = buildPrintableTemplate(
+      template,
+      config.product_type,
+      layoutId,
+      orientation,
+      hiddenLayerIds,
+    );
     const baseTemplateInput = {
       template: printableTemplate,
       orientation,
@@ -373,6 +386,7 @@ export default function EditorPage() {
       photoOverlays: useEditorStore.getState().getPhotoOverlays(),
       aiPhotoResults,
       aiPhotoSelectedRefUrl: useEditorStore.getState().aiPhotoSelectedRefUrl,
+      race: isRaceTemplate ? raceRenderInput(raceLocaleFor(i18n.language)) : null,
     };
 
     setIsPreparing(true);
@@ -431,6 +445,12 @@ export default function EditorPage() {
       _print_file_url: printFileUrl,
       _session_id: getSessionKey(),
     };
+    if (isRaceTemplate && raceState.route) {
+      // Synligt i kundvagn/order — underlättar support.
+      properties.Lopp = raceState.fields.title || (raceState.source === "gpx" ? "Egen GPX-fil" : "");
+      properties._race_source = raceState.source ?? "";
+      if (raceState.raceId) properties._race_id = raceState.raceId;
+    }
 
     track("add_to_cart", {
       designId,

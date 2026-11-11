@@ -19,6 +19,8 @@ import {
   Move,
   Maximize2,
   HelpCircle,
+  Mountain,
+  Timer,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -91,6 +93,9 @@ const LAYER_TYPE_ICON: Record<TemplateLayer["type"], LucideIcon> = {
   line: Minus,
   margin: Square,
   image: ImageIcon,
+  starmap: Sparkles,
+  elevation: Mountain,
+  raceStats: Timer,
 };
 
 const MAX_LAYERS = 12;

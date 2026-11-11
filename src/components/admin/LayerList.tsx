@@ -29,6 +29,9 @@ const typeLabel: Record<TemplateLayer["type"], string> = {
   line: "Linje",
   margin: "Marginal",
   shape: "Figur",
+  starmap: "Stjärnkarta",
+  elevation: "Höjdprofil",
+  raceStats: "Loppstatistik",
 };
 
 export default function LayerList({

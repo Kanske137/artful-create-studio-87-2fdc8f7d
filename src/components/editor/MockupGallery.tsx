@@ -10,6 +10,8 @@ import { Canvas3DPreview } from "./Canvas3DPreview";
 import { renderTemplateSnapshot } from "@/lib/template-snapshot";
 import { CANVAS_BLEED_CM, canvasWrapExtCm } from "@/lib/gelato-geometry";
 import { getProductDetailsFor, type ProductDetail } from "./product-details";
+import { buildPrintableTemplate } from "@/lib/printable-template";
+import { useRaceStore, raceLocaleFor } from "@/stores/raceStore";
 
 interface MockupSlot {
   scene: MockupScene;
@@ -30,7 +32,7 @@ type GallerySlot =
   | { kind: "detail"; id: string; label: string; thumbUrl: string; fullUrl: string };
 
 export function MockupGallery() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const {
     config, template, size, variant, orientation, layoutId,
     mapStyleId, mapCenter, mapZoom,
@@ -43,7 +45,13 @@ export function MockupGallery() {
     aiPhotoResults,
     whiteMarginEnabled,
     templateLayers,
+    hiddenLayerIds,
   } = useEditorStore();
+  // Lopptavla: mockuperna ska visa banan och kundens värden precis som trycket.
+  const raceRoute = useRaceStore((s) => s.route);
+  const raceFields = useRaceStore((s) => s.fields);
+  const raceShow = useRaceStore((s) => s.show);
+  const raceRouteColor = useRaceStore((s) => s.routeColor);
   const [slots, setSlots] = useState<MockupSlot[]>([]);
   const [snapshotUrl, setSnapshotUrl] = useState<string | null>(null);
   const [snapshotLoading, setSnapshotLoading] = useState(false);
@@ -80,8 +88,19 @@ export function MockupGallery() {
     debounceRef.current = window.setTimeout(async () => {
       const myReq = ++reqIdRef.current;
       try {
+        const isRace = !!template.productOptions.raceOptions?.enabled;
         const newSnapshot = await renderTemplateSnapshot({
-          template,
+          // Dolda lager med i mockuperna var en bugg — samma underlag som trycket.
+          template: buildPrintableTemplate(template, config.product_type, layoutId, orientation, hiddenLayerIds),
+          race: isRace
+            ? {
+                route: raceRoute,
+                fields: raceFields,
+                show: raceShow,
+                routeColor: raceRouteColor,
+                locale: raceLocaleFor(i18n.language),
+              }
+            : null,
           orientation,
           size,
           productType: config.product_type,
@@ -167,6 +186,8 @@ export function MockupGallery() {
     text, textFont, textVisible,
     photoSources, photoAiResults,
     aiPhotoResults,
+    hiddenLayerIds,
+    raceRoute, raceFields, raceShow, raceRouteColor, i18n.language,
   ]);
 
   // Bygg en enhetlig lista av "slots" i den ordning vi vill visa dem.

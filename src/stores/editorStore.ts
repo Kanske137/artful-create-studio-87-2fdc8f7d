@@ -4,6 +4,9 @@ import { getEffectiveSizes } from "@/lib/product-config";
 import type { DesignSource } from "@/lib/print-pipeline";
 import type { ProductOptions, Template, TemplateLayer } from "@/lib/template-schema";
 import { getActiveLayoutBlock, getAllLayouts } from "@/lib/template-schema";
+import { applyFlowLayout } from "@/lib/flow-layout";
+import type { Bounds } from "@/lib/race/types";
+import { useRaceStore } from "@/stores/raceStore";
 import { resolveTemplate } from "@/lib/template-migrate";
 import { clampLayerRect } from "@/lib/layer-utils";
 import {
@@ -72,6 +75,10 @@ export interface MapLayerValue {
   country?: string;
   /** Customer-placed icons (hearts, home, …). Always present (default []). */
   icons: MapIcon[];
+  /** Ruttkartor (lopptavla): exakt synligt utsnitt i editorn. Tryckfilen
+   *  anpassar sig till detta i stället för center/zoom, så banan hamnar
+   *  likadant oavsett upplösning. */
+  viewBounds?: Bounds;
 }
 
 export interface TextLayerValue {
@@ -315,6 +322,7 @@ interface EditorState {
   // Per-layer setters
   setLayerMapCenter: (id: string, c: [number, number]) => void;
   setLayerMapZoom: (id: string, z: number) => void;
+  setLayerMapViewBounds: (id: string, bounds: Bounds) => void;
   setLayerMapStyle: (id: string, s: string) => void;
   setLayerMapShape: (id: string, s: MapShape) => void;
   setLayerShowLabels: (id: string, v: boolean) => void;
@@ -861,11 +869,26 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       applyVariantTextInPlace(template, nextContentVariantId, variantLayersById, nextLayerValues);
     }
 
+    // Lager med hiddenByDefault (t.ex. foto på lopptavlan) startar dolda.
+    let nextHiddenLayerIds = state.hiddenLayerIds;
+    if (isFirstLoad) {
+      nextHiddenLayerIds = {};
+      for (const named of getAllLayouts(template)) {
+        for (const block of [named.defaultLayout, named.canvasLayout]) {
+          if (!block) continue;
+          for (const l of [...block.portrait.layers, ...block.landscape.layers]) {
+            if (l.hiddenByDefault) nextHiddenLayerIds[l.id] = true;
+          }
+        }
+      }
+    }
+
     const next = {
       config,
       template,
       productOptions,
       orientation,
+      hiddenLayerIds: nextHiddenLayerIds,
       contentVariantId: nextContentVariantId,
       layoutId: nextLayoutId,
       size: nextSize,
@@ -1577,6 +1600,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   setLayerMapCenter: (id, c) => updateMap(set, get, id, { center: c }),
   setLayerMapZoom: (id, z) => updateMap(set, get, id, { zoom: z }),
+  setLayerMapViewBounds: (id, bounds) => updateMap(set, get, id, { viewBounds: bounds }),
   setLayerMapStyle: (id, s) => updateMap(set, get, id, { styleId: s }),
   setLayerMapShape: (id, s) => updateMap(set, get, id, { shape: s }),
   setLayerShowLabels: (id, v) => updateMap(set, get, id, { showLabels: v }),
@@ -1662,9 +1686,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     return config?.layouts[orientation] ?? null;
   },
   templateLayers: () => {
-    const { template, orientation, config } = get();
+    const { template, orientation, config, hiddenLayerIds } = get();
     if (!template) return [];
-    return [...getActiveLayoutBlock(template, config?.product_type, get().layoutId)[orientation].layers].sort((a, b) => a.zIndex - b.zIndex);
+    const block = getActiveLayoutBlock(template, config?.product_type, get().layoutId)[orientation];
+    // Flödesgrupper: dolda lager lämnar inget hål (no-op utan block.flow).
+    const flowed = applyFlowLayout(block.layers, block.flow, (id) => !!hiddenLayerIds[id]);
+    return [...flowed].sort((a, b) => a.zIndex - b.zIndex);
   },
   firstMapLayerId: () => {
     const layers = get().templateLayers();
@@ -1856,6 +1883,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         const missing = filledCount === 0 ? photoLayers.length : missingPlaceholder;
         return missing > 1 ? "photoMulti" : "photo";
       }
+    }
+
+    // 2b) Lopptavla: ett lopp (eller en GPX-fil) måste vara valt.
+    if (state.template.productOptions.raceOptions?.enabled && !useRaceStore.getState().route) {
+      return "customize";
     }
 
     // 3) Mallar utan bildlager (karttavlor m.fl.): kräv att kunden ändrat

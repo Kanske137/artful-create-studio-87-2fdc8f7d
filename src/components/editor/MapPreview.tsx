@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -11,6 +11,11 @@ import { TextLayerView } from "./layers/TextLayerView";
 import { substituteTokensWithSpans, buildEffectiveTextWithSpans } from "@/lib/text-typography";
 import { ShapeLayerView } from "./layers/ShapeLayerView";
 import StarmapLayerView from "./layers/StarmapLayerView";
+import { RaceElevationView, RaceStatsView } from "./layers/RaceLayerViews";
+import { useRaceStore, raceLocaleFor } from "@/stores/raceStore";
+import { elevationSeries } from "@/lib/race/geo";
+import { raceFieldText, raceStatItems } from "@/lib/race/derive";
+import type { RaceRenderInput } from "@/lib/race/types";
 import {
   lineThicknessPxFromCanvas,
   effectiveLayerRect,
@@ -302,8 +307,28 @@ export function MapPreview({
   wrapCm = 0,
   layersIncludeWrap = false,
 }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const frameRef = useRef<HTMLDivElement>(null);
+  // Lopptavla: kundens lopp/GPX + fält. Tomma värden när mallen inte är en lopptavla.
+  const raceRoute = useRaceStore((s) => s.route);
+  const raceFields = useRaceStore((s) => s.fields);
+  const raceShow = useRaceStore((s) => s.show);
+  const raceRouteColor = useRaceStore((s) => s.routeColor);
+  const raceFitNonce = useRaceStore((s) => s.fitNonce);
+  const race: RaceRenderInput = useMemo(
+    () => ({
+      route: raceRoute,
+      fields: raceFields,
+      show: raceShow,
+      routeColor: raceRouteColor,
+      locale: raceLocaleFor(i18n.language),
+    }),
+    [raceRoute, raceFields, raceShow, raceRouteColor, i18n.language],
+  );
+  const raceElevation = useMemo(
+    () => (raceRoute?.ele ? elevationSeries(raceRoute.coords, raceRoute.ele) : []),
+    [raceRoute],
+  );
   /** Per-layer Mapbox instance refs, populated by `MapLayerInstance` via
    *  `onMapReady`. Used by `MapIconsOverlay` to project geo-anchored icons. */
   const mapInstances = useRef<Record<string, mapboxgl.Map | null>>({});
@@ -650,6 +675,20 @@ export function MapPreview({
             const effectiveLabels = mv?.showLabels ?? l.defaults.showLabels;
             const icons = mv?.icons ?? [];
             const staticClip = shapeClipPath(effectiveShape);
+            const routeStyle = l.defaults.routeStyle;
+            const routeProp = routeStyle
+              ? {
+                  route: race.route,
+                  fitNonce: raceFitNonce,
+                  opts: {
+                    style: routeStyle,
+                    color: race.routeColor ?? routeStyle.color,
+                    showStartFinish: race.show.startFinish,
+                    showKmMarkers: race.show.kmMarkers,
+                    canvasShortPx: frontShortPx,
+                  },
+                }
+              : undefined;
             return (
               <MapLayerSlot
                 key={l.id}
@@ -682,6 +721,7 @@ export function MapPreview({
                     onMapReady={(m) => {
                       mapInstances.current[l.id] = m;
                     }}
+                    route={routeProp}
                   />
                 )}
               </MapLayerSlot>
@@ -945,10 +985,13 @@ export function MapPreview({
                       dateISO: mv.dateISO,
                     }
                   : null;
+            // Lopptavla: texten kommer från loppanelen (tomt ⇒ mallens placeholder).
+            const raceValue = d.raceField ? raceFieldText(d.raceField, race) : null;
+            const raceOverride = raceValue ? (d.raceFieldUppercase ? raceValue.toLocaleUpperCase("sv-SE") : raceValue) : null;
             const { text: effectiveText, spans: effectiveSpans } = buildEffectiveTextWithSpans(
               d,
               place,
-              tv?.overrideText ?? null,
+              d.raceField ? raceOverride : tv?.overrideText ?? null,
             );
             const effectiveFont = tv?.font || d.font;
             const layerHeightPx = (l.hPct / 100) * (frameShortPx > 0 ? frameShortPx : 0);
@@ -1033,6 +1076,34 @@ export function MapPreview({
                 />
                 {moveHandle}
                 {resizeHandle}
+              </div>
+            );
+          }
+
+          if (l.type === "elevation") {
+            const routeMap = layers.find((x) => x.type === "map" && x.defaults.routeStyle);
+            const baseColor =
+              routeMap && routeMap.type === "map" ? routeMap.defaults.routeStyle!.color : "#FC4C02";
+            return (
+              <div key={l.id} style={{ ...wrapStyle, pointerEvents: "none" }}>
+                <RaceElevationView
+                  layer={l}
+                  series={raceElevation}
+                  routeColor={race.routeColor ?? baseColor}
+                  canvasShortPx={frontShortPx}
+                />
+              </div>
+            );
+          }
+
+          if (l.type === "raceStats") {
+            return (
+              <div key={l.id} style={{ ...wrapStyle, pointerEvents: "none" }}>
+                <RaceStatsView
+                  layer={l}
+                  items={raceStatItems(l.defaults.items, race)}
+                  canvasShortPx={frontShortPx}
+                />
               </div>
             );
           }

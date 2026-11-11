@@ -25,6 +25,8 @@ import TextLayerPreview from "./TextLayerPreview";
 import { LineLayerView, MarginLayerView } from "@/components/editor/layers/StaticLayers";
 import { ShapeLayerView } from "@/components/editor/layers/ShapeLayerView";
 import StarmapLayerView from "@/components/editor/layers/StarmapLayerView";
+import { RaceElevationView, RaceStatsView } from "@/components/editor/layers/RaceLayerViews";
+import { SAMPLE_ELEVATION, SAMPLE_STATS } from "@/lib/race/sample";
 import { AcrylicCornerOverlay } from "@/components/editor/AcrylicCornerOverlay";
 
 const SNAP_PCT = 1.25;
@@ -159,6 +161,27 @@ export default function LayerCanvas({
             timeHHMM={layer.defaults.timeHHMM}
             showConstellations={layer.defaults.showConstellations}
             showGrid={layer.defaults.showGrid}
+          />
+        );
+      case "elevation": {
+        const routeMap = layers.find((l) => l.type === "map" && !!l.defaults.routeStyle);
+        const routeColor =
+          routeMap?.type === "map" && routeMap.defaults.routeStyle ? routeMap.defaults.routeStyle.color : "#FC4C02";
+        return (
+          <RaceElevationView
+            layer={layer}
+            series={SAMPLE_ELEVATION}
+            routeColor={routeColor}
+            canvasShortPx={Math.min(size.w, size.h)}
+          />
+        );
+      }
+      case "raceStats":
+        return (
+          <RaceStatsView
+            layer={layer}
+            items={SAMPLE_STATS.filter((it) => layer.defaults.items.includes(it.key)).slice(0, 3)}
+            canvasShortPx={Math.min(size.w, size.h)}
           />
         );
       case "line":

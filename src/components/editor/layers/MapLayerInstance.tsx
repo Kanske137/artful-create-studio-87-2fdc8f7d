@@ -7,6 +7,31 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEditorStore } from "@/stores/editorStore";
 import { getMapboxToken, reverseGeocode, styleUrl } from "@/lib/mapbox";
+import {
+  applyRouteToMap,
+  paddedBounds,
+  viewBoundsOf,
+  type RouteRenderOptions,
+} from "@/lib/race/route-map";
+import type { RaceRoute } from "@/lib/race/types";
+
+/** Lopptavla: rutten som ska ritas i kartan + när den ska anpassas. */
+export interface MapRouteProp {
+  route: RaceRoute | null;
+  opts: RouteRenderOptions | null;
+  /** Ökar när en ny bana valts → kartan anpassas till banan. */
+  fitNonce: number;
+}
+
+/** Luft runt banan: andel av banans spann + px-marginal i kartrutan. */
+export const ROUTE_FIT_FRAC = 0.06;
+export const ROUTE_FIT_PAD_SHARE = 0.04;
+
+function fitToRoute(map: mapboxgl.Map, route: RaceRoute): void {
+  const c = map.getContainer();
+  const pad = Math.round(Math.min(c.clientWidth, c.clientHeight) * ROUTE_FIT_PAD_SHARE);
+  map.fitBounds(paddedBounds(route.bbox, ROUTE_FIT_FRAC), { padding: pad, duration: 0 });
+}
 
 interface Props {
   layerId: string;
@@ -18,6 +43,8 @@ interface Props {
   interactive: boolean;
   clipPath?: string;
   onMapReady?: (map: mapboxgl.Map | null) => void;
+  /** Bara för ruttkartor (mallens map-lager har routeStyle). */
+  route?: MapRouteProp;
 }
 
 function applyLabelVisibility(map: mapboxgl.Map, show: boolean) {
@@ -48,11 +75,34 @@ export function MapLayerInstance({
   interactive,
   clipPath,
   onMapReady,
+  route,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const programmaticRef = useRef(false);
   const reverseTimerRef = useRef<number | null>(null);
+  // Ruttkarta: senaste props i ref (eventhandlers registreras en gång),
+  // vilken bana vi senast anpassat kartan till, och om kunden själv panorerat.
+  const routeRef = useRef<MapRouteProp | undefined>(route);
+  routeRef.current = route;
+  const fittedNonceRef = useRef<number | null>(null);
+  const userMovedRef = useRef(false);
+
+  const syncRoute = (map: mapboxgl.Map) => {
+    const r = routeRef.current;
+    if (!r) return;
+    if (!applyRouteToMap(map, r.route, r.opts)) {
+      map.once("idle", () => {
+        const latest = routeRef.current;
+        if (latest) applyRouteToMap(map, latest.route, latest.opts);
+      });
+    }
+    if (r.route && fittedNonceRef.current !== r.fitNonce) {
+      fittedNonceRef.current = r.fitNonce;
+      userMovedRef.current = false;
+      fitToRoute(map, r.route);
+    }
+  };
 
   // Init
   useEffect(() => {
@@ -80,12 +130,27 @@ export function MapLayerInstance({
       map.on("load", () => {
         map.resize();
         applyLabelVisibility(map, showLabels);
+        syncRoute(map);
       });
       map.on("style.load", () => {
         applyLabelVisibility(map, showLabels);
+        // Stilbyte rensar egna lager — rita rutten igen.
+        const r = routeRef.current;
+        if (r) applyRouteToMap(map, r.route, r.opts);
+      });
+      map.on("resize", () => {
+        // Kartan ändrar storlek när fält slås av/på (flödeslayout). Har
+        // kunden inte själv panorerat följer utsnittet med banan.
+        const r = routeRef.current;
+        if (r?.route && !userMovedRef.current) fitToRoute(map, r.route);
       });
 
-      map.on("moveend", () => {
+      map.on("moveend", (e: { originalEvent?: unknown }) => {
+        if (routeRef.current) {
+          // Tryckfilen återskapar exakt detta utsnitt.
+          useEditorStore.getState().setLayerMapViewBounds(layerId, viewBoundsOf(map));
+          if (e?.originalEvent) userMovedRef.current = true;
+        }
         if (programmaticRef.current) {
           programmaticRef.current = false;
           return;
@@ -178,6 +243,27 @@ export function MapLayerInstance({
       map.flyTo({ center, zoom, duration: 800 });
     }
   }, [center, zoom]);
+
+  // Ruttkarta: rita om när banan eller stilen ändras, anpassa vid ny bana.
+  const routeKey = route
+    ? [
+        route.fitNonce,
+        route.route?.coords.length ?? 0,
+        route.route?.distanceKm ?? 0,
+        route.opts?.color,
+        route.opts?.style.thicknessMm,
+        route.opts?.style.casing,
+        route.opts?.style.casingColor,
+        route.opts?.showStartFinish,
+        route.opts?.showKmMarkers,
+        Math.round(route.opts?.canvasShortPx ?? 0),
+      ].join("|")
+    : "";
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !routeRef.current) return;
+    syncRoute(map);
+  }, [routeKey, route?.route]);
 
   // resize when shape changes (square/circle re-layout)
   useEffect(() => {
