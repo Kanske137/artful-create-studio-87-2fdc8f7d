@@ -186,7 +186,8 @@ export function useAvailableSections(): SectionMeta[] {
       forvandling: aiPhotoLayers.length > 0,
       karta: editableMaps.filter((l: any) => !l.defaults.routeStyle).length > 0,
       stjarnhimmel: starmapLayers.length > 0,
-      stil: allLayouts.length > 1,
+      // Lopptavla: stilarna väljs som "Bakgrund" i loppanelen.
+      stil: !isRace && allLayouts.length > 1,
       text: editableTexts.filter((l: any) => !l.defaults.raceField).length > 0,
       format: true,
     };

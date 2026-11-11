@@ -23,7 +23,8 @@ import {
 import { GPX_ERROR_MESSAGES, GpxError, readGpxFile } from "@/lib/race/gpx";
 import { formatDistance, parseDuration } from "@/lib/race/format";
 import type { RaceCategory, RaceShow } from "@/lib/race/types";
-import type { RaceStatKey, TemplateLayer } from "@/lib/template-schema";
+import { DEFAULT_LAYOUT_ID, getAllLayouts, type RaceStatKey, type TemplateLayer } from "@/lib/template-schema";
+import { mapStyleLabel, mapStylePreviewBg } from "@/lib/map-style-catalog";
 import { PhotoUploadSection } from "./PhotoUploadSection";
 
 type Filter = RaceCategory | "all";
@@ -277,9 +278,18 @@ export function RaceDetailsPanel({ mapStyleSlot }: { mapStyleSlot?: React.ReactN
   const hiddenLayerIds = useEditorStore((s) => s.hiddenLayerIds);
   const setLayerVisible = useEditorStore((s) => s.setLayerVisible);
   const raceOptions = useEditorStore((s) => s.productOptions?.raceOptions);
-  // Prenumerera på layout/orientering så listan följer aktiv stil.
-  useEditorStore((s) => s.layoutId);
+  const template = useEditorStore((s) => s.template);
+  const layoutId = useEditorStore((s) => s.layoutId);
+  const setLayoutId = useEditorStore((s) => s.setLayoutId);
+  // Prenumerera på orientering så listan följer aktiv layout.
   useEditorStore((s) => s.orientation);
+  // Bakgrunder = mallens stilar (var och en med egen kartstil + textfärger).
+  const backgrounds = (template ? getAllLayouts(template) : []).map((l) => {
+    const map = l.defaultLayout.portrait.layers.find((x) => x.type === "map");
+    const styleId = map && map.type === "map" ? map.defaults.styleId : "";
+    return { id: l.id, name: l.name || mapStyleLabel(styleId), bg: mapStylePreviewBg(styleId) };
+  });
+  const activeLayout = layoutId ?? DEFAULT_LAYOUT_ID;
   const { fields, show, routeColor, source } = useRaceStore();
   const setField = useRaceStore((s) => s.setField);
   const setShow = useRaceStore((s) => s.setShow);
@@ -414,6 +424,31 @@ export function RaceDetailsPanel({ mapStyleSlot }: { mapStyleSlot?: React.ReactN
       {routeMap && (
         <div className="space-y-3">
           <SectionHeading>{t("race.look")}</SectionHeading>
+          {backgrounds.length > 1 && (
+            <div className="space-y-1.5">
+              <Label className="text-xs">{t("race.background")}</Label>
+              <div className="grid grid-cols-4 gap-2">
+                {backgrounds.map((b) => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => setLayoutId(b.id)}
+                    className="flex flex-col items-center gap-1"
+                    aria-pressed={activeLayout === b.id}
+                  >
+                    <span
+                      className={cn(
+                        "h-10 w-full rounded-lg border transition",
+                        activeLayout === b.id ? "ring-2 ring-offset-2 ring-foreground" : "border-border",
+                      )}
+                      style={{ background: b.bg }}
+                    />
+                    <span className="text-[11px] text-muted-foreground truncate max-w-full">{b.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {colors.length > 1 && (
             <div className="space-y-1.5">
               <Label className="text-xs">{t("race.routeColor")}</Label>

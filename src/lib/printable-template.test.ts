@@ -96,12 +96,12 @@ describe("Lopptavla-startmallen", () => {
     });
   }
 
-  it("har tre stilar med var sin karta", () => {
+  it("har åtta bakgrunder med var sin karta", () => {
     const names = [seeded.defaultLayoutName, ...seeded.extraLayouts.map((l) => l.name)];
-    expect(names).toEqual(["Midnatt", "Ljus", "Noir"]);
+    expect(names).toEqual(["Midnatt", "Noir", "Blåtryck", "Skog", "Guld", "Ljus", "Sand", "Salvia"]);
     const mapIds = [seeded.defaultLayout, ...seeded.extraLayouts.map((l) => l.defaultLayout)].map(
       (b) => b.portrait.layers.find((l) => l.type === "map")!.id,
     );
-    expect(new Set(mapIds).size).toBe(3);
+    expect(new Set(mapIds).size).toBe(8);
   });
 });

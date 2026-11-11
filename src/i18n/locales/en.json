@@ -457,6 +457,7 @@
       "kmMarkers": "Km markers"
     },
     "look": "Look",
-    "routeColor": "Route colour"
+    "routeColor": "Route colour",
+    "background": "Background"
   }
 }

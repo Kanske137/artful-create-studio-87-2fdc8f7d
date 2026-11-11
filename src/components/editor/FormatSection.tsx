@@ -217,8 +217,9 @@ export function FormatSection({ configs, activeHandle, activeProductType, onProd
 
   return (
     <div className="space-y-5">
-      {/* Bakgrundsfärg — högst upp, alltid synlig */}
-      <div className="space-y-2">
+      {/* Bakgrundsfärg — högst upp. Lopptavlor väljer bakgrund i loppanelen
+          (kartan täcker hela tavlan, så posterns bakgrundsfärg syns inte). */}
+      <div className={template?.productOptions.raceOptions?.enabled ? "hidden" : "space-y-2"}>
         <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("format.backgroundColor")}</Label>
         <div className="flex flex-wrap gap-2 items-center">
           {BG_SWATCHES.map((c) => {

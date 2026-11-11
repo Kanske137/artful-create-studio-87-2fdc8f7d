@@ -517,7 +517,7 @@ export function createLayer(type: LayerType, existing: TemplateLayer[]): Templat
         hPct: 8,
         type: "elevation",
         name: `Höjdprofil ${countOfType(existing, "elevation") + 1}`,
-        defaults: { fillOpacity: 0.18, thicknessMm: 0.6 },
+        defaults: { style: "bars", fillOpacity: 0.18, thicknessMm: 0.6 },
         // Kunden kan bara slå av/på (via loppanelen).
         locks: defaultLocks({ content: true, visibility: false }),
       };

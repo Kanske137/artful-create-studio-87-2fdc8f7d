@@ -457,6 +457,7 @@
       "kmMarkers": "Km-markeringar"
     },
     "look": "Utseende",
-    "routeColor": "Färg på rutten"
+    "routeColor": "Färg på rutten",
+    "background": "Bakgrund"
   }
 }

@@ -150,6 +150,16 @@ describe("Lopptavlans kundpanel", () => {
     expect(y(RACE_LAYER_IDS.elevation)).toBeLessThan(before);
   });
 
+  it("bakgrundsbyte byter stil men behåller kundens av/på-val", () => {
+    render(<RaceDetailsPanel />);
+    click(byText("Höjdprofil", "span"));
+    click(byText("Sand", "span"));
+    expect(useEditorStore.getState().layoutId).toBe("race-sand");
+    expect(useEditorStore.getState().hiddenLayerIds[RACE_LAYER_IDS.elevation]).toBeUndefined();
+    const map = useEditorStore.getState().templateLayers().find((l) => l.type === "map");
+    expect(map?.id).toBe("race-map-sand");
+  });
+
   it("statistikvärden slås av och på individuellt", () => {
     render(<RaceDetailsPanel />);
     expect(useRaceStore.getState().show.bib).toBe(false);

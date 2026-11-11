@@ -48,14 +48,47 @@ export function drawElevationProfile(
   ctx.rect(rect.x, rect.y, rect.w, rect.h);
   ctx.clip();
 
-  // Yta
+  if (d.style === "bars") {
+    // Staplar: jämnt fördelade, rundade, lägsta punkt ≈ 12 % höjd så att
+    // platta partier fortfarande syns som en jämn rad.
+    const n = Math.max(24, Math.min(110, Math.round(rect.w / Math.max(4, strokePx * 4))));
+    const step = rect.w / n;
+    const barW = Math.max(1, step * 0.55);
+    const minFrac = 0.12;
+    ctx.fillStyle = color;
+    for (let i = 0; i < n; i++) {
+      const t = (i + 0.5) / n;
+      const fi = t * (series.length - 1);
+      const i0 = Math.floor(fi);
+      const i1 = Math.min(series.length - 1, i0 + 1);
+      const v = series[i0]! + (series[i1]! - series[i0]!) * (fi - i0);
+      const frac = minFrac + (1 - minFrac) * ((v - min) / (max - min));
+      const h = Math.max(barW, frac * rect.h);
+      const x = rect.x + i * step + (step - barW) / 2;
+      const y = bottom - h;
+      const r = Math.min(barW / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x, bottom);
+      ctx.lineTo(x, y + r);
+      ctx.arc(x + r, y + r, r, Math.PI, 0);
+      ctx.lineTo(x + barW, bottom);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+    return;
+  }
+
+  // Yta (inte för "line")
   ctx.beginPath();
   ctx.moveTo(xAt(0), bottom);
   for (let i = 0; i < series.length; i++) ctx.lineTo(xAt(i), yAt(series[i]!));
   ctx.lineTo(xAt(series.length - 1), bottom);
   ctx.closePath();
-  ctx.fillStyle = hexToRgba(fill, d.fillOpacity ?? 0.18);
-  ctx.fill();
+  if (d.style !== "line") {
+    ctx.fillStyle = hexToRgba(fill, d.fillOpacity ?? 0.18);
+    ctx.fill();
+  }
 
   // Linje
   ctx.beginPath();

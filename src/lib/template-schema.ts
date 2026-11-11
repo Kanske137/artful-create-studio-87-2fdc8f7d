@@ -405,6 +405,8 @@ export type StarmapDefaults = z.infer<typeof starmapDefaultsSchema>;
 // Ritas av delade canvas-funktioner (src/lib/race/render-*.ts) — identiska i
 // editor och tryckfil, samma princip som stjärnkartan.
 export const elevationDefaultsSchema = z.object({
+  /** "area" = fylld kurva, "line" = bara linje, "bars" = staplar. */
+  style: z.enum(["area", "line", "bars"]).default("area"),
   /** Linjefärg. Utelämnad ⇒ ruttens färg (följer kundens val). */
   color: hexColorSchema.optional(),
   /** Ytans färg under kurvan. Utelämnad ⇒ samma som linjen. */

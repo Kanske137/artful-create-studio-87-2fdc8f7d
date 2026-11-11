@@ -91,6 +91,16 @@ export function ElevationInspector({ layer, update }: { layer: Extract<TemplateL
   return (
     <div className="space-y-3 border-t pt-4">
       <Heading>Höjdprofil</Heading>
+      <Row label="Utseende">
+        <Select value={d.style ?? "area"} onValueChange={(style) => update({ style })}>
+          <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="bars">Staplar</SelectItem>
+            <SelectItem value="line">Linje</SelectItem>
+            <SelectItem value="area">Fylld kurva</SelectItem>
+          </SelectContent>
+        </Select>
+      </Row>
       <label className="flex items-center justify-between gap-3">
         <span className="text-sm">Följ ruttens färg</span>
         <Switch checked={!d.color} onCheckedChange={(on) => update({ color: on ? undefined : "#111111" })} />

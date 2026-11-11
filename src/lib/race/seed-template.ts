@@ -6,8 +6,8 @@
 // nere till höger. Valfritt: foto nere till vänster, höjdprofil under
 // statistiken, egen rad under namnet.
 //
-// Tre stilar (fliken "Stil"): Midnatt (standard), Ljus och Noir. Kartstilen
-// är låst per stil så att texten alltid har rätt kontrast. Text-/statistik-
+// Åtta bakgrunder (Midnatt är standard), var och en en egen stil med låst
+// kartstil så att texten alltid har rätt kontrast. Text-/statistik-
 // lagren delar id mellan stilarna (kundens av/på-val följer med), kartan har
 // eget id per stil (så att stilbyte även byter karta).
 import { applyFlowLayout } from "@/lib/flow-layout";
@@ -41,10 +41,17 @@ interface Palette {
   muted: string;
 }
 
+// Bakgrunder kunden väljer mellan (loppanelen → Utseende → Bakgrund). Varje
+// bakgrund är en egen stil: Arthenas kartstil + textfärger med rätt kontrast.
 export const RACE_PALETTES: Palette[] = [
   { key: "midnatt", name: "Midnatt", styleId: "midnatt", bg: "#16213E", ink: "#FFFFFF", muted: "#9AA6C0" },
-  { key: "ljus", name: "Ljus", styleId: "skandinavisk", bg: "#F4F2EC", ink: "#141414", muted: "#6B6B6B" },
   { key: "noir", name: "Noir", styleId: "noir", bg: "#0E0E0E", ink: "#FFFFFF", muted: "#9C9C9C" },
+  { key: "blatryck", name: "Blåtryck", styleId: "blatryck", bg: "#16395E", ink: "#FFFFFF", muted: "#A9BCD6" },
+  { key: "skog", name: "Skog", styleId: "navigation-night-v1", bg: "#0A1F0A", ink: "#FFFFFF", muted: "#9DB5A0" },
+  { key: "guld", name: "Guld", styleId: "guldlinje", bg: "#141210", ink: "#F5EBD7", muted: "#B9A98A" },
+  { key: "ljus", name: "Ljus", styleId: "skandinavisk", bg: "#F4F2EC", ink: "#141414", muted: "#6B6B6B" },
+  { key: "sand", name: "Sand", styleId: "streets-v12", bg: "#F3ECDD", ink: "#2A2118", muted: "#7A6B57" },
+  { key: "salvia", name: "Salvia", styleId: "outdoors-v12", bg: "#DCEBD9", ink: "#1D2B1F", muted: "#5E7262" },
 ];
 
 const FONT = "Inter";
@@ -233,7 +240,8 @@ function layers(o: "portrait" | "landscape", p: Palette): TemplateLayer[] {
       zIndex: 13,
       hiddenByDefault: true,
       locks: toggleOnly(),
-      defaults: { fillOpacity: 0.22, thicknessMm: 0.5 },
+      // Staplar — eget formspråk (inte en fylld kurva).
+      defaults: { style: "bars", fillOpacity: 0.22, thicknessMm: 0.5 },
     },
     raceText(ids.name, "Namn", g.name, 14, {
       field: "runnerName", placeholder: "Ditt namn", sizePt: P ? 20 : 22, color: p.ink, align: "right",
@@ -294,7 +302,7 @@ export function applyRaceSeed(base: Template): Template {
       raceOptions: {
         enabled: true,
         allowGpx: true,
-        routeColors: ["#FC4C02", "#FFC233", "#3DDC97", "#FF4D8D"],
+        routeColors: ["#FC4C02", "#FFC233", "#3DDC97", "#4DA3FF", "#FF4D8D", "#FFFFFF", "#111111"],
       },
       mapStyles: RACE_PALETTES.map((p) => ({ id: p.styleId, enabled: true })),
       allowedFonts: undefined,
