@@ -137,6 +137,16 @@ export function routeFromGpx(parsed: ParsedGpx, maxPoints = 800): GpxRouteResult
 
 /** Läs en File (från <input type=file>) hela vägen till en ritbar bana. */
 export async function readGpxFile(file: File): Promise<GpxRouteResult> {
-  const text = await file.text();
-  return routeFromGpx(parseGpx(text));
+  return routeFromGpx(parseGpx(await readAsText(file)));
+}
+
+/** Blob.text() saknas i äldre webbläsare — fall tillbaka på FileReader. */
+function readAsText(file: Blob): Promise<string> {
+  if (typeof file.text === "function") return file.text();
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result ?? ""));
+    r.onerror = () => reject(r.error ?? new Error("read failed"));
+    r.readAsText(file);
+  });
 }

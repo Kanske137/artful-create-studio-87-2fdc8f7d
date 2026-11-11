@@ -23,6 +23,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { DEFAULT_PRODUCT_VARIANTS } from "@/lib/product-defaults";
 import type { Template } from "@/lib/template-schema";
 import type { ProductType } from "@/lib/product-config";
+import { applyRaceSeed } from "@/lib/race/seed-template";
+
+type Preset = "empty" | "race";
 
 interface Props {
   open: boolean;
@@ -109,6 +112,7 @@ export default function CreateTemplateDialog({ open, onOpenChange }: Props) {
     acrylic: true,
   });
   const [saving, setSaving] = useState(false);
+  const [preset, setPreset] = useState<Preset>("empty");
 
   useEffect(() => {
     if (!handleEdited) setHandle(slugify(title));
@@ -121,6 +125,7 @@ export default function CreateTemplateDialog({ open, onOpenChange }: Props) {
       setHandleEdited(false);
       setSelected({ poster: true, canvas: true, aluminum: true, acrylic: true });
       setSaving(false);
+      setPreset("empty");
     }
   }, [open]);
 
@@ -146,7 +151,7 @@ export default function CreateTemplateDialog({ open, onOpenChange }: Props) {
     const templateSlug = trimmedHandle.replace(/-(poster|posters|canvas|aluminum|acrylic)$/i, "");
     const enabledProductTypes = kinds.map((k) => KIND_META[k].productType);
 
-    const tpl = buildSeedTemplate(kinds);
+    const tpl = preset === "race" ? applyRaceSeed(buildSeedTemplate(kinds)) : buildSeedTemplate(kinds);
     const baseTextConfig = {
       fonts: ["Inter", "Playfair Display"],
       maxChars: 24,
@@ -230,6 +235,28 @@ export default function CreateTemplateDialog({ open, onOpenChange }: Props) {
               placeholder="personlig-stadkarta"
               className="font-mono text-sm"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Startmall</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                { id: "empty", label: "Tom mall", hint: "Bygg från grunden" },
+                { id: "race", label: "Lopptavla", hint: "Rutt, höjdprofil, statistik" },
+              ] as const).map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setPreset(p.id)}
+                  className={`rounded-md border p-3 text-left transition ${
+                    preset === p.id ? "ring-2 ring-primary border-transparent" : "hover:bg-muted/40"
+                  }`}
+                >
+                  <span className="block text-sm font-medium">{p.label}</span>
+                  <span className="block text-xs text-muted-foreground">{p.hint}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2">

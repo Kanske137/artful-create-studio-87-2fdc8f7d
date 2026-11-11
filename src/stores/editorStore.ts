@@ -387,7 +387,7 @@ interface EditorState {
    *   - "customize": mall utan bildlager (t.ex. karttavla) där kunden inte
    *     ändrat någon parameter alls från default
    *  Freeform-mallar hanteras separat via hasDesignContent(). */
-  orderBlockReason: () => "generation" | "photo" | "photoMulti" | "customize" | "demo" | null;
+  orderBlockReason: () => "generation" | "photo" | "photoMulti" | "customize" | "demo" | "race" | null;
 
   // ---------- legacy globals (derived getters; mutators apply to first layer) ----------
   // These setters/getters keep older code (EditorPage cart payload, snapshot
@@ -1855,6 +1855,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const layers = state.templateLayers().filter((l) => !state.hiddenLayerIds[l.id]);
     if (layers.length === 0) return null;
 
+    // Lopptavla: ett lopp (eller en GPX-fil) måste vara valt innan något annat.
+    if (state.template.productOptions.raceOptions?.enabled && !useRaceStore.getState().route) {
+      return "race";
+    }
+
     // 0) Demo-resultat ("Prova med exempelbild") får aldrig beställas.
     const demoActive = layers.some((l) => {
       const demoUrl = (l.defaults as { demoResultUrl?: string }).demoResultUrl;
@@ -1883,11 +1888,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         const missing = filledCount === 0 ? photoLayers.length : missingPlaceholder;
         return missing > 1 ? "photoMulti" : "photo";
       }
-    }
-
-    // 2b) Lopptavla: ett lopp (eller en GPX-fil) måste vara valt.
-    if (state.template.productOptions.raceOptions?.enabled && !useRaceStore.getState().route) {
-      return "customize";
     }
 
     // 3) Mallar utan bildlager (karttavlor m.fl.): kräv att kunden ändrat

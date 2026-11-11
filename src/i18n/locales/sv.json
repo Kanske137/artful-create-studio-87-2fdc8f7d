@@ -50,7 +50,9 @@
     "style": "Stil",
     "layers": "Lager",
     "starmap": "Stjärnhimmel",
-    "variant": "Motiv"
+    "variant": "Motiv",
+    "race": "Lopp",
+    "raceDetails": "Dina uppgifter"
   },
   "format": {
     "backgroundColor": "Bakgrundsfärg",
@@ -253,7 +255,8 @@
     "variantUnavailable": "Den här kombinationen är inte tillgänglig i butiken ännu",
     "variantUnavailableHint": "{{size}} · {{variant}} hittades inte för {{handle}}.",
     "freeformEmpty": "Lägg till något i din design först",
-    "freeformEmptyHint": "Lägg till minst en bild, karta eller text innan du går till kassan."
+    "freeformEmptyHint": "Lägg till minst en bild, karta eller text innan du går till kassan.",
+    "blockedRace": "Välj ett lopp eller ladda upp din GPX-fil innan du beställer"
   },
   "scene": {
     "livingroom": "Vardagsrum",
@@ -399,7 +402,9 @@
     "format": "Välj storlek och eventuell ram.",
     "lager": "Lägg till bilder, text eller former.",
     "startHere": "Börja här",
-    "continueHere": "Fortsätt här"
+    "continueHere": "Fortsätt här",
+    "lopp": "Välj ditt lopp i listan – eller ladda upp din GPX-fil.",
+    "loppinfo": "Skriv ditt namn och din tid och välj vad som ska synas på tavlan."
   },
   "starmap": {
     "date": "Datum",
@@ -407,5 +412,51 @@
     "constellations": "Stjärnbildslinjer",
     "grid": "Gradnät",
     "tip": "Himlen beräknas astronomiskt för valt datum, klockslag och plats."
+  },
+  "race": {
+    "pickTitle": "Välj ditt lopp",
+    "pickHint": "Banan ritas upp på kartan direkt.",
+    "search": "Sök lopp eller stad",
+    "noRaces": "Inga lopp i listan än – ladda upp din GPX-fil nedan så ritas din rutt upp direkt.",
+    "noMatch": "Inget lopp matchar sökningen.",
+    "loading": "Hämtar banan …",
+    "loadFailed": "Banan kunde inte hämtas. Försök igen.",
+    "gpxTitle": "Sprang du ett annat lopp?",
+    "gpxHint": "Ladda upp din GPX-fil så ritas din egen rutt upp. Exportera den från Strava eller Garmin Connect. Filen stannar i din webbläsare.",
+    "gpxButton": "Ladda upp GPX-fil",
+    "gpxReplace": "Byt fil",
+    "gpxActive": "Din rutt: {{distance}}",
+    "fieldsTitle": "Text på tavlan",
+    "title": "Loppets namn",
+    "titlePlaceholder": "t.ex. Stockholm Marathon",
+    "city": "Ort",
+    "runnerName": "Ditt namn",
+    "date": "Datum",
+    "finishTime": "Sluttid",
+    "finishTimePlaceholder": "t.ex. 3:45:12",
+    "finishTimeInvalid": "Skriv tiden som t:mm:ss, t.ex. 3:45:12",
+    "bib": "Startnummer",
+    "placement": "Placering",
+    "customLine": "Egen rad",
+    "customLinePlaceholder": "t.ex. Mitt första maraton",
+    "showTitle": "Visa på tavlan",
+    "show": {
+      "photo": "Foto",
+      "elevation": "Höjdprofil",
+      "stats": "Statistikrad",
+      "subtitle": "Ort och år",
+      "runnerName": "Namn",
+      "date": "Datum",
+      "customLine": "Egen rad",
+      "distance": "Distans",
+      "time": "Sluttid",
+      "pace": "Tempo (räknas ut automatiskt)",
+      "bib": "Startnummer",
+      "placement": "Placering",
+      "startFinish": "Start och mål",
+      "kmMarkers": "Km-markeringar"
+    },
+    "look": "Utseende",
+    "routeColor": "Färg på rutten"
   }
 }

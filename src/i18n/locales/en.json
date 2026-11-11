@@ -50,7 +50,9 @@
     "style": "Style",
     "layers": "Layers",
     "starmap": "Night sky",
-    "variant": "Design"
+    "variant": "Design",
+    "race": "Race",
+    "raceDetails": "Your details"
   },
   "format": {
     "backgroundColor": "Background colour",
@@ -248,7 +250,8 @@
     "variantUnavailable": "This combination is not yet available in the store",
     "variantUnavailableHint": "{{size}} · {{variant}} not found for {{handle}}.",
     "freeformEmpty": "Add something to your design first",
-    "freeformEmptyHint": "Add at least one image, map or text before checking out."
+    "freeformEmptyHint": "Add at least one image, map or text before checking out.",
+    "blockedRace": "Choose a race or upload your GPX file before ordering"
   },
   "scene": {
     "livingroom": "Living room",
@@ -394,7 +397,9 @@
     "format": "Choose size and frame, if any.",
     "lager": "Add images, text or shapes.",
     "startHere": "Start here",
-    "continueHere": "Continue here"
+    "continueHere": "Continue here",
+    "lopp": "Choose your race from the list – or upload your GPX file.",
+    "loppinfo": "Add your name and time and choose what to show on the print."
   },
   "starmap": {
     "date": "Date",
@@ -407,5 +412,51 @@
     "done": "Done! Here's your artwork.",
     "changePhoto": "Change photo",
     "changeStyle": "Change style"
+  },
+  "race": {
+    "pickTitle": "Choose your race",
+    "pickHint": "The course is drawn on the map instantly.",
+    "search": "Search race or city",
+    "noRaces": "No races in the list yet – upload your GPX file below and your route is drawn instantly.",
+    "noMatch": "No race matches your search.",
+    "loading": "Loading the course …",
+    "loadFailed": "The course could not be loaded. Please try again.",
+    "gpxTitle": "Ran a different race?",
+    "gpxHint": "Upload your GPX file and your own route is drawn. Export it from Strava or Garmin Connect. The file stays in your browser.",
+    "gpxButton": "Upload GPX file",
+    "gpxReplace": "Change file",
+    "gpxActive": "Your route: {{distance}}",
+    "fieldsTitle": "Text on the print",
+    "title": "Race name",
+    "titlePlaceholder": "e.g. Berlin Marathon",
+    "city": "City",
+    "runnerName": "Your name",
+    "date": "Date",
+    "finishTime": "Finish time",
+    "finishTimePlaceholder": "e.g. 3:45:12",
+    "finishTimeInvalid": "Write the time as h:mm:ss, e.g. 3:45:12",
+    "bib": "Bib number",
+    "placement": "Placement",
+    "customLine": "Custom line",
+    "customLinePlaceholder": "e.g. My first marathon",
+    "showTitle": "Show on the print",
+    "show": {
+      "photo": "Photo",
+      "elevation": "Elevation profile",
+      "stats": "Stats row",
+      "subtitle": "City and year",
+      "runnerName": "Name",
+      "date": "Date",
+      "customLine": "Custom line",
+      "distance": "Distance",
+      "time": "Finish time",
+      "pace": "Pace (calculated automatically)",
+      "bib": "Bib number",
+      "placement": "Placement",
+      "startFinish": "Start and finish",
+      "kmMarkers": "Km markers"
+    },
+    "look": "Look",
+    "routeColor": "Route colour"
   }
 }

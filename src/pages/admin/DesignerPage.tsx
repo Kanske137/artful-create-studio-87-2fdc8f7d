@@ -37,6 +37,7 @@ import {
 import { createDefaultLayout, createLayer, createShapeLayer, moveLayer, normaliseZIndex } from "@/lib/layer-utils";
 import type { ShapeKind } from "@/lib/template-schema";
 import { Sparkles } from "lucide-react";
+import { applyFlowLayout } from "@/lib/flow-layout";
 import ProductOptionsSection from "@/components/admin/ProductOptionsSection";
 import ShopifyPublishingSection from "@/components/admin/ShopifyPublishingSection";
 import LayerCanvas from "@/components/admin/LayerCanvas";
@@ -210,6 +211,10 @@ export default function DesignerPage() {
     : null;
   const layout = layoutBlock?.[orientation] ?? null;
   const layers = useMemo(() => layout?.layers ?? [], [layout]);
+  // Flödesgrupper (lopptavla): visa lagren där flödet placerar dem — med ALLA
+  // valfria lager påslagna, så att varje lager går att se och styla. Ändrar
+  // man höjden på ett lager i en grupp flyttas resten med, precis som i editorn.
+  const flowedLayers = useMemo(() => applyFlowLayout(layers, layout?.flow), [layers, layout]);
   const selectedLayer = useMemo(
     () => layers.find((l) => l.id === selectedId) ?? null,
     [layers, selectedId],
@@ -714,7 +719,7 @@ export default function DesignerPage() {
             <LayerCanvas
               aspect={layout.aspect}
               background={layout.background.color}
-              layers={layers}
+              layers={flowedLayers}
               selectedId={selectedId}
               onSelect={setSelectedId}
               onChange={updateLayer}

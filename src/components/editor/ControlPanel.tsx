@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Image as ImageIcon, Images, Sparkles, MapPin, Palette, Type, Ruler, Layers, Star, type LucideIcon } from "lucide-react";
+import { Image as ImageIcon, Images, Sparkles, MapPin, Palette, Type, Ruler, Layers, Star, Route, PenLine, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +22,7 @@ import { AiStyleSection } from "./AiStyleSection";
 import { AiPhotoSection } from "./AiPhotoSection";
 import { MultiFaceUploadSection } from "./MultiFaceUploadSection";
 import { LayersSection } from "./LayersSection";
+import { RaceDetailsPanel, RacePickerPanel } from "./RaceSection";
 import { Loader2, Search } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -123,7 +124,9 @@ export type SectionId =
   | "stjarnhimmel"
   | "stil"
   | "text"
-  | "format";
+  | "format"
+  | "lopp"
+  | "loppinfo";
 
 export interface SectionMeta {
   id: SectionId;
@@ -131,7 +134,7 @@ export interface SectionMeta {
   icon: LucideIcon;
 }
 
-const SECTION_ORDER: SectionId[] = ["motiv", "lager", "bild", "forvandling", "karta", "stjarnhimmel", "stil", "text", "format"];
+const SECTION_ORDER: SectionId[] = ["lopp", "loppinfo", "motiv", "lager", "bild", "forvandling", "karta", "stjarnhimmel", "stil", "text", "format"];
 
 const SECTION_META: Record<SectionId, { labelKey: string; icon: LucideIcon }> = {
   motiv: { labelKey: "section.variant", icon: Images },
@@ -143,6 +146,8 @@ const SECTION_META: Record<SectionId, { labelKey: string; icon: LucideIcon }> = 
   stil: { labelKey: "section.style", icon: Palette },
   text: { labelKey: "section.text", icon: Type },
   format: { labelKey: "section.format", icon: Ruler },
+  lopp: { labelKey: "section.race", icon: Route },
+  loppinfo: { labelKey: "section.raceDetails", icon: PenLine },
 };
 
 /** Computes which sections are available for the currently loaded template. */
@@ -169,16 +174,20 @@ export function useAvailableSections(): SectionMeta[] {
     );
     const allLayouts = template ? getAllLayouts(template) : [];
     const isFreeform = !!config?.is_freeform;
+    // Lopptavla: loppanelen äger ruttkartan, loppets texter och fotot.
+    const isRace = !!template?.productOptions.raceOptions?.enabled;
 
     const flags: Record<SectionId, boolean> = {
+      lopp: isRace,
+      loppinfo: isRace,
       motiv: (template?.contentVariants?.length ?? 0) > 0,
       lager: isFreeform,
-      bild: photoLayers.length > 0,
+      bild: !isRace && photoLayers.length > 0,
       forvandling: aiPhotoLayers.length > 0,
-      karta: editableMaps.length > 0,
+      karta: editableMaps.filter((l: any) => !l.defaults.routeStyle).length > 0,
       stjarnhimmel: starmapLayers.length > 0,
       stil: allLayouts.length > 1,
-      text: editableTexts.length > 0,
+      text: editableTexts.filter((l: any) => !l.defaults.raceField).length > 0,
       format: true,
     };
     return SECTION_ORDER.filter((id) => flags[id]).map((id) => ({
@@ -216,17 +225,39 @@ export function ControlPanel({ configs, activeHandle, activeProductType, onProdu
     (l): l is Extract<TemplateLayer, { type: "aiPhoto" }> => l.type === "aiPhoto",
   );
   const editableMaps = mapLayers.filter(
-    (l) => !l.locks.position || !l.locks.style || !l.locks.shape || !l.locks.visibility || !l.locks.size || !l.locks.move,
+    (l) =>
+      !l.defaults.routeStyle &&
+      (!l.locks.position || !l.locks.style || !l.locks.shape || !l.locks.visibility || !l.locks.size || !l.locks.move),
   );
   const editableTexts = textLayers.filter(
-    (l) => !l.locks.content || !l.locks.font || !l.locks.visibility || !l.locks.size || !l.locks.move,
+    (l) =>
+      !l.defaults.raceField &&
+      (!l.locks.content || !l.locks.font || !l.locks.visibility || !l.locks.size || !l.locks.move),
   );
+  const routeMapLayer = mapLayers.find((l) => !!l.defaults.routeStyle);
   const aiStyles = productOptions?.aiStyles ?? [];
   const allLayouts = template ? getAllLayouts(template) : [];
   const productType = config.product_type ?? null;
 
   const renderSection = () => {
     switch (sectionId) {
+    case "lopp":
+      return <RacePickerPanel />;
+    case "loppinfo":
+      return (
+        <RaceDetailsPanel
+          mapStyleSlot={
+            routeMapLayer ? (
+              <MapStyleLayerSection
+                config={config}
+                layer={routeMapLayer}
+                value={(layerValues[routeMapLayer.id] as MapLayerValue | undefined) ?? null}
+                heading={null}
+              />
+            ) : null
+          }
+        />
+      );
     case "motiv": {
       const variants = template?.contentVariants ?? [];
       return (

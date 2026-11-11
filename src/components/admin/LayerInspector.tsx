@@ -40,6 +40,13 @@ import { defaultPromptFor } from "@/lib/ai-photo-prompts";
 import { uploadAiReferenceImage } from "@/lib/ai-reference-upload";
 import { FONT_CATALOG, FONT_CATEGORY_LABELS, type FontCategory } from "@/lib/font-catalog";
 import MultiFaceInspector from "./MultiFaceInspector";
+import {
+  ElevationInspector,
+  HiddenByDefaultToggle,
+  RaceFieldInspector,
+  RaceStatsInspector,
+  RouteStyleInspector,
+} from "./RaceInspector";
 
 interface Props {
   config: ProductConfig;
@@ -240,6 +247,17 @@ export default function LayerInspector({ config, layer, allLayers, onChange, onL
         </div>
       )}
 
+      {layer.type === "map" && (
+        <RouteStyleInspector layer={layer} update={(p) => updateDefaults(p as never)} />
+      )}
+      {layer.type === "elevation" && (
+        <ElevationInspector layer={layer} update={(p) => updateDefaults(p as never)} />
+      )}
+      {layer.type === "raceStats" && (
+        <RaceStatsInspector layer={layer} update={(p) => updateDefaults(p as never)} />
+      )}
+      <HiddenByDefaultToggle layer={layer} onChange={onChange} />
+
       {layer.type === "starmap" && (
         <div className="space-y-3 border-t pt-4">
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -379,6 +397,9 @@ export default function LayerInspector({ config, layer, allLayers, onChange, onL
           allLayers={allLayers}
           updateDefaults={updateDefaults}
         />
+      )}
+      {layer.type === "text" && (
+        <RaceFieldInspector layer={layer} update={(p) => updateDefaults(p as never)} />
       )}
 
       {layer.type === "photo" && (

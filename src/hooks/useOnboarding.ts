@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useEditorStore } from "@/stores/editorStore";
 import { useOnboardingStore } from "@/stores/onboardingStore";
+import { useRaceStore } from "@/stores/raceStore";
 import { useAvailableSections, type SectionId } from "@/components/editor/ControlPanel";
 
 /**
@@ -27,6 +28,13 @@ export function useOnboarding() {
   const layerValues = useEditorStore((s) => s.layerValues);
 
   const layers = templateLayers();
+  const raceRoute = useRaceStore((s) => s.route);
+
+  // Auto-mark LOPP när ett lopp valts eller en GPX-fil laddats upp.
+  useEffect(() => {
+    if (completed.lopp) return;
+    if (raceRoute) markCompleted("lopp");
+  }, [raceRoute, completed.lopp, markCompleted]);
 
   // Auto-mark BILD när minst ett photo-lager har upload.
   useEffect(() => {
@@ -95,6 +103,8 @@ export function useOnboarding() {
     if (section === "text") return "onboarding.text";
     if (section === "format") return "onboarding.format";
     if (section === "lager") return "onboarding.lager";
+    if (section === "lopp") return "onboarding.lopp";
+    if (section === "loppinfo") return "onboarding.loppinfo";
     return "";
   };
 

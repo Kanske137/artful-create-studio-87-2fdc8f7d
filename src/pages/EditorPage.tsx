@@ -290,6 +290,8 @@ export default function EditorPage() {
   const isFreeform = Boolean(config?.is_freeform);
   // Beställningsspärr: freeform kräver innehåll; vanliga mallar kräver att
   // designen faktiskt personaliserats (ingen exempel-/defaultdesign i tryck).
+  // Lopptavla: spärren beror på raceStore — prenumerera så CTA:n uppdateras.
+  useRaceStore((s) => s.route);
   const blockReason = isFreeform ? null : orderBlockReason();
   const canAddToCart = (!isFreeform || hasDesignContent()) && blockReason === null;
   const blockHint = blockReason
@@ -302,7 +304,9 @@ export default function EditorPage() {
             ? "cartAdd.blockedPhoto"
             : blockReason === "photoMulti"
               ? "cartAdd.blockedPhotoMulti"
-              : "cartAdd.blockedCustomize",
+              : blockReason === "race"
+                ? "cartAdd.blockedRace"
+                : "cartAdd.blockedCustomize",
       )
     : isFreeform && !hasDesignContent()
       ? t("cartAdd.freeformEmpty")

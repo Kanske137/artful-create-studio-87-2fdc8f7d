@@ -27,7 +27,7 @@ export function OnboardingHint({ sectionId }: Props) {
   // är uppfyllt (hanteras i useOnboarding).
   useEffect(() => {
     if (!isActive) return;
-    const passive: SectionId[] = ["stil", "text", "format", "lager"];
+    const passive: SectionId[] = ["stil", "text", "format", "lager", "loppinfo"];
     if (!passive.includes(sectionId)) return;
     markCompleted(sectionId);
   }, [isActive, sectionId, markCompleted]);
