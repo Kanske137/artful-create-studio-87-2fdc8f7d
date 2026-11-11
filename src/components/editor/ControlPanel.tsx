@@ -235,7 +235,6 @@ export function ControlPanel({ configs, activeHandle, activeProductType, onProdu
       !l.defaults.raceField &&
       (!l.locks.content || !l.locks.font || !l.locks.visibility || !l.locks.size || !l.locks.move),
   );
-  const routeMapLayer = mapLayers.find((l) => !!l.defaults.routeStyle);
   const aiStyles = productOptions?.aiStyles ?? [];
   const allLayouts = template ? getAllLayouts(template) : [];
   const productType = config.product_type ?? null;
@@ -245,20 +244,8 @@ export function ControlPanel({ configs, activeHandle, activeProductType, onProdu
     case "lopp":
       return <RacePickerPanel />;
     case "loppinfo":
-      return (
-        <RaceDetailsPanel
-          mapStyleSlot={
-            routeMapLayer ? (
-              <MapStyleLayerSection
-                config={config}
-                layer={routeMapLayer}
-                value={(layerValues[routeMapLayer.id] as MapLayerValue | undefined) ?? null}
-                heading={null}
-              />
-            ) : null
-          }
-        />
-      );
+      // Ingen kartstilväljare: lopptavlan visar bara rutten, ingen karta.
+      return <RaceDetailsPanel />;
     case "motiv": {
       const variants = template?.contentVariants ?? [];
       return (

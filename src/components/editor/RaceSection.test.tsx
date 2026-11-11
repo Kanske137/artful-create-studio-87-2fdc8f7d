@@ -5,7 +5,7 @@ import "@/i18n";
 import { RaceDetailsPanel, RacePickerPanel } from "./RaceSection";
 import { useEditorStore } from "@/stores/editorStore";
 import { useRaceStore } from "@/stores/raceStore";
-import { applyRaceSeed, RACE_LAYER_IDS } from "@/lib/race/seed-template";
+import { applyRaceSeed, RACE_LAYER_IDS, RACE_ROUTE_LAYER_ID } from "@/lib/race/seed-template";
 import type { Template } from "@/lib/template-schema";
 import type { ProductConfig } from "@/lib/product-config";
 
@@ -159,15 +159,19 @@ describe("Lopptavlans kundpanel", () => {
     expect(y(RACE_LAYER_IDS.elevation)).toBeLessThan(before);
   });
 
-  it("bakgrundsbyte byter stil men behåller kundens av/på-val", () => {
+  it("bakgrundsbyte byter färg men behåller kundens av/på-val och ruttlagret", () => {
     withRoute();
     render(<RaceDetailsPanel />);
     click(byText("Höjdprofil", "span"));
     click(byText("Sand", "span"));
-    expect(useEditorStore.getState().layoutId).toBe("race-sand");
-    expect(useEditorStore.getState().hiddenLayerIds[RACE_LAYER_IDS.elevation]).toBeUndefined();
-    const map = useEditorStore.getState().templateLayers().find((l) => l.type === "map");
-    expect(map?.id).toBe("race-map-sand");
+    const st = useEditorStore.getState();
+    expect(st.layoutId).toBe("race-sand");
+    expect(st.posterBgColor?.toUpperCase()).toBe("#F3ECDD");
+    expect(st.hiddenLayerIds[RACE_LAYER_IDS.elevation]).toBeUndefined();
+    // Samma ruttlager i alla bakgrunder (utsnittet följer med) — utan karta.
+    const map = st.templateLayers().find((l) => l.type === "map");
+    expect(map?.id).toBe(RACE_ROUTE_LAYER_ID);
+    expect(map?.type === "map" && map.defaults.styleId).toBe("blank");
   });
 
   it("kilometertider kan bara slås på när GPX-filen har tider", async () => {

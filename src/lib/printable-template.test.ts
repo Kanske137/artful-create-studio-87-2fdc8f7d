@@ -1,3 +1,4 @@
+import { routeMapStyleId } from "@/lib/race/route-map";
 import { describe, expect, it } from "vitest";
 import { withTemplateAlias } from "./printable-template";
 import { RACE_TEMPLATE_ALIASES } from "./race/catalog";
@@ -96,12 +97,20 @@ describe("Lopptavla-startmallen", () => {
     });
   }
 
-  it("har åtta bakgrunder med var sin karta", () => {
+  it("har åtta bakgrundsfärger och bara rutten — ingen karta", () => {
     const names = [seeded.defaultLayoutName, ...seeded.extraLayouts.map((l) => l.name)];
     expect(names).toEqual(["Midnatt", "Noir", "Blåtryck", "Skog", "Guld", "Ljus", "Sand", "Salvia"]);
-    const mapIds = [seeded.defaultLayout, ...seeded.extraLayouts.map((l) => l.defaultLayout)].map(
-      (b) => b.portrait.layers.find((l) => l.type === "map")!.id,
-    );
-    expect(new Set(mapIds).size).toBe(8);
+    const blocks = [seeded.defaultLayout, ...seeded.extraLayouts.map((l) => l.defaultLayout)];
+    expect(new Set(blocks.map((b) => b.portrait.background.color)).size).toBe(8);
+    for (const b of blocks) {
+      for (const o of [b.portrait, b.landscape]) {
+        const maps = o.layers.filter((l) => l.type === "map");
+        expect(maps).toHaveLength(1);
+        const m = maps[0]!;
+        expect(m.id).toBe("race-route");
+        expect(m.type === "map" && m.defaults.styleId).toBe("blank");
+      }
+    }
+    expect(routeMapStyleId()).toBe("blank");
   });
 });

@@ -4,7 +4,7 @@
 // like the editor preview and the print snapshot.
 import { useMemo } from "react";
 import { useMapboxToken } from "@/hooks/useMapboxToken";
-import { mapStyleUrl, parseMapboxStyleUrl } from "@/lib/map-style-catalog";
+import { isBlankMapStyle, mapStyleUrl, parseMapboxStyleUrl } from "@/lib/map-style-catalog";
 import { buildShapeClipPath, type ClipShape } from "@/lib/shape-clip";
 import type { MapDefaults } from "@/lib/template-schema";
 
@@ -31,6 +31,11 @@ export default function MapLayerPreview({ defaults, width, height }: Props) {
   }, [token, defaults, width, height]);
 
   const clipPath = buildShapeClipPath(defaults.shape as ClipShape, width, height);
+
+  // Ingen karta (lopptavlans ruttlager): mallens bakgrund syns igenom.
+  if (isBlankMapStyle(defaults.styleId) || defaults.routeStyle) {
+    return <div className="relative w-full h-full" />;
+  }
 
   return (
     <div className="relative w-full h-full overflow-hidden">

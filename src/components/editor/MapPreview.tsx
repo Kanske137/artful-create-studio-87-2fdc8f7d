@@ -16,7 +16,7 @@ import { useRaceStore, raceLocaleFor } from "@/stores/raceStore";
 import { elevationSeries } from "@/lib/race/geo";
 import { raceFieldText, raceInactiveLayerIds, raceStatItems } from "@/lib/race/derive";
 import type { RaceRenderInput } from "@/lib/race/types";
-import { overlayAvoidPct } from "@/lib/race/route-map";
+import { overlayAvoidPct, routeMapStyleId } from "@/lib/race/route-map";
 import {
   lineThicknessPxFromCanvas,
   effectiveLayerRect,
@@ -677,7 +677,8 @@ export function MapPreview({
             const v = layerValues[l.id];
             const mv = v && v.kind === "map" ? v : null;
             const effectiveShape = (mv?.shape ?? l.defaults.shape) as "circle" | "heart" | "star";
-            const effectiveStyleId = mv?.styleId ?? l.defaults.styleId;
+            // Ruttkartor (lopptavlan) visar bara rutten — ingen karta under.
+            const effectiveStyleId = l.defaults.routeStyle ? routeMapStyleId() : mv?.styleId ?? l.defaults.styleId;
             const effectiveCenter: [number, number] = mv?.center ?? [l.defaults.center[0]!, l.defaults.center[1]!];
             const effectiveZoom = mv?.zoom ?? l.defaults.zoom;
             const effectiveLabels = mv?.showLabels ?? l.defaults.showLabels;

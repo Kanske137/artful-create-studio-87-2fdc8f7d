@@ -1,9 +1,11 @@
-// Rutten som lager i själva Mapbox-kartan — används av både editorns
-// MapLayerInstance och tryckfilens offscreen-karta, så linjen ligger exakt
-// på gatorna och ser likadan ut i editor och tryck.
+// Rutten som lager i en Mapbox-karta — används av både editorns
+// MapLayerInstance och tryckfilens offscreen-karta, så projektion, utsnitt och
+// linje blir identiska i editor och tryck. Kartan själv är tom (routeMapStyleId):
+// på tavlan syns bara rutten mot mallens bakgrundsfärg.
 //
 // Mapbox rensar egna lager vid stilbyte (setStyle) — anropa
 // applyRouteToMap igen på "style.load".
+import { BLANK_MAP_STYLE_ID } from "@/lib/map-style-catalog";
 import type mapboxgl from "mapbox-gl";
 import type { Feature, FeatureCollection } from "geojson";
 import { mmToPx } from "@/lib/text-typography";
@@ -237,4 +239,12 @@ export function routeFitPaddingPx(
     bottom: Math.round(((bottom * sv) / 100) * h),
     left: Math.round(((left * sh) / 100) * w),
   };
+}
+
+/**
+ * Lopptavlans ruttkarta visar bara rutten — ingen karta under (mallens
+ * bakgrundsfärg syns igenom). Gäller även mallar som skapats med en kartstil.
+ */
+export function routeMapStyleId(): string {
+  return BLANK_MAP_STYLE_ID;
 }

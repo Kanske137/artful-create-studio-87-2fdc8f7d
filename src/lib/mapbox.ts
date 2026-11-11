@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
-import { mapStyleUrl } from "@/lib/map-style-catalog";
+import type { StyleSpecification } from "mapbox-gl";
+import { isBlankMapStyle, mapStyleUrl } from "@/lib/map-style-catalog";
 
 let cachedToken: string | null = null;
 
@@ -73,6 +74,15 @@ export async function reverseGeocode(
   };
 }
 
-export function styleUrl(styleId: string): string {
+/**
+ * Stil att ge mapbox-gl: URL för katalogstilar, eller en tom stil (inga
+ * källor/lager, genomskinlig duk) för blank — då syns bara egna lager som
+ * lopptavlans rutt, ovanpå mallens bakgrund. Ny instans varje gång eftersom
+ * mapbox-gl kan ändra i stilobjektet.
+ */
+export function styleUrl(styleId: string): string | StyleSpecification {
+  if (isBlankMapStyle(styleId)) {
+    return { version: 8, name: "Arthena blank", sources: {}, layers: [], projection: { name: "mercator" } };
+  }
   return mapStyleUrl(styleId);
 }

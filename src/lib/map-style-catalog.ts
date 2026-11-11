@@ -120,8 +120,20 @@ export function mapStyleThumbnailUrl(styleId: string): string | undefined {
   return MAP_STYLE_BY_ID[styleId]?.thumbnailUrl;
 }
 
-/** Resolve the full Mapbox style URL for a given catalog style id. */
+/**
+ * Ingen karta: bara kartlagrets egna lager (lopptavlans rutt) på mallens
+ * bakgrundsfärg. Kartduken är genomskinlig. Ingår inte i katalogen och visas
+ * därför aldrig i stilväljare.
+ */
+export const BLANK_MAP_STYLE_ID = "blank";
+
+export function isBlankMapStyle(styleId: string | null | undefined): boolean {
+  return styleId === BLANK_MAP_STYLE_ID;
+}
+
+/** Resolve the full Mapbox style URL for a given catalog style id ("" för blank). */
 export function mapStyleUrl(styleId: string): string {
+  if (isBlankMapStyle(styleId)) return "";
   return MAP_STYLE_BY_ID[styleId]?.styleUrl ?? `mapbox://styles/mapbox/${styleId}`;
 }
 

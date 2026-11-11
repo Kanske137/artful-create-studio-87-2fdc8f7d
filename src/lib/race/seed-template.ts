@@ -1,15 +1,15 @@
 // Färdig startmall för lopptavlan ("Skapa mall" → Startmall: Lopptavla).
 //
-// Formspråk (efter Akrams referens): kartan täcker hela tavlan och texten
-// ligger ovanpå. Stor, fet, vänsterställd rubrik uppe till vänster med
-// sluttiden till höger, diskret statistik under rubriken och löparens namn
-// nere till höger. Valfritt: foto nere till vänster, höjdprofil under
-// statistiken, egen rad under namnet.
+// Formspråk (efter Akrams referens): bara rutten — ingen karta — på en
+// enfärgad bakgrund, med texten ovanpå. Stor, fet, vänsterställd rubrik uppe
+// till vänster med sluttiden till höger, diskret statistik under rubriken och
+// löparens namn nere till höger. Valfritt: foto nere till vänster, höjdprofil
+// under statistiken, egen rad under namnet.
 //
-// Åtta bakgrunder (Midnatt är standard), var och en en egen stil med låst
-// kartstil så att texten alltid har rätt kontrast. Text-/statistik-
-// lagren delar id mellan stilarna (kundens av/på-val följer med), kartan har
-// eget id per stil (så att stilbyte även byter karta).
+// Åtta bakgrunder (Midnatt är standard): bakgrundsfärg + textfärger med rätt
+// kontrast. Alla lager delar id mellan bakgrunderna, så kundens av/på-val och
+// utsnitt av rutten följer med vid byte.
+import { BLANK_MAP_STYLE_ID } from "@/lib/map-style-catalog";
 import { applyFlowLayout } from "@/lib/flow-layout";
 import {
   defaultLocks,
@@ -31,28 +31,28 @@ export const RACE_LAYER_IDS = {
   splits: "race-splits",
 } as const;
 
-export const raceMapLayerId = (styleKey: string) => `race-map-${styleKey}`;
+/** Ruttlagret (en Mapbox-karta utan karta: bara rutten syns). */
+export const RACE_ROUTE_LAYER_ID = "race-route";
 
 interface Palette {
   key: string;
   name: string;
-  styleId: string;
   bg: string;
   ink: string;
   muted: string;
 }
 
-// Bakgrunder kunden väljer mellan (loppanelen → Utseende → Bakgrund). Varje
-// bakgrund är en egen stil: Arthenas kartstil + textfärger med rätt kontrast.
+// Bakgrunder kunden väljer mellan (loppanelen → Utseende → Bakgrund):
+// bakgrundsfärg + textfärger med rätt kontrast.
 export const RACE_PALETTES: Palette[] = [
-  { key: "midnatt", name: "Midnatt", styleId: "midnatt", bg: "#16213E", ink: "#FFFFFF", muted: "#9AA6C0" },
-  { key: "noir", name: "Noir", styleId: "noir", bg: "#0E0E0E", ink: "#FFFFFF", muted: "#9C9C9C" },
-  { key: "blatryck", name: "Blåtryck", styleId: "blatryck", bg: "#16395E", ink: "#FFFFFF", muted: "#A9BCD6" },
-  { key: "skog", name: "Skog", styleId: "navigation-night-v1", bg: "#0A1F0A", ink: "#FFFFFF", muted: "#9DB5A0" },
-  { key: "guld", name: "Guld", styleId: "guldlinje", bg: "#141210", ink: "#F5EBD7", muted: "#B9A98A" },
-  { key: "ljus", name: "Ljus", styleId: "skandinavisk", bg: "#F4F2EC", ink: "#141414", muted: "#6B6B6B" },
-  { key: "sand", name: "Sand", styleId: "streets-v12", bg: "#F3ECDD", ink: "#2A2118", muted: "#7A6B57" },
-  { key: "salvia", name: "Salvia", styleId: "outdoors-v12", bg: "#DCEBD9", ink: "#1D2B1F", muted: "#5E7262" },
+  { key: "midnatt", name: "Midnatt", bg: "#16213E", ink: "#FFFFFF", muted: "#9AA6C0" },
+  { key: "noir", name: "Noir", bg: "#0E0E0E", ink: "#FFFFFF", muted: "#9C9C9C" },
+  { key: "blatryck", name: "Blåtryck", bg: "#16395E", ink: "#FFFFFF", muted: "#A9BCD6" },
+  { key: "skog", name: "Skog", bg: "#0F2416", ink: "#FFFFFF", muted: "#9DB5A0" },
+  { key: "guld", name: "Guld", bg: "#141210", ink: "#F5EBD7", muted: "#B9A98A" },
+  { key: "ljus", name: "Ljus", bg: "#F4F2EC", ink: "#141414", muted: "#6B6B6B" },
+  { key: "sand", name: "Sand", bg: "#F3ECDD", ink: "#2A2118", muted: "#7A6B57" },
+  { key: "salvia", name: "Salvia", bg: "#DCEBD9", ink: "#1D2B1F", muted: "#5E7262" },
 ];
 
 const FONT = "Inter";
@@ -126,8 +126,8 @@ interface Geometry {
   fitPaddingPct: { top: number; right: number; bottom: number; left: number };
 }
 
-// Allt inom 8 % säkerhetsmarginal (canvas-kravet) utom själva kartan, som
-// går kant i kant (och vidare ut i canvasens kant/bleed).
+// Allt inom 8 % säkerhetsmarginal (canvas-kravet) utom ruttlagret, som går
+// kant i kant (rutten själv hålls inom marginalen via fitPaddingPct).
 const GEOMETRY: Record<"portrait" | "landscape", Geometry> = {
   portrait: {
     title: { xPct: 8, yPct: 0, wPct: 64, hPct: 11 },
@@ -170,8 +170,8 @@ function layers(o: "portrait" | "landscape", p: Palette): TemplateLayer[] {
   const P = o === "portrait";
   return [
     {
-      id: raceMapLayerId(p.key),
-      name: "Karta med rutt",
+      id: RACE_ROUTE_LAYER_ID,
+      name: "Rutt",
       type: "map",
       xPct: 0,
       yPct: 0,
@@ -179,11 +179,11 @@ function layers(o: "portrait" | "landscape", p: Palette): TemplateLayer[] {
       hPct: 100,
       rotation: 0,
       zIndex: 1,
-      // Kunden får panorera/zooma; kartstilen följer vald stil.
+      // Kunden får panorera/zooma rutten. Ingen karta under (blank stil).
       locks: defaultLocks({ position: false }),
       defaults: {
         shape: "rect",
-        styleId: p.styleId,
+        styleId: BLANK_MAP_STYLE_ID,
         center: [18.0686, 59.3293],
         zoom: 11,
         showLabels: false,
@@ -330,7 +330,6 @@ export function applyRaceSeed(base: Template): Template {
         allowGpx: true,
         routeColors: ["#FC4C02", "#FFC233", "#3DDC97", "#4DA3FF", "#FF4D8D", "#FFFFFF", "#111111"],
       },
-      mapStyles: RACE_PALETTES.map((p) => ({ id: p.styleId, enabled: true })),
       allowedFonts: undefined,
     },
     orientations: ["portrait", "landscape"],

@@ -33,7 +33,7 @@ import {
 import { iconSvgString } from "./map-icon-catalog";
 import { renderStarmap } from "./starmap-render";
 import { applyFlowLayout } from "./flow-layout";
-import { applyRouteToMap, overlayAvoidPct, paddedBounds, routeFitPaddingPx, type RouteRenderOptions } from "./race/route-map";
+import { applyRouteToMap, overlayAvoidPct, paddedBounds, routeFitPaddingPx, type RouteRenderOptions, routeMapStyleId } from "./race/route-map";
 import { elevationSeries } from "./race/geo";
 import { raceFieldText, raceStatItems } from "./race/derive";
 import { drawElevationProfile } from "./race/render-elevation";
@@ -934,7 +934,14 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
         ? input.liveMapCenter
         : [layer.defaults.center[0]!, layer.defaults.center[1]!];
       const zoom = mv ? mv.zoom : isLive ? input.liveMapZoom : layer.defaults.zoom;
-      const styleId = mv ? mv.styleId : isLive ? input.liveMapStyleId : layer.defaults.styleId;
+      // Ruttkartor (lopptavlan) visar bara rutten — ingen karta under.
+      const styleId = layer.defaults.routeStyle
+        ? routeMapStyleId()
+        : mv
+        ? mv.styleId
+        : isLive
+        ? input.liveMapStyleId
+        : layer.defaults.styleId;
       const showLabels = mv ? mv.showLabels : isLive ? input.liveShowLabels : layer.defaults.showLabels;
       const shape = mv ? mv.shape : isLive ? input.liveMapShape : layer.defaults.shape;
       const routeStyle = layer.defaults.routeStyle;

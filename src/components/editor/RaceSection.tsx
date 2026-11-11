@@ -24,7 +24,6 @@ import { GPX_ERROR_MESSAGES, GpxError, readGpxFile } from "@/lib/race/gpx";
 import { formatDistance, parseDuration } from "@/lib/race/format";
 import type { RaceCategory, RaceShow } from "@/lib/race/types";
 import { DEFAULT_LAYOUT_ID, getAllLayouts, type RaceStatKey, type TemplateLayer } from "@/lib/template-schema";
-import { mapStyleLabel, mapStylePreviewBg } from "@/lib/map-style-catalog";
 import { PhotoUploadSection } from "./PhotoUploadSection";
 
 type Filter = RaceCategory | "all";
@@ -274,7 +273,7 @@ function ToggleRow({ label, checked, onChange, indent }: { label: string; checke
   );
 }
 
-export function RaceDetailsPanel({ mapStyleSlot }: { mapStyleSlot?: React.ReactNode }) {
+export function RaceDetailsPanel() {
   const { t, i18n } = useTranslation();
   const templateLayers = useEditorStore((s) => s.templateLayers);
   const hiddenLayerIds = useEditorStore((s) => s.hiddenLayerIds);
@@ -285,12 +284,13 @@ export function RaceDetailsPanel({ mapStyleSlot }: { mapStyleSlot?: React.ReactN
   const setLayoutId = useEditorStore((s) => s.setLayoutId);
   // Prenumerera på orientering så listan följer aktiv layout.
   useEditorStore((s) => s.orientation);
-  // Bakgrunder = mallens stilar (var och en med egen kartstil + textfärger).
-  const backgrounds = (template ? getAllLayouts(template) : []).map((l) => {
-    const map = l.defaultLayout.portrait.layers.find((x) => x.type === "map");
-    const styleId = map && map.type === "map" ? map.defaults.styleId : "";
-    return { id: l.id, name: l.name || mapStyleLabel(styleId), bg: mapStylePreviewBg(styleId) };
-  });
+  // Bakgrunder = mallens stilar (bakgrundsfärg + textfärger). Ingen karta —
+  // bara rutten — så swatchen är stilens bakgrundsfärg.
+  const backgrounds = (template ? getAllLayouts(template) : []).map((l) => ({
+    id: l.id,
+    name: l.name,
+    bg: l.defaultLayout.portrait.background?.color ?? "#888888",
+  }));
   const activeLayout = layoutId ?? DEFAULT_LAYOUT_ID;
   const { fields, show, routeColor, source, route, splits } = useRaceStore();
   const setField = useRaceStore((s) => s.setField);
@@ -499,7 +499,6 @@ export function RaceDetailsPanel({ mapStyleSlot }: { mapStyleSlot?: React.ReactN
               </div>
             </div>
           )}
-          {mapStyleSlot}
         </div>
       )}
     </div>
