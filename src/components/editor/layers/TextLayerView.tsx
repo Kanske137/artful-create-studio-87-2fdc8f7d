@@ -55,6 +55,8 @@ export function TextLayerView({
 
   const justify =
     d.align === "left" ? "flex-start" : d.align === "right" ? "flex-end" : "center";
+  // Lodrät placering (d.valign) — samma som tryckfilen.
+  const alignV = d.valign === "top" ? "flex-start" : d.valign === "bottom" ? "flex-end" : "center";
 
   const renderText = (
     <span
@@ -94,6 +96,7 @@ export function TextLayerView({
       <div
         className="absolute inset-0 flex items-center"
         style={{
+          alignItems: alignV,
           background: d.backgroundColor || "transparent",
           justifyContent: justify,
           fontFamily: `"${effectiveFont}", system-ui, sans-serif`,
@@ -118,6 +121,7 @@ export function TextLayerView({
       <div
         className="absolute inset-0 flex items-center"
         style={{
+          alignItems: alignV,
           background: d.backgroundColor || "transparent",
           justifyContent: justify,
           pointerEvents: "none",
@@ -156,6 +160,7 @@ export function TextLayerView({
     <div
       className="absolute inset-0 flex items-center"
       style={{
+        alignItems: alignV,
         background: d.backgroundColor || "transparent",
         justifyContent: ruleLenPx ? "center" : justify,
         pointerEvents: "none",

@@ -170,7 +170,9 @@ describe("härledda värden", () => {
 
   it("texter till lagren", () => {
     expect(raceFieldText("title", base)).toBe("Stockholm Marathon");
-    expect(raceFieldText("subtitle", base)).toBe("Stockholm · 2026");
+    expect(raceFieldText("subtitle", base)).toBe("Stockholm · 30 maj 2026");
+    expect(raceFieldText("finishTime", base)).toBe("3:45:12");
+    expect(raceFieldText("finishTime", { ...base, fields: { ...base.fields, finishTime: "trasig" } })).toBe("");
     expect(raceFieldText("date", base)).toBe("30 maj 2026");
     expect(raceFieldText("runnerName", base)).toBe("");
   });
@@ -183,5 +185,30 @@ describe("härledda värden", () => {
     expect(withBib.map((i) => i.value)).toEqual(["42,195 km", "1234"]);
     const noTime = raceStatItems(["time", "pace"], { ...base, fields: { ...base.fields, finishTime: "" } });
     expect(noTime).toEqual([]);
+  });
+});
+
+import { overlayAvoidPct, routeFitPaddingPx } from "./route-map";
+
+describe("banan hålls fri från text och foto", () => {
+  const map = { id: "m", type: "map", xPct: 0, yPct: 0, wPct: 100, hPct: 100, zIndex: 1 };
+  const L = (id: string, yPct: number, hPct: number, zIndex = 5) => ({ id, type: "text", xPct: 8, yPct, wPct: 50, hPct, zIndex });
+
+  it("räknar topp från rubrikblocket och botten från namn/foto", () => {
+    const a = overlayAvoidPct([map, L("title", 8, 11), L("stats", 20, 4), L("name", 84, 5), L("photo", 70, 22)], map);
+    expect(a.top).toBeCloseTo(24);
+    expect(a.bottom).toBeCloseTo(30);
+  });
+
+  it("ignorerar lager under kartan", () => {
+    expect(overlayAvoidPct([map, L("bg", 0, 100, 0)], map)).toEqual({ top: 0, bottom: 0 });
+  });
+
+  it("lägger luft runt överliggande lager men lämnar plats åt banan", () => {
+    const p = routeFitPaddingPx({ color: "#FC4C02", thicknessMm: 1, casing: false, casingColor: "#FFFFFF", fitPaddingPct: { top: 8, right: 9, bottom: 8, left: 9 } }, 1000, 1000, { top: 24, bottom: 30 });
+    expect(p.top).toBe(280);
+    expect(p.bottom).toBe(340);
+    const tight = routeFitPaddingPx(undefined, 1000, 1000, { top: 60, bottom: 50 });
+    expect(tight.top + tight.bottom).toBeLessThanOrEqual(800);
   });
 });

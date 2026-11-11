@@ -1,46 +1,78 @@
 // Färdig startmall för lopptavlan ("Skapa mall" → Startmall: Lopptavla).
 //
-// Stående: en flödesgrupp uppifrån och ned — titel, ort · år, foto (av),
-// karta med rutt (växer), höjdprofil, statistikrad, namn, datum, egen rad
-// (av). Liggande: kartan till vänster, samma element i en kolumn till höger.
-// Samma lager-id i båda orienteringarna, så kundens av/på-val följer med.
+// Formspråk (efter Akrams referens): kartan täcker hela tavlan och texten
+// ligger ovanpå. Stor, fet, vänsterställd rubrik uppe till vänster med
+// sluttiden till höger, diskret statistik under rubriken och löparens namn
+// nere till höger. Valfritt: foto nere till vänster, höjdprofil under
+// statistiken, egen rad under namnet.
+//
+// Tre stilar (fliken "Stil"): Midnatt (standard), Ljus och Noir. Kartstilen
+// är låst per stil så att texten alltid har rätt kontrast. Text-/statistik-
+// lagren delar id mellan stilarna (kundens av/på-val följer med), kartan har
+// eget id per stil (så att stilbyte även byter karta).
 import { applyFlowLayout } from "@/lib/flow-layout";
-import { defaultLocks, type FlowGroup, type OrientationLayout, type Template, type TemplateLayer } from "@/lib/template-schema";
+import {
+  defaultLocks,
+  type FlowGroup,
+  type OrientationLayout,
+  type Template,
+  type TemplateLayer,
+} from "@/lib/template-schema";
 
 export const RACE_LAYER_IDS = {
   title: "race-title",
-  subtitle: "race-subtitle",
-  photo: "race-photo",
-  map: "race-map",
-  elevation: "race-elevation",
+  time: "race-time",
   stats: "race-stats",
+  elevation: "race-elevation",
+  photo: "race-photo",
   name: "race-name",
-  date: "race-date",
+  subtitle: "race-subtitle",
   custom: "race-custom",
 } as const;
 
-const INK = "#111111";
-const MUTED = "#5C5C5C";
-const BG = "#F7F5F0";
+export const raceMapLayerId = (styleKey: string) => `race-map-${styleKey}`;
 
-/** Låst för kunden; bara av/på via loppanelen. */
+interface Palette {
+  key: string;
+  name: string;
+  styleId: string;
+  bg: string;
+  ink: string;
+  muted: string;
+}
+
+export const RACE_PALETTES: Palette[] = [
+  { key: "midnatt", name: "Midnatt", styleId: "midnatt", bg: "#16213E", ink: "#FFFFFF", muted: "#9AA6C0" },
+  { key: "ljus", name: "Ljus", styleId: "skandinavisk", bg: "#F4F2EC", ink: "#141414", muted: "#6B6B6B" },
+  { key: "noir", name: "Noir", styleId: "noir", bg: "#0E0E0E", ink: "#FFFFFF", muted: "#9C9C9C" },
+];
+
+const FONT = "Inter";
+/** Fet stil sätts via spans (mallsystemets konvention). Täcker hela texten. */
+const BOLD = [{ start: 0, end: 200, bold: true }];
+
+/** Kunden når bara av/på (via loppanelen). */
 const toggleOnly = () => defaultLocks({ content: true, visibility: false });
 
 type Rect = { xPct: number; yPct: number; wPct: number; hPct: number };
+type RaceField = "title" | "subtitle" | "runnerName" | "date" | "customLine" | "finishTime";
 
 function raceText(
   id: string,
   name: string,
   rect: Rect,
   z: number,
-  opts: {
-    raceField: "title" | "subtitle" | "runnerName" | "date" | "customLine";
+  o: {
+    field: RaceField;
     placeholder: string;
-    font: string;
     sizePt: number;
-    color?: string;
+    color: string;
+    align: "left" | "right";
+    valign?: "top" | "middle" | "bottom";
+    bold?: boolean;
     spacing?: number;
-    align?: "left" | "center" | "right";
+    lineHeight?: number;
+    upper?: boolean;
     toggle?: boolean;
     hidden?: boolean;
   },
@@ -52,168 +84,209 @@ function raceText(
     ...rect,
     rotation: 0,
     zIndex: z,
-    locks: opts.toggle === false ? defaultLocks({ content: true }) : toggleOnly(),
-    ...(opts.hidden ? { hiddenByDefault: true } : {}),
+    locks: o.toggle === false ? defaultLocks({ content: true }) : toggleOnly(),
+    ...(o.hidden ? { hiddenByDefault: true } : {}),
     defaults: {
-      text: opts.placeholder,
-      font: opts.font,
-      fontSizePt: opts.sizePt,
-      align: opts.align ?? "center",
-      color: opts.color ?? INK,
-      letterSpacingEm: opts.spacing ?? 0,
-      raceField: opts.raceField,
-      raceFieldUppercase: true,
+      text: o.placeholder,
+      font: FONT,
+      fontSizePt: o.sizePt,
+      align: o.align,
+      valign: o.valign ?? "middle",
+      color: o.color,
+      letterSpacingEm: o.spacing ?? 0,
+      ...(o.lineHeight ? { lineHeight: o.lineHeight } : {}),
+      ...(o.bold ? { spans: BOLD } : {}),
+      raceField: o.field,
+      raceFieldUppercase: !!o.upper,
     },
   };
 }
 
-function layers(o: "portrait" | "landscape"): TemplateLayer[] {
+interface Geometry {
+  title: Rect;
+  titlePt: number;
+  time: Rect;
+  stats: Rect;
+  elevation: Rect;
+  photo: Rect;
+  topFlow: Rect;
+  bottomFlow: Rect;
+  name: Rect;
+  subtitle: Rect;
+  custom: Rect;
+  fitPaddingPct: { top: number; right: number; bottom: number; left: number };
+}
+
+// Allt inom 8 % säkerhetsmarginal (canvas-kravet) utom själva kartan, som
+// går kant i kant (och vidare ut i canvasens kant/bleed).
+const GEOMETRY: Record<"portrait" | "landscape", Geometry> = {
+  portrait: {
+    title: { xPct: 8, yPct: 0, wPct: 64, hPct: 11 },
+    titlePt: 40,
+    time: { xPct: 72, yPct: 8.4, wPct: 20, hPct: 4 },
+    stats: { xPct: 8, yPct: 0, wPct: 64, hPct: 4.2 },
+    elevation: { xPct: 8, yPct: 0, wPct: 40, hPct: 4.5 },
+    photo: { xPct: 8, yPct: 70, wPct: 26, hPct: 22 },
+    topFlow: { xPct: 8, yPct: 8, wPct: 64, hPct: 30 },
+    bottomFlow: { xPct: 38, yPct: 76, wPct: 54, hPct: 16 },
+    name: { xPct: 38, yPct: 0, wPct: 54, hPct: 4.6 },
+    subtitle: { xPct: 38, yPct: 0, wPct: 54, hPct: 2.4 },
+    custom: { xPct: 38, yPct: 0, wPct: 54, hPct: 2.4 },
+    fitPaddingPct: { top: 8, right: 9, bottom: 8, left: 9 },
+  },
+  landscape: {
+    title: { xPct: 8, yPct: 0, wPct: 52, hPct: 14 },
+    titlePt: 38,
+    time: { xPct: 72, yPct: 9.2, wPct: 20, hPct: 6 },
+    stats: { xPct: 8, yPct: 0, wPct: 52, hPct: 6 },
+    elevation: { xPct: 8, yPct: 0, wPct: 30, hPct: 6 },
+    photo: { xPct: 8, yPct: 64, wPct: 20, hPct: 28 },
+    topFlow: { xPct: 8, yPct: 9, wPct: 52, hPct: 36 },
+    bottomFlow: { xPct: 44, yPct: 70, wPct: 48, hPct: 22 },
+    name: { xPct: 44, yPct: 0, wPct: 48, hPct: 6.4 },
+    subtitle: { xPct: 44, yPct: 0, wPct: 48, hPct: 3.2 },
+    custom: { xPct: 44, yPct: 0, wPct: 48, hPct: 3.2 },
+    fitPaddingPct: { top: 8, right: 8, bottom: 8, left: 8 },
+  },
+};
+
+const ids = RACE_LAYER_IDS;
+
+function layers(o: "portrait" | "landscape", p: Palette): TemplateLayer[] {
+  const g = GEOMETRY[o];
   const P = o === "portrait";
-  // Rect här är bara startvärden — flödesgrupperna räknar om y/h.
-  // 8 % säkerhetsmarginal runt om (canvas-kravet) — samma för alla material.
-  const col: Rect = P ? { xPct: 8, yPct: 0, wPct: 84, hPct: 0 } : { xPct: 63, yPct: 0, wPct: 29, hPct: 0 };
-  const align = P ? "center" : "left";
   return [
-    // Liggande: smalare kolumn — plats för två rader vid långa loppnamn.
-    raceText(RACE_LAYER_IDS.title, "Titel", { ...col, hPct: P ? 8 : 13 }, 10, {
-      raceField: "title", placeholder: "Ditt lopp", font: "Bebas Neue", sizePt: P ? 40 : 30, spacing: 0.03, align, toggle: false,
-    }),
-    raceText(RACE_LAYER_IDS.subtitle, "Ort och år", { ...col, hPct: P ? 3 : 4 }, 11, {
-      raceField: "subtitle", placeholder: "Stad · År", font: "Montserrat", sizePt: 10, color: MUTED, spacing: 0.25, align,
-    }),
     {
-      id: RACE_LAYER_IDS.photo,
+      id: raceMapLayerId(p.key),
+      name: "Karta med rutt",
+      type: "map",
+      xPct: 0,
+      yPct: 0,
+      wPct: 100,
+      hPct: 100,
+      rotation: 0,
+      zIndex: 1,
+      // Kunden får panorera/zooma; kartstilen följer vald stil.
+      locks: defaultLocks({ position: false }),
+      defaults: {
+        shape: "rect",
+        styleId: p.styleId,
+        center: [18.0686, 59.3293],
+        zoom: 11,
+        showLabels: false,
+        routeStyle: {
+          color: "#FC4C02",
+          thicknessMm: 1.2,
+          casing: false,
+          casingColor: "#FFFFFF",
+          fitPaddingPct: g.fitPaddingPct,
+        },
+      },
+    },
+    {
+      id: ids.photo,
       name: "Foto",
       type: "photo",
-      ...col,
-      hPct: 18,
+      ...g.photo,
       rotation: 0,
       zIndex: 5,
       hiddenByDefault: true,
       locks: defaultLocks({ content: false, visibility: false }),
       defaults: { shape: "rect", fit: "cover" },
     },
+    raceText(ids.title, "Titel", g.title, 10, {
+      field: "title", placeholder: "Ditt lopp", sizePt: g.titlePt, color: p.ink, align: "left",
+      valign: "top", bold: true, spacing: -0.02, lineHeight: 1.0, toggle: false,
+    }),
+    raceText(ids.time, "Sluttid", g.time, 11, {
+      field: "finishTime", placeholder: "", sizePt: P ? 14 : 15, color: p.ink, align: "right", valign: "top",
+    }),
     {
-      id: RACE_LAYER_IDS.map,
-      name: "Karta med rutt",
-      type: "map",
-      ...(P ? { xPct: 8, yPct: 20, wPct: 84, hPct: 50 } : { xPct: 8, yPct: 8, wPct: 51, hPct: 84 }),
-      rotation: 0,
-      zIndex: 1,
-      // Kunden får panorera/zooma och byta kartstil; formen är låst.
-      locks: defaultLocks({ position: false, style: false }),
-      defaults: {
-        shape: "rect",
-        styleId: "skandinavisk",
-        center: [18.0686, 59.3293],
-        zoom: 11,
-        showLabels: false,
-        routeStyle: { color: "#FC4C02", thicknessMm: 1.6, casing: false, casingColor: "#FFFFFF" },
-      },
-    },
-    {
-      id: RACE_LAYER_IDS.elevation,
-      name: "Höjdprofil",
-      type: "elevation",
-      ...col,
-      hPct: P ? 7 : 9,
-      rotation: 0,
-      zIndex: 6,
-      locks: toggleOnly(),
-      defaults: { fillOpacity: 0.18, thicknessMm: 0.6 },
-    },
-    {
-      id: RACE_LAYER_IDS.stats,
+      id: ids.stats,
       name: "Loppstatistik",
       type: "raceStats",
-      ...col,
-      hPct: P ? 6 : 18,
+      ...g.stats,
       rotation: 0,
-      zIndex: 7,
+      zIndex: 12,
       locks: toggleOnly(),
       defaults: {
-        items: ["distance", "time", "pace", "bib", "placement"],
-        valueFont: "Montserrat",
-        labelFont: "Montserrat",
-        valueSizePt: P ? 15 : 13,
-        labelSizePt: 6,
-        color: INK,
-        labelColor: MUTED,
-        letterSpacingEm: 0.14,
-        dividers: true,
-        arrange: P ? "row" : "column",
+        // Sluttiden har eget, större textlager — här bara de diskreta värdena.
+        items: ["distance", "pace", "bib", "placement"],
+        valueFont: FONT,
+        labelFont: FONT,
+        valueSizePt: 10,
+        labelSizePt: 5.5,
+        color: p.ink,
+        labelColor: p.muted,
+        letterSpacingEm: 0.16,
+        dividers: false,
+        arrange: "row",
+        align: "start",
       },
     },
-    raceText(RACE_LAYER_IDS.name, "Namn", { ...col, hPct: P ? 4 : 5 }, 12, {
-      raceField: "runnerName", placeholder: "Ditt namn", font: "Montserrat", sizePt: P ? 16 : 14, spacing: 0.12, align,
+    {
+      id: ids.elevation,
+      name: "Höjdprofil",
+      type: "elevation",
+      ...g.elevation,
+      rotation: 0,
+      zIndex: 13,
+      hiddenByDefault: true,
+      locks: toggleOnly(),
+      defaults: { fillOpacity: 0.22, thicknessMm: 0.5 },
+    },
+    raceText(ids.name, "Namn", g.name, 14, {
+      field: "runnerName", placeholder: "Ditt namn", sizePt: P ? 20 : 22, color: p.ink, align: "right",
+      valign: "bottom", bold: true, spacing: -0.01,
     }),
-    raceText(RACE_LAYER_IDS.date, "Datum", { ...col, hPct: P ? 2.6 : 3.5 }, 13, {
-      raceField: "date", placeholder: "Datum", font: "Montserrat", sizePt: 9, color: MUTED, spacing: 0.2, align,
+    raceText(ids.subtitle, "Ort och datum", g.subtitle, 15, {
+      field: "subtitle", placeholder: "Stad · Datum", sizePt: 7.5, color: p.muted, align: "right",
+      spacing: 0.18, upper: true,
     }),
-    raceText(RACE_LAYER_IDS.custom, "Egen rad", { ...col, hPct: P ? 2.6 : 3.5 }, 14, {
-      raceField: "customLine", placeholder: "Mitt första maraton", font: "Montserrat", sizePt: 9, color: MUTED, spacing: 0.2, align, hidden: true,
+    raceText(ids.custom, "Egen rad", g.custom, 16, {
+      field: "customLine", placeholder: "Mitt första maraton", sizePt: 7.5, color: p.muted, align: "right",
+      spacing: 0.18, upper: true, hidden: true,
     }),
   ];
 }
-
-const ids = RACE_LAYER_IDS;
 
 function flow(o: "portrait" | "landscape"): FlowGroup[] {
-  if (o === "portrait") {
-    return [
-      {
-        id: "race-main",
-        xPct: 8, yPct: 8, wPct: 84, hPct: 84,
-        gapPct: 1.4,
-        align: "start",
-        items: [
-          { layerId: ids.title },
-          { layerId: ids.subtitle },
-          { layerId: ids.photo },
-          { layerId: ids.map, grow: true },
-          { layerId: ids.elevation },
-          { layerId: ids.stats },
-          { layerId: ids.name },
-          { layerId: ids.date },
-          { layerId: ids.custom },
-        ],
-      },
-    ];
-  }
+  const g = GEOMETRY[o];
   return [
     {
-      id: "race-side",
-      xPct: 63, yPct: 8, wPct: 29, hPct: 84,
-      gapPct: 1.8,
-      align: "center",
-      items: [
-        { layerId: ids.title },
-        { layerId: ids.subtitle },
-        { layerId: ids.photo },
-        { layerId: ids.elevation },
-        { layerId: ids.stats },
-        { layerId: ids.name },
-        { layerId: ids.date },
-        { layerId: ids.custom },
-      ],
+      id: "race-top",
+      ...g.topFlow,
+      gapPct: o === "portrait" ? 1.4 : 2,
+      align: "start",
+      items: [{ layerId: ids.title }, { layerId: ids.stats }, { layerId: ids.elevation }],
+    },
+    {
+      id: "race-bottom",
+      ...g.bottomFlow,
+      gapPct: o === "portrait" ? 0.7 : 1,
+      align: "end",
+      items: [{ layerId: ids.name }, { layerId: ids.subtitle }, { layerId: ids.custom }],
     },
   ];
 }
 
-function layout(o: "portrait" | "landscape"): OrientationLayout {
+function layout(o: "portrait" | "landscape", p: Palette): OrientationLayout {
   const f = flow(o);
   return {
     aspect: o === "portrait" ? "3:4" : "4:3",
-    background: { color: BG },
-    // Spara lagren där flödet placerar dem (alla påslagna), så att varje lager
-    // har en rimlig ruta även där flödet inte räknas om.
-    layers: applyFlowLayout(layers(o), f),
+    background: { color: p.bg },
+    // Spara lagren där flödet placerar dem (alla påslagna), så att varje
+    // lager har en rimlig ruta även där flödet inte räknas om (admin).
+    layers: applyFlowLayout(layers(o, p), f),
     flow: f,
   };
 }
 
-/** Lägg lopptavlans layout och inställningar på en mall med valda produkttyper. */
+const block = (p: Palette) => ({ portrait: layout("portrait", p), landscape: layout("landscape", p) });
+
+/** Lägg lopptavlans layouter och inställningar på en mall med valda produkttyper. */
 export function applyRaceSeed(base: Template): Template {
+  const [standard, ...extra] = RACE_PALETTES;
   return {
     ...base,
     productOptions: {
@@ -221,14 +294,20 @@ export function applyRaceSeed(base: Template): Template {
       raceOptions: {
         enabled: true,
         allowGpx: true,
-        routeColors: ["#FC4C02", "#111111", "#1F5EFF", "#E0245E"],
+        routeColors: ["#FC4C02", "#FFC233", "#3DDC97", "#FF4D8D"],
       },
-      mapStyles: ["skandinavisk", "midnatt", "noir", "blatryck", "outdoors-v12"].map((id) => ({ id, enabled: true })),
+      mapStyles: RACE_PALETTES.map((p) => ({ id: p.styleId, enabled: true })),
       allowedFonts: undefined,
     },
     orientations: ["portrait", "landscape"],
     defaultOrientation: "portrait",
-    defaultLayout: { portrait: layout("portrait"), landscape: layout("landscape") },
+    defaultLayoutName: standard!.name,
+    defaultLayout: block(standard!),
+    extraLayouts: extra.map((p) => ({
+      id: `race-${p.key}`,
+      name: p.name,
+      defaultLayout: block(p),
+    })),
     contentVariants: [],
   };
 }

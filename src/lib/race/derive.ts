@@ -22,8 +22,14 @@ export function raceFieldText(field: RaceTextField, race: RaceRenderInput): stri
     case "title":
       return f.title.trim();
     case "subtitle": {
-      const parts = [f.city.trim(), yearOf(f.dateISO)].filter(Boolean);
-      return parts.join(" · ");
+      // "Stockholm · 30 maj 2026" — ort och hela datumet (eller bara året
+      // om datumet inte går att tolka).
+      const date = formatRaceDate(f.dateISO, race.locale) || yearOf(f.dateISO);
+      return [f.city.trim(), date].filter(Boolean).join(" · ");
+    }
+    case "finishTime": {
+      const sec = parseDuration(f.finishTime);
+      return sec ? formatDuration(sec) : "";
     }
     case "runnerName":
       return f.runnerName.trim();

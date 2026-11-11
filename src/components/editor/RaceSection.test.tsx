@@ -108,11 +108,12 @@ describe("Lopptavlans kundpanel", () => {
     loadRaceTemplate();
   });
 
-  it("startmallen döljer foto och egen rad från början", () => {
+  it("startmallen döljer foto, höjdprofil och egen rad från början", () => {
     const hidden = useEditorStore.getState().hiddenLayerIds;
     expect(hidden[RACE_LAYER_IDS.photo]).toBe(true);
     expect(hidden[RACE_LAYER_IDS.custom]).toBe(true);
-    expect(hidden[RACE_LAYER_IDS.elevation]).toBeUndefined();
+    expect(hidden[RACE_LAYER_IDS.elevation]).toBe(true);
+    expect(hidden[RACE_LAYER_IDS.stats]).toBeUndefined();
   });
 
   it("spärrar beställning tills ett lopp eller en GPX-fil valts", async () => {
@@ -137,14 +138,16 @@ describe("Lopptavlans kundpanel", () => {
     await waitFor(() => expect(container.querySelector('[role="alert"]')?.textContent).toMatch(/inte vara en GPX-fil/));
   });
 
-  it("reglagen döljer lager och flödet ger kartan ytan", () => {
-    const mapBefore = useEditorStore.getState().templateLayers().find((l) => l.id === RACE_LAYER_IDS.map)!;
+  it("reglagen döljer lager och flödet flyttar upp det som ligger under", () => {
+    const y = (id: string) => useEditorStore.getState().templateLayers().find((l) => l.id === id)!.yPct;
     render(<RaceDetailsPanel />);
     // Etiketten omsluter reglaget — klick på texten växlar det.
     click(byText("Höjdprofil", "span"));
-    expect(useEditorStore.getState().hiddenLayerIds[RACE_LAYER_IDS.elevation]).toBe(true);
-    const mapAfter = useEditorStore.getState().templateLayers().find((l) => l.id === RACE_LAYER_IDS.map)!;
-    expect(mapAfter.hPct).toBeGreaterThan(mapBefore.hPct);
+    expect(useEditorStore.getState().hiddenLayerIds[RACE_LAYER_IDS.elevation]).toBeUndefined();
+    const before = y(RACE_LAYER_IDS.elevation);
+    click(byText("Statistikrad", "span"));
+    expect(useEditorStore.getState().hiddenLayerIds[RACE_LAYER_IDS.stats]).toBe(true);
+    expect(y(RACE_LAYER_IDS.elevation)).toBeLessThan(before);
   });
 
   it("statistikvärden slås av och på individuellt", () => {

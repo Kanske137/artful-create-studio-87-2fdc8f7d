@@ -540,6 +540,7 @@ export function createLayer(type: LayerType, existing: TemplateLayer[]): Templat
           letterSpacingEm: 0.08,
           dividers: true,
           arrange: "auto",
+          align: "spread",
         },
         locks: defaultLocks({ content: true, visibility: false }),
       };

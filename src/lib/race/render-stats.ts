@@ -96,7 +96,52 @@ export function drawRaceStats(
   ctx.save();
   ctx.textBaseline = "alphabetic";
 
-  if (arrange === "row") {
+  if (arrange === "row" && (d.align ?? "spread") !== "spread") {
+    // Tätt packad rad mot vänster/höger kant: etikett ovanför värde,
+    // vänsterställt (start) eller högerställt (end), jämn lucka emellan.
+    const packed = d.align === "end" ? "end" : "start";
+    let valuePx = Math.min(valuePx0, rect.h * 0.62);
+    let labelPx = Math.min(labelPx0, valuePx * 0.6);
+    const widths = (vp: number, lp: number) => {
+      ctx.font = fontCss(vp, d.valueFont, 600);
+      const vw = items.map((it) => spacedWidth(ctx, it.value, 0));
+      ctx.font = fontCss(lp, d.labelFont, 500);
+      const lw = items.map((it) => spacedWidth(ctx, it.label, spacing * lp));
+      return items.map((_, i) => Math.max(vw[i]!, lw[i]!));
+    };
+    let gap = valuePx * 1.6;
+    let w = widths(valuePx, labelPx);
+    let total = w.reduce((a, b) => a + b, 0) + gap * (items.length - 1);
+    if (total > rect.w) {
+      const k = rect.w / total;
+      valuePx *= k;
+      labelPx *= k;
+      gap *= k;
+      w = widths(valuePx, labelPx);
+      total = w.reduce((a, b) => a + b, 0) + gap * (items.length - 1);
+    }
+    const lgap = labelPx * 0.55;
+    const blockH = labelPx + lgap + valuePx;
+    const top = rect.y + Math.max(0, (rect.h - blockH) / 2);
+    let x = packed === "start" ? rect.x : rect.x + rect.w - total;
+    items.forEach((it, i) => {
+      const ax = packed === "start" ? x : x + w[i]!;
+      const al = packed === "start" ? "left" : "right";
+      ctx.fillStyle = labelColor;
+      ctx.font = fontCss(labelPx, d.labelFont, 500);
+      fillSpaced(ctx, it.label, ax, top + labelPx, spacing * labelPx, al);
+      ctx.fillStyle = d.color;
+      ctx.font = fontCss(valuePx, d.valueFont, 600);
+      fillSpaced(ctx, it.value, ax, top + labelPx + lgap + valuePx * 0.92, 0, al);
+      if (d.dividers && i < items.length - 1) {
+        ctx.fillStyle = dividerColor;
+        ctx.globalAlpha = 0.35;
+        ctx.fillRect(x + w[i]! + gap / 2 - dividerPx / 2, top, dividerPx, blockH);
+        ctx.globalAlpha = 1;
+      }
+      x += w[i]! + gap;
+    });
+  } else if (arrange === "row") {
     const colW = rect.w / items.length;
     const pad = colW * 0.06;
     // Gemensam storlek för alla värden (den minsta som får plats) → jämn rad.

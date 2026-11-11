@@ -81,6 +81,16 @@ export const mapDefaultsSchema = z.object({
       /** Ljus kontur runt linjen — för mörka kartstilar. */
       casing: z.boolean().default(false),
       casingColor: hexColorSchema.default("#FFFFFF"),
+      /** Luft runt banan när kartan anpassas (% av kartans höjd/bredd).
+       *  Större uppe/nere när text ligger ovanpå kartan. */
+      fitPaddingPct: z
+        .object({
+          top: z.number().min(0).max(45),
+          right: z.number().min(0).max(45),
+          bottom: z.number().min(0).max(45),
+          left: z.number().min(0).max(45),
+        })
+        .optional(),
     })
     .optional(),
 });
@@ -303,9 +313,12 @@ export const textDefaultsSchema = z.object({
   // Lopptavla: texten styrs av loppets data (titel, ort · år, löparens namn,
   // datum, egen rad) via loppanelen i stället för att kunden skriver i lagret.
   // Tomt värde ⇒ mallens placeholder-text visas.
-  raceField: z.enum(["title", "subtitle", "runnerName", "date", "customLine"]).optional(),
+  raceField: z.enum(["title", "subtitle", "runnerName", "date", "customLine", "finishTime"]).optional(),
   /** Skriv loppvärdet med versaler (t.ex. "STOCKHOLM MARATHON"). */
   raceFieldUppercase: z.boolean().optional(),
+  /** Lodrät placering i lagret. Utelämnad ⇒ mitten (tidigare beteende).
+   *  "top" behövs för rubriker vars radantal varierar (ett eller två rader). */
+  valign: z.enum(["top", "middle", "bottom"]).optional(),
   // DEPRECATED — kept for back-compat. Migrated to `linkedTokens`.
   linkedMapFields: z
     .object({
@@ -421,6 +434,9 @@ export const raceStatsDefaultsSchema = z.object({
   /** "row" = sida vid sida, "column" = lista uppifrån, "auto" = rad om
    *  lagret är bredare än det är högt. */
   arrange: z.enum(["row", "column", "auto"]).default("auto"),
+  /** Rad: "spread" = jämnt fördelat över bredden, "start"/"end" = tätt
+   *  packat mot vänster/höger kant (diskret statistik under en rubrik). */
+  align: z.enum(["spread", "start", "end"]).default("spread"),
 });
 export type RaceStatsDefaults = z.infer<typeof raceStatsDefaultsSchema>;
 

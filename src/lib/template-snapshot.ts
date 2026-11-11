@@ -33,7 +33,7 @@ import {
 import { iconSvgString } from "./map-icon-catalog";
 import { renderStarmap } from "./starmap-render";
 import { applyFlowLayout } from "./flow-layout";
-import { applyRouteToMap, paddedBounds, type RouteRenderOptions } from "./race/route-map";
+import { applyRouteToMap, overlayAvoidPct, paddedBounds, routeFitPaddingPx, type RouteRenderOptions } from "./race/route-map";
 import { elevationSeries } from "./race/geo";
 import { raceFieldText, raceStatItems } from "./race/derive";
 import { drawElevationProfile } from "./race/render-elevation";
@@ -42,7 +42,6 @@ import type { Bounds, RaceRenderInput, RaceRoute } from "./race/types";
 
 /** Samma luft runt banan som editorns första anpassning (MapLayerInstance). */
 const ROUTE_FIT_FRAC = 0.06;
-const ROUTE_FIT_PAD_SHARE = 0.04;
 
 export interface TemplateSnapshotInput {
   template: Template;
@@ -214,7 +213,9 @@ async function drawMapLayer(
       : opts.route
         ? {
             bounds: paddedBounds(opts.route.route.bbox, ROUTE_FIT_FRAC),
-            fitBoundsOptions: { padding: Math.round(Math.min(rect.w, rect.h) * ROUTE_FIT_PAD_SHARE) },
+            fitBoundsOptions: {
+              padding: routeFitPaddingPx(opts.route.opts.style, rect.w, rect.h, opts.route.opts.avoidPct),
+            },
           }
         : { center: opts.center, zoom: opts.zoom };
     map = new mapboxgl.Map({
@@ -475,7 +476,13 @@ function drawTextLayer(
   }
 
   // ---- Rita raderna: segment vänster→höger från justerad startpunkt ----
-  let y = rect.y + rect.h / 2 - totalH / 2;
+  // Lodrät placering: mitten (standard), eller topp/botten (d.valign).
+  let y =
+    d.valign === "top"
+      ? rect.y
+      : d.valign === "bottom"
+        ? rect.y + rect.h - totalH
+        : rect.y + rect.h / 2 - totalH / 2;
   lines.forEach((pieces, i) => {
     const m = measured[i];
     const midY = y + m.h / 2;
@@ -941,6 +948,7 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
                 showStartFinish: input.race.show.startFinish,
                 showKmMarkers: input.race.show.kmMarkers,
                 canvasShortPx: Math.min(frontPxW, frontPxH),
+                avoidPct: overlayAvoidPct(layers, layer),
               },
             }
           : null;

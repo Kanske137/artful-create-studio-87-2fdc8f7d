@@ -444,7 +444,7 @@
       "photo": "Photo",
       "elevation": "Elevation profile",
       "stats": "Stats row",
-      "subtitle": "City and year",
+      "subtitle": "City and date",
       "runnerName": "Name",
       "date": "Date",
       "customLine": "Custom line",

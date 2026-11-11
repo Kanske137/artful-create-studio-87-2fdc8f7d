@@ -237,7 +237,7 @@ type RaceTextField = NonNullable<Extract<TemplateLayer, { type: "text" }>["defau
 
 /** Lager kunden kan slå av/på från loppanelen, i visningsordning. */
 function toggleableLayers(layers: TemplateLayer[]) {
-  const order: Record<string, number> = { photo: 0, subtitle: 1, runnerName: 2, date: 3, customLine: 4, elevation: 5, raceStats: 6 };
+  const order: Record<string, number> = { finishTime: 0, raceStats: 1, elevation: 2, runnerName: 3, subtitle: 4, date: 5, customLine: 6, photo: 7 };
   const out: Array<{ layer: TemplateLayer; key: string }> = [];
   for (const l of layers) {
     if (l.locks.visibility) continue;
@@ -259,6 +259,7 @@ const TOGGLE_LABEL_KEY: Record<string, string> = {
   runnerName: "race.show.runnerName",
   date: "race.show.date",
   customLine: "race.show.customLine",
+  finishTime: "race.show.time",
 };
 
 function ToggleRow({ label, checked, onChange, indent }: { label: string; checked: boolean; onChange: (v: boolean) => void; indent?: boolean }) {
@@ -340,7 +341,7 @@ export function RaceDetailsPanel({ mapStyleSlot }: { mapStyleSlot?: React.ReactN
               <Input type="date" value={fields.dateISO} onChange={(e) => setField("dateISO", e.target.value)} />
             </div>
           )}
-          {statKeys.includes("time") && (
+          {(statKeys.includes("time") || fieldsInTemplate.has("finishTime")) && (
             <div className="space-y-1">
               <Label className="text-xs">{t("race.finishTime")}</Label>
               <Input

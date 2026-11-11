@@ -78,24 +78,30 @@ describe("Lopptavla-startmallen", () => {
   });
 
   for (const o of ["portrait", "landscape"] as const) {
-    it(`${o}: allt inom 8 % säkerhetsmarginal, både med och utan valfria lager`, () => {
+    it(`${o}: kartan går kant i kant, all text inom 8 % säkerhetsmarginal`, () => {
       const block = seeded.defaultLayout[o];
-      const hiddenSets = [
-        new Set<string>([RACE_LAYER_IDS.photo, RACE_LAYER_IDS.custom]),
-        new Set<string>(),
-      ];
-      for (const hidden of hiddenSets) {
+      for (const hidden of [new Set<string>([RACE_LAYER_IDS.photo, RACE_LAYER_IDS.custom, RACE_LAYER_IDS.elevation]), new Set<string>()]) {
         const flowed = applyFlowLayout(block.layers, block.flow, (id) => hidden.has(id)).filter((l) => !hidden.has(l.id));
         for (const l of flowed) {
+          if (l.type === "map") {
+            expect([l.xPct, l.yPct, l.wPct, l.hPct]).toEqual([0, 0, 100, 100]);
+            continue;
+          }
           expect(l.xPct).toBeGreaterThanOrEqual(8 - 1e-6);
           expect(l.yPct).toBeGreaterThanOrEqual(8 - 1e-6);
           expect(l.xPct + l.wPct).toBeLessThanOrEqual(92 + 1e-6);
-          // Liggande med ALLA valfria lager på får sticka ut lite — kontrollera bara standardläget.
-          if (hidden.size > 0 || o === "portrait") expect(l.yPct + l.hPct).toBeLessThanOrEqual(92 + 1e-6);
+          expect(l.yPct + l.hPct).toBeLessThanOrEqual(92 + 1e-6);
         }
-        const map = flowed.find((l) => l.id === RACE_LAYER_IDS.map)!;
-        expect(map.hPct).toBeGreaterThan(20);
       }
     });
   }
+
+  it("har tre stilar med var sin karta", () => {
+    const names = [seeded.defaultLayoutName, ...seeded.extraLayouts.map((l) => l.name)];
+    expect(names).toEqual(["Midnatt", "Ljus", "Noir"]);
+    const mapIds = [seeded.defaultLayout, ...seeded.extraLayouts.map((l) => l.defaultLayout)].map(
+      (b) => b.portrait.layers.find((l) => l.type === "map")!.id,
+    );
+    expect(new Set(mapIds).size).toBe(3);
+  });
 });

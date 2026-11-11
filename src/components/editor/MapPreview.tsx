@@ -16,6 +16,7 @@ import { useRaceStore, raceLocaleFor } from "@/stores/raceStore";
 import { elevationSeries } from "@/lib/race/geo";
 import { raceFieldText, raceStatItems } from "@/lib/race/derive";
 import type { RaceRenderInput } from "@/lib/race/types";
+import { overlayAvoidPct } from "@/lib/race/route-map";
 import {
   lineThicknessPxFromCanvas,
   effectiveLayerRect,
@@ -686,6 +687,7 @@ export function MapPreview({
                     showStartFinish: race.show.startFinish,
                     showKmMarkers: race.show.kmMarkers,
                     canvasShortPx: frontShortPx,
+                    avoidPct: overlayAvoidPct(layers, l),
                   },
                 }
               : undefined;

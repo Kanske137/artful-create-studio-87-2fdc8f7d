@@ -28,6 +28,8 @@ export interface RouteRenderOptions {
   showKmMarkers: boolean;
   /** Framsidans kortsida i px för den här renderingen (skalar tjocklek). */
   canvasShortPx: number;
+  /** Ytor upptagna av text/foto ovanpå kartan — banan anpassas runt dem. */
+  avoidPct?: AvoidPct;
 }
 
 export function routeThicknessPx(style: RouteStyle, canvasShortPx: number): number {
@@ -126,7 +128,7 @@ function applyRouteUnsafe(
     map.setPaintProperty(L_LINE, "line-width", w);
   }
 
-  const ring = Math.max(1, w * 0.55);
+  const ring = Math.max(1, w * 0.5);
   const circle = (
     id: string,
     kind: string,
@@ -147,9 +149,9 @@ function applyRouteUnsafe(
       for (const [k, v] of Object.entries(paint)) map.setPaintProperty(id, k as never, v as never);
     }
   };
-  circle(L_KM, "km", w * 0.95, "#FFFFFF", opts.color);
-  circle(L_START, "start", w * 1.7, "#FFFFFF", "#111111");
-  circle(L_FINISH, "finish", w * 1.7, "#111111", "#FFFFFF");
+  circle(L_KM, "km", w * 0.8, "#FFFFFF", opts.color);
+  circle(L_START, "start", w * 1.35, "#FFFFFF", opts.color);
+  circle(L_FINISH, "finish", w * 1.35, opts.color, "#FFFFFF");
 }
 
 /** Synligt utsnitt som [[väst, syd], [öst, nord]] — sparas för tryck. */
@@ -170,4 +172,57 @@ export function paddedBounds(bbox: Bounds, frac = 0.08): Bounds {
     [w - dx, s - dy],
     [e + dx, n + dy],
   ];
+}
+
+export interface AvoidPct {
+  top: number;
+  bottom: number;
+}
+
+/** Luft mellan banan och text/foto som ligger ovanpå kartan (% av kartans höjd). */
+const AVOID_GAP_PCT = 4;
+
+/**
+ * Hur mycket av kartans överkant/underkant som täcks av synliga lager ovanpå
+ * den (rubrik, statistik, namn, foto …), i % av kartans höjd. Lager i övre
+ * halvan räknas till toppen, lager i nedre halvan till botten. Banan anpassas
+ * sedan till ytan däremellan, så att den aldrig hamnar under text eller foto.
+ */
+export function overlayAvoidPct(
+  layers: Array<{ id: string; type: string; xPct: number; yPct: number; wPct: number; hPct: number; zIndex: number }>,
+  map: { id: string; xPct: number; yPct: number; wPct: number; hPct: number; zIndex: number },
+): AvoidPct {
+  let top = 0;
+  let bottom = 0;
+  for (const l of layers) {
+    if (l.id === map.id || l.type === "margin" || l.zIndex <= map.zIndex) continue;
+    const overlapX = Math.min(l.xPct + l.wPct, map.xPct + map.wPct) - Math.max(l.xPct, map.xPct);
+    const overlapY = Math.min(l.yPct + l.hPct, map.yPct + map.hPct) - Math.max(l.yPct, map.yPct);
+    if (overlapX <= 0 || overlapY <= 0) continue;
+    const rel = (y: number) => ((y - map.yPct) / map.hPct) * 100;
+    const centre = rel(l.yPct + l.hPct / 2);
+    if (centre < 50) top = Math.max(top, rel(l.yPct + l.hPct));
+    else bottom = Math.max(bottom, 100 - rel(l.yPct));
+  }
+  return { top: Math.max(0, top), bottom: Math.max(0, bottom) };
+}
+
+/** Fit-padding i px för en kartruta: ruttstilens minimum + fri yta kring överliggande lager. */
+export function routeFitPaddingPx(
+  style: RouteStyle | undefined,
+  w: number,
+  h: number,
+  avoid?: AvoidPct | null,
+): { top: number; right: number; bottom: number; left: number } {
+  const base = style?.fitPaddingPct ?? { top: 4, right: 4, bottom: 4, left: 4 };
+  const top = Math.max(base.top, avoid && avoid.top > 0 ? avoid.top + AVOID_GAP_PCT : 0);
+  const bottom = Math.max(base.bottom, avoid && avoid.bottom > 0 ? avoid.bottom + AVOID_GAP_PCT : 0);
+  // Lämna alltid minst 20 % av höjden åt banan.
+  const scale = top + bottom > 80 ? 80 / (top + bottom) : 1;
+  return {
+    top: Math.round(((top * scale) / 100) * h),
+    right: Math.round((base.right / 100) * w),
+    bottom: Math.round(((bottom * scale) / 100) * h),
+    left: Math.round((base.left / 100) * w),
+  };
 }

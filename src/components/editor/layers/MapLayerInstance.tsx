@@ -10,9 +10,11 @@ import { getMapboxToken, reverseGeocode, styleUrl } from "@/lib/mapbox";
 import {
   applyRouteToMap,
   paddedBounds,
+  routeFitPaddingPx,
   viewBoundsOf,
   type RouteRenderOptions,
 } from "@/lib/race/route-map";
+import type { RouteStyle } from "@/lib/template-schema";
 import type { RaceRoute } from "@/lib/race/types";
 
 /** Lopptavla: rutten som ska ritas i kartan + när den ska anpassas. */
@@ -25,13 +27,15 @@ export interface MapRouteProp {
 
 /** Luft runt banan: andel av banans spann + px-marginal i kartrutan. */
 export const ROUTE_FIT_FRAC = 0.06;
-export const ROUTE_FIT_PAD_SHARE = 0.04;
 
-function fitToRoute(map: mapboxgl.Map, route: RaceRoute): void {
+function fitToRoute(map: mapboxgl.Map, route: RaceRoute, opts: RouteRenderOptions | null): void {
   const c = map.getContainer();
-  const pad = Math.round(Math.min(c.clientWidth, c.clientHeight) * ROUTE_FIT_PAD_SHARE);
-  map.fitBounds(paddedBounds(route.bbox, ROUTE_FIT_FRAC), { padding: pad, duration: 0 });
+  const padding = routeFitPaddingPx(opts?.style as RouteStyle | undefined, c.clientWidth, c.clientHeight, opts?.avoidPct);
+  map.fitBounds(paddedBounds(route.bbox, ROUTE_FIT_FRAC), { padding, duration: 0 });
 }
+
+const avoidKeyOf = (o: RouteRenderOptions | null | undefined) =>
+  o?.avoidPct ? `${o.avoidPct.top.toFixed(1)}/${o.avoidPct.bottom.toFixed(1)}` : "";
 
 interface Props {
   layerId: string;
@@ -86,6 +90,7 @@ export function MapLayerInstance({
   const routeRef = useRef<MapRouteProp | undefined>(route);
   routeRef.current = route;
   const fittedNonceRef = useRef<number | null>(null);
+  const fittedAvoidRef = useRef<string>("");
   const userMovedRef = useRef(false);
 
   const syncRoute = (map: mapboxgl.Map) => {
@@ -97,10 +102,17 @@ export function MapLayerInstance({
         if (latest) applyRouteToMap(map, latest.route, latest.opts);
       });
     }
+    const avoidKey = avoidKeyOf(r.opts);
     if (r.route && fittedNonceRef.current !== r.fitNonce) {
+      // Ny bana: anpassa alltid, och glöm kundens tidigare panorering.
       fittedNonceRef.current = r.fitNonce;
+      fittedAvoidRef.current = avoidKey;
       userMovedRef.current = false;
-      fitToRoute(map, r.route);
+      fitToRoute(map, r.route, r.opts);
+    } else if (r.route && fittedAvoidRef.current !== avoidKey && !userMovedRef.current) {
+      // Fält slogs av/på (t.ex. foto) — håll banan fri från det som ligger ovanpå.
+      fittedAvoidRef.current = avoidKey;
+      fitToRoute(map, r.route, r.opts);
     }
   };
 
@@ -142,7 +154,7 @@ export function MapLayerInstance({
         // Kartan ändrar storlek när fält slås av/på (flödeslayout). Har
         // kunden inte själv panorerat följer utsnittet med banan.
         const r = routeRef.current;
-        if (r?.route && !userMovedRef.current) fitToRoute(map, r.route);
+        if (r?.route && !userMovedRef.current) fitToRoute(map, r.route, r.opts);
       });
 
       map.on("moveend", (e: { originalEvent?: unknown }) => {
@@ -257,6 +269,7 @@ export function MapLayerInstance({
         route.opts?.showStartFinish,
         route.opts?.showKmMarkers,
         Math.round(route.opts?.canvasShortPx ?? 0),
+        avoidKeyOf(route.opts),
       ].join("|")
     : "";
   useEffect(() => {
