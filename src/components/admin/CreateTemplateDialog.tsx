@@ -96,6 +96,7 @@ function buildSeedTemplate(kinds: Kind[]): Template {
     },
     sizeOverrides: {},
     extraLayouts: [],
+    contentVariants: [],
   };
 }
 

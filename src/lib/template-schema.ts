@@ -384,7 +384,11 @@ export const starmapDefaultsSchema = z.object({
   /** Lokal tid "HH:MM". Utelämnad ⇒ 22:00. */
   timeHHMM: z.string().regex(/^\d{1,2}:\d{2}$/).optional(),
   /** [lng, lat] — samma konvention som map-lagret/editorStore. */
-  center: z.tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)]),
+  center: z
+    .tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)])
+    // zod 4 löser ut tuple med checks som [number?, number?, ...unknown[]];
+    // transform låser output till [number, number] så render-vägar kan använda den.
+    .transform(([lng, lat]) => [lng, lat] as [number, number]),
   /** Visningsnamn för platsen — källa för [[city]]-token i länkad text. */
   placeName: z.string().optional(),
   bgColor: hexColorSchema,

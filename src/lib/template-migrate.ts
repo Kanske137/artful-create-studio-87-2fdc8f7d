@@ -58,6 +58,7 @@ export function buildTemplateFromLegacy(config: ProductConfig): Template {
     },
     sizeOverrides: {},
     extraLayouts: [],
+    contentVariants: [],
   };
 }
 

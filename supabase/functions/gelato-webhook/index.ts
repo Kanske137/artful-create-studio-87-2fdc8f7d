@@ -23,7 +23,7 @@
 //   - Samma last_status som redan är satt ⇒ no-op för status-transitions.
 //   - shopify_fulfillment_gid återanvänds när det redan finns.
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.95.0";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.95.0";
 import { shopifyAdmin } from "../_shared/shopify-admin.ts";
 
 const corsHeaders = {
@@ -235,7 +235,7 @@ async function postEvent(fulfillmentGid: string, status: string) {
 }
 
 async function findLink(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient<any, "public", "public", any, any>,
   parsed: ParsedEvent,
 ): Promise<any | null> {
   if (parsed.gelatoOrderId) {
