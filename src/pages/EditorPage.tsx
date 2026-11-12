@@ -34,6 +34,7 @@ import { renderTemplateSnapshot } from "@/lib/template-snapshot";
 import { uploadCartPreview } from "@/lib/upload-preview";
 import { getPrintFileUrl } from "@/lib/print-pipeline";
 import { resolveShopifyVariantId } from "@/lib/shopify-variant-resolver";
+import { numericVariantId, productTypeLabel } from "@/lib/variant-match";
 import { hangerColorFromVariant } from "@/lib/mockup-scenes";
 import { FRAME_FRONT_CM, CANVAS_BLEED_CM, canvasWrapExtCm } from "@/lib/gelato-geometry";
 import { buildPrintableTemplate, withTemplateAlias } from "@/lib/printable-template";
@@ -468,13 +469,29 @@ export default function EditorPage() {
       priceSek: currentPrice(),
     });
 
+    // Resolve real variant ID (storlek + utförande + material). Fall back to a
+    // fresh lookup if not yet cached (race when user clicks before the effect
+    // resolves). Den cachade shopifyVariantId gäller sidans produkt; om vald
+    // drink har en annan huvudprodukt måste vi slå upp DEN produktens variant.
+    let variantGid = effectiveHandle === config.shopify_handle ? shopifyVariantId : null;
+    if (!variantGid) {
+      variantGid = await resolveShopifyVariantId(effectiveHandle, size, variant, config.product_type);
+      if (variantGid && effectiveHandle === config.shopify_handle) setShopifyVariantId(variantGid);
+    }
+
     if (inIframe) {
+      // Temat lägger i varukorgen. Skicka exakt variant + material så att det
+      // aldrig behöver gissa (Metallposter och Plexiglas delar storlek och
+      // utförande — se variant-match.ts). Temat matchar själv på material om
+      // variantId saknas.
       window.parent.postMessage(
         {
           type: "ADD_TO_CART",
           handle: effectiveHandle,
           size,
           variant,
+          variantId: numericVariantId(variantGid),
+          productTypeLabel: productTypeLabel(config.product_type),
           quantity: 1,
           properties,
         },
@@ -484,15 +501,6 @@ export default function EditorPage() {
       return;
     }
 
-    // Resolve real variant ID. Fall back to a fresh lookup if not yet cached
-    // (race when user clicks before the effect resolves).
-    // Den cachade shopifyVariantId gäller sidans produkt; om vald drink har en
-    // annan huvudprodukt måste vi slå upp DEN produktens variant på nytt.
-    let variantGid = effectiveHandle === config.shopify_handle ? shopifyVariantId : null;
-    if (!variantGid) {
-      variantGid = await resolveShopifyVariantId(effectiveHandle, size, variant, config.product_type);
-      if (variantGid && effectiveHandle === config.shopify_handle) setShopifyVariantId(variantGid);
-    }
     if (!variantGid) {
       toast.error(t("cartAdd.variantUnavailable"), {
         description: t("cartAdd.variantUnavailableHint", { size, variant, handle: effectiveHandle }),

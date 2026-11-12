@@ -55,6 +55,7 @@ export function useShopifyPriceMap(): ShopifyPriceMapResult {
       config.shopify_handle,
       country,
       combos.map((c) => ({ size: c.size, variant: c.variant })),
+      config.product_type,
     ).then((m) => {
       if (cancelled) return;
       setMap(m);

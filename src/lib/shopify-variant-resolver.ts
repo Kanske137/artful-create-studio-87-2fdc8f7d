@@ -1,8 +1,9 @@
-// Resolves a Shopify variant ID for a product handle + size/variant selection
-// via the Storefront API (proxied through the `shopify-storefront` edge fn).
+// Resolves a Shopify variant ID for a product handle + size/variant/material
+// selection via the Storefront API (proxied through the `shopify-storefront` edge fn).
 // Used in the editor to ensure "Add to cart" pushes a REAL variant ID rather
 // than a synthetic placeholder string. Caches by (handle,size,variant).
 import { supabase } from "@/integrations/supabase/client";
+import { matchVariant } from "@/lib/variant-match";
 
 interface ProductOptionInput {
   name: string;
@@ -40,54 +41,12 @@ const PRODUCT_VARIANTS_QUERY = /* GraphQL */ `
 const cache = new Map<string, { id: string | null; ts: number }>();
 const TTL_MS = 5 * 60 * 1000;
 
-/** Maps internal product types to the Swedish "Produkttyp"-värde som
- *  konsoliderade Shopify-produkter använder. */
-const PRODUCT_TYPE_LABEL: Record<string, string> = {
-  posters: "Poster",
-  poster: "Poster",
-  canvas: "Canvas",
-  aluminum: "Metallposter",
-  acrylic: "Plexiglas",
-};
-
 function cacheKey(handle: string, size: string, variant: string, productType?: string) {
   return `${handle}|${size}|${variant}|${productType ?? ""}`;
 }
 
 export function clearVariantResolverCache() {
   cache.clear();
-}
-
-const normalize = (s: string) =>
-  s.toLowerCase().replace(/\s*cm\s*$/i, "").replace(/\s+/g, "").trim();
-
-/**
- * Match a variant whose selectedOptions contain BOTH size and variant
- * (frame/depth/finish), and — if productType supplied — also the
- * "Produkttyp" option (Poster/Canvas/Metallposter/Plexiglas).
- */
-function findMatchingVariant(
-  variants: VariantNode[],
-  size: string,
-  variant: string,
-  productTypeLabel: string | null,
-): string | null {
-  const sizeN = normalize(size);
-  const variantN = normalize(variant);
-  const typeN = productTypeLabel ? normalize(productTypeLabel) : null;
-
-  for (const v of variants) {
-    const opts = v.selectedOptions ?? [];
-    const sizeMatch = opts.some((o) => normalize(o.value) === sizeN);
-    const variantMatch = opts.some((o) => normalize(o.value) === variantN);
-    if (!sizeMatch || !variantMatch) continue;
-    if (typeN) {
-      const typeMatch = opts.some((o) => normalize(o.value) === typeN);
-      if (!typeMatch) continue;
-    }
-    return v.id;
-  }
-  return null;
 }
 
 /** Resolve a real Shopify variant ID. Returns null if not found / unavailable.
@@ -99,7 +58,6 @@ export async function resolveShopifyVariantId(
   variant: string,
   productType?: string,
 ): Promise<string | null> {
-  const productTypeLabel = productType ? PRODUCT_TYPE_LABEL[productType] ?? null : null;
   const key = cacheKey(handle, size, variant, productType);
   const cached = cache.get(key);
   if (cached && Date.now() - cached.ts < TTL_MS) return cached.id;
@@ -124,11 +82,9 @@ export async function resolveShopifyVariantId(
       return null;
     }
 
-    let id = findMatchingVariant(variants, size, variant, productTypeLabel);
-    // Fallback: legacy 2-option product utan Produkttyp-axel.
-    if (!id && productTypeLabel) {
-      id = findMatchingVariant(variants, size, variant, null);
-    }
+    // Material ingår i matchningen (Produkttyp-axeln); produkter utan axeln
+    // matchas på storlek + utförande. Ingen gissning vid tvetydighet.
+    const id = matchVariant(variants, size, variant, productType)?.id ?? null;
     cache.set(key, { id, ts: Date.now() });
     return id;
   } catch (e) {

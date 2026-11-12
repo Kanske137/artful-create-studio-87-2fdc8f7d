@@ -3,6 +3,7 @@
 // displays the same amount the customer will pay in checkout — Shopify does
 // the FX + rounding internally per market.
 import { supabase } from "@/integrations/supabase/client";
+import { matchVariant } from "@/lib/variant-match";
 
 export interface ShopifyMoney {
   amount: number;
@@ -137,38 +138,16 @@ async function fetchVariants(handle: string, country: string): Promise<VariantNo
   return promise;
 }
 
-function normalize(s: string) {
-  return s
-    .toLowerCase()
-    // Strip diacritics so "valnöt" matches "valnot", "hängare" matches "hangare".
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    // Drop common ram-prefix the merchant might add in Shopify, but NEVER
-    // strip "Hängare" — hängar-varianterna har egna priser i Shopify och måste
-    // matchas distinkt från ram-varianterna med samma färg (Ek/Valnöt/...).
-    .replace(/^ram\s+(i\s+)?/i, "")
-    .replace(/^ramad\s+/i, "")
-    // Unify "x", "X" and the real multiplication sign "×" so size strings match.
-    .replace(/[×x]/g, "x")
-    .replace(/\s*cm\s*$/i, "")
-    .replace(/\s+/g, "")
-    .trim();
-}
-
+// Matchning (storlek + utförande + material) delas med variant-uppslaget till
+// varukorgen, så att editorn visar priset för exakt den variant som läggs i
+// kassan. Se variant-match.ts.
 function findVariant(
   variants: VariantNode[],
   size: string,
   variantName: string,
+  productType?: string | null,
 ): VariantNode | null {
-  const sizeN = normalize(size);
-  const variantN = normalize(variantName);
-  for (const v of variants) {
-    const opts = v.selectedOptions ?? [];
-    const sizeMatch = opts.some((o) => normalize(o.value) === sizeN);
-    const variantMatch = opts.some((o) => normalize(o.value) === variantN);
-    if (sizeMatch && variantMatch) return v;
-  }
-  return null;
+  return matchVariant(variants, size, variantName, productType);
 }
 
 /** Get price for a single (size, variant) in the customer's market. */
@@ -177,10 +156,11 @@ export async function getShopifyPrice(
   country: string,
   size: string,
   variantName: string,
+  productType?: string | null,
 ): Promise<ShopifyMoney | null> {
   const variants = await fetchVariants(handle, country);
   if (!variants) return null;
-  const v = findVariant(variants, size, variantName);
+  const v = findVariant(variants, size, variantName, productType);
   if (!v) return null;
   return {
     amount: parseFloat(v.price.amount),
@@ -197,17 +177,21 @@ function saleCompareAt(v: VariantNode): number | null {
   return isFinite(c) && c > p ? c : null;
 }
 
-/** Get prices for many (size, variant) pairs in one call. Map keys = "size|variant". */
+/** Get prices for many (size, variant) pairs in one call. Map keys = "size|variant".
+ *  `productType` (posters/canvas/aluminum/acrylic) väljer materialet på
+ *  konsoliderade produkter — utan det är t.ex. Plexiglas och Metallposter
+ *  omöjliga att skilja åt. */
 export async function getShopifyPrices(
   handle: string,
   country: string,
   combos: Array<{ size: string; variant: string }>,
+  productType?: string | null,
 ): Promise<Map<string, ShopifyMoney>> {
   const variants = await fetchVariants(handle, country);
   const out = new Map<string, ShopifyMoney>();
   if (!variants) return out;
   for (const c of combos) {
-    const v = findVariant(variants, c.size, c.variant);
+    const v = findVariant(variants, c.size, c.variant, productType);
     if (v) {
       out.set(`${c.size}|${c.variant}`, {
         amount: parseFloat(v.price.amount),
