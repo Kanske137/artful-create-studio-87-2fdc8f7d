@@ -2,6 +2,7 @@
 // generates print files and submits a Gelato order.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import GELATO_SKU_MAP_JSON from "../_shared/gelato-sku-map.json" with { type: "json" };
+import { paidVariantMismatch } from "../_shared/variant-guard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -150,6 +151,7 @@ async function processOrder(supabase: any, order: any) {
   const items: any[] = [];
   const printErrors: string[] = [];
   const skuErrors: string[] = [];
+  const mismatchErrors: string[] = [];
 
   for (const li of order.line_items ?? []) {
     const props = li.properties as Array<{ name: string; value: string }> | undefined;
@@ -217,6 +219,20 @@ async function processOrder(supabase: any, order: any) {
       );
     }
 
+    // 0) Spärr: det designade (material/storlek/utförande) måste vara det
+    //    som betalades. Annars stoppas hela ordern för manuell kontroll.
+    const mismatch = paidVariantMismatch({
+      variantTitle: li.variant_title,
+      productType: getProp(props, "_product_type"),
+      size,
+      variant,
+    });
+    if (mismatch) {
+      console.warn(`[shopify-webhook] line ${li.id}: variant mismatch — ${mismatch}`);
+      mismatchErrors.push(`line ${li.id} (${li.title ?? ""}): ${mismatch}`);
+      continue;
+    }
+
     console.log(
       `[shopify-webhook] line ${li.id}: clientPrintFileUrl=${clientPrintFileUrl ?? "MISSING"} source=${designSource}`
     );
@@ -258,6 +274,40 @@ async function processOrder(supabase: any, order: any) {
       files: [{ type: "default", url: printUrl }],
       quantity: li.quantity ?? 1,
     });
+  }
+
+  if (mismatchErrors.length) {
+    // Skicka ingenting till tryck: kunden har betalat för något annat än det
+    // som designades. Märk ordern så att den syns direkt i Shopify.
+    const error = `variant_mismatch — ${mismatchErrors.join(" | ")}`;
+    console.warn(`[shopify-webhook] order ${shopifyOrderId} → pending_manual: ${error}`);
+    await supabase.from("gelato_orders").update({ status: "pending_manual", error })
+      .eq("shopify_order_id", shopifyOrderId);
+    if (shopifyDomain && shopifyToken) {
+      await fetch(`https://${shopifyDomain}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`, {
+        method: "POST",
+        headers: { "X-Shopify-Access-Token": shopifyToken, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: `mutation($id: ID!, $tags: [String!]!) { tagsAdd(id: $id, tags: $tags) { userErrors { message } } }`,
+          variables: { id: `gid://shopify/Order/${shopifyOrderId}`, tags: ["kontroll-material"] },
+        }),
+      }).catch((e) => console.warn("[shopify-webhook] tagsAdd failed:", e));
+      await fetch(`https://${shopifyDomain}/admin/api/${SHOPIFY_API_VERSION}/orders/${shopifyOrderId}.json`, {
+        method: "PUT",
+        headers: { "X-Shopify-Access-Token": shopifyToken, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order: {
+            id: shopifyOrderId,
+            // Behåll kundens egen ordernotering och lägg vår text efter.
+            note: [
+              order.note,
+              `Ej skickad till tryck: designen och den betalda varianten skiljer sig åt (${mismatchErrors.join("; ")}). Kontrollera med kunden.`,
+            ].filter(Boolean).join("\n\n"),
+          },
+        }),
+      }).catch(() => {});
+    }
+    return;
   }
 
   if (items.length === 0) {
