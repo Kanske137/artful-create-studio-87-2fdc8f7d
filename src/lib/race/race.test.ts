@@ -308,3 +308,35 @@ describe("TCX och FIT", () => {
     expect(r.splits?.length).toBe(5);
   });
 });
+
+describe("målflaggan", () => {
+  it("är lika hög som startcirkeln är bred (diameter inklusive ring)", async () => {
+    const { finishFlagSizePx } = await import("./route-map");
+    for (const w of [2, 6, 24]) {
+      const { height, width } = finishFlagSizePx(w);
+      expect(height).toBeCloseTo(2 * (w * 1.35 + Math.max(1, w * 0.5)), 6);
+      expect(width).toBeLessThanOrEqual(height);
+    }
+  });
+
+  it("ritar stång och rutig duk i ruttfärg och vitt", async () => {
+    const { drawFinishFlag } = await import("./route-map");
+    const fills: string[] = [];
+    const ctx = {
+      clearRect() {},
+      fillRect() { fills.push(String(this.fillStyle)); },
+      strokeRect() {},
+      fillStyle: "", strokeStyle: "", lineWidth: 1,
+    } as unknown as CanvasRenderingContext2D;
+    drawFinishFlag(ctx, 40, 48, "#FC4C02");
+    expect(fills.length).toBe(1 + 6);
+    expect(new Set(fills)).toEqual(new Set(["#FC4C02", "#FFFFFF"]));
+  });
+
+  it("ruttens lager skyddas från etikettreglaget", async () => {
+    const { isRouteLayerId } = await import("./route-map");
+    expect(isRouteLayerId("arthena-route-finish")).toBe(true);
+    expect(isRouteLayerId("label-road")).toBe(false);
+  });
+});
+

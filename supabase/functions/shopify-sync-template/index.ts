@@ -76,13 +76,37 @@ function getUid(kind: Kind, size: string, variant: string): string | null {
   return block[`${size}|${variant}`]?.portrait ?? null;
 }
 
-function getPrice(kind: Kind, size: string, variant: string): number {
+// Butikens kampanjpriser — samma på alla produkter i Shopify (kontrollerat
+// 2026-11-12 mot alla 46 editorprodukter). Där ett kampanjpris finns blir
+// tabellpriset ovan jämförpris; övriga varianter har inget jämförpris.
+const SALE_PRICES: Record<string, number> = {
+  "poster|13x18|Ingen": 149, "poster|21x30|Ingen": 179, "poster|30x40|Ingen": 189,
+  "poster|40x50|Ingen": 209, "poster|50x70|Ingen": 239, "poster|70x100|Ingen": 319,
+  "canvas|20x25|2cm": 219, "canvas|20x25|4cm": 239, "canvas|20x30|2cm": 259, "canvas|20x30|4cm": 279,
+  "canvas|30x40|2cm": 329, "canvas|30x40|4cm": 359, "canvas|40x50|2cm": 449, "canvas|40x50|4cm": 479,
+  "canvas|40x60|2cm": 519, "canvas|40x60|4cm": 569, "canvas|50x70|2cm": 599, "canvas|50x70|4cm": 649,
+  "canvas|60x80|2cm": 749, "canvas|60x80|4cm": 819, "canvas|70x100|2cm": 969, "canvas|70x100|4cm": 1049,
+};
+
+function listPrice(kind: Kind, size: string, variant: string): number {
   const table =
     kind === "poster" ? POSTER_PRICES
     : kind === "canvas" ? CANVAS_PRICES
     : kind === "aluminum" ? ALUMINUM_PRICES
     : ACRYLIC_PRICES;
   return table[size]?.[variant] ?? 0;
+}
+
+/** Pris som kunden betalar. */
+function getPrice(kind: Kind, size: string, variant: string): number {
+  return SALE_PRICES[`${kind}|${size}|${variant}`] ?? listPrice(kind, size, variant);
+}
+
+/** Jämförpris (ordinarie pris) när varianten har kampanjpris, annars null. */
+function getCompareAt(kind: Kind, size: string, variant: string): number | null {
+  const sale = SALE_PRICES[`${kind}|${size}|${variant}`];
+  const list = listPrice(kind, size, variant);
+  return sale && list > sale ? list : null;
 }
 
 interface SyncBody {
@@ -92,6 +116,7 @@ interface SyncBody {
 interface VariantInput {
   optionValues: { optionName: string; name: string }[];
   price: string;
+  compareAtPrice: string | null;
   inventoryItem: { sku: string; tracked: boolean };
   inventoryPolicy: "CONTINUE";
 }
@@ -101,6 +126,7 @@ interface PlannedVariant {
   variant: string;
   sku: string;
   price: number;
+  compareAt: number | null;
   /** Konsoliderad: visar Produkttyp-värdet ("Poster", "Canvas", ...). */
   productTypeLabel?: string;
 }
@@ -164,7 +190,7 @@ function plan(template: any): PlannedGroup[] {
         const price = getPrice(kind, size, v);
         if (!sku) { g.skipped.push({ size, variant: v, reason: "no Gelato SKU" }); continue; }
         if (!price) { g.skipped.push({ size, variant: v, reason: "no price" }); continue; }
-        g.variants.push({ size, variant: v, sku, price });
+        g.variants.push({ size, variant: v, sku, price, compareAt: getCompareAt(kind, size, v) });
       }
     }
     return g;
@@ -239,7 +265,7 @@ function planConsolidated(template: any, enabledTypes: string[]): PlannedGroup {
         if (!sku) { skipped.push({ size: `${label}/${size}`, variant: v, reason: "no Gelato SKU" }); continue; }
         if (!price) { skipped.push({ size: `${label}/${size}`, variant: v, reason: "no price" }); continue; }
         variantsUnion.add(v);
-        variants.push({ size, variant: v, sku, price, productTypeLabel: label });
+        variants.push({ size, variant: v, sku, price, compareAt: getCompareAt(kind, size, v), productTypeLabel: label });
       }
     }
   }
@@ -392,6 +418,7 @@ function buildVariantInput(
   return {
     optionValues,
     price: v.price.toFixed(2),
+    compareAtPrice: v.compareAt ? v.compareAt.toFixed(2) : null,
     inventoryItem: {
       sku: v.sku,
       tracked: false,

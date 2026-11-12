@@ -8,6 +8,7 @@ import { useRaceStore } from "@/stores/raceStore";
 import { applyRaceSeed, RACE_LAYER_IDS, RACE_ROUTE_LAYER_ID } from "@/lib/race/seed-template";
 import type { Template } from "@/lib/template-schema";
 import type { ProductConfig } from "@/lib/product-config";
+import { availableRaces } from "@/lib/race/catalog";
 
 
 // Minimal render-hjälp utan @testing-library (saknas i repot).
@@ -53,6 +54,9 @@ async function changeFile(input: HTMLInputElement, file: File) {
   await act(async () => {
     input.dispatchEvent(new Event("change", { bubbles: true }));
   });
+}
+function buttonByText(text: string): HTMLElement | null {
+  return Array.from(document.body.querySelectorAll<HTMLElement>("button")).find((b) => b.textContent?.trim() === text) ?? null;
 }
 function click(el: HTMLElement | null) {
   if (!el) throw new Error("element saknas");
@@ -120,6 +124,24 @@ describe("Lopptavlans kundpanel", () => {
     expect(hidden[RACE_LAYER_IDS.custom]).toBe(true);
     expect(hidden[RACE_LAYER_IDS.elevation]).toBe(true);
     expect(hidden[RACE_LAYER_IDS.stats]).toBeUndefined();
+  });
+
+  it("visar tio lopp i taget, största först, och bläddrar framåt och bakåt", () => {
+    const all = availableRaces();
+    render(<RacePickerPanel />);
+    click(byText("Alla", "button"));
+    const names = () =>
+      Array.from(document.body.querySelectorAll('[role="option"] span.font-medium')).map((e) => e.textContent);
+    expect(names()).toEqual(all.slice(0, 10).map((r) => r.name));
+    expect(byText(`1–10 av ${all.length}`)).not.toBeNull();
+    // Största först
+    const sizes = all.map((r) => r.size ?? 0);
+    expect([...sizes].sort((a, b) => b - a)).toEqual(sizes);
+    // Nästa sida ersätter listan i stället för att bygga på den
+    click(buttonByText("Nästa"));
+    expect(names()).toEqual(all.slice(10, 20).map((r) => r.name));
+    click(buttonByText("Föregående"));
+    expect(names()).toEqual(all.slice(0, 10).map((r) => r.name));
   });
 
   it("spärrar beställning tills ett lopp eller en GPX-fil valts", async () => {

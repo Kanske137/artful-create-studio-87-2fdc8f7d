@@ -21,6 +21,86 @@ const L_KM = "arthena-route-km";
 const L_START = "arthena-route-start";
 const L_FINISH = "arthena-route-finish";
 const ALL_LAYERS = [L_FINISH, L_START, L_KM, L_LINE, L_CASING];
+const FLAG_IMAGE_PREFIX = "arthena-route-flag-";
+
+/** Ruttens egna lager. Etikettreglaget (dölj symbollager) får aldrig röra dem. */
+export function isRouteLayerId(id: string): boolean {
+  return id.startsWith("arthena-route");
+}
+
+/** Start- och målmarkeringarnas storlek, i px, utifrån linjens tjocklek. */
+function markerRadiusPx(w: number): number {
+  return w * 1.35;
+}
+function markerRingPx(w: number): number {
+  return Math.max(1, w * 0.5);
+}
+
+/**
+ * Målflaggans mått i px: lika hög som startcirkeln är bred (diameter inklusive
+ * ringen), så att start och mål väger lika mycket på tavlan.
+ */
+export function finishFlagSizePx(w: number): { width: number; height: number; pole: number } {
+  const height = 2 * (markerRadiusPx(w) + markerRingPx(w));
+  return { width: height, height, pole: Math.max(1, height * 0.13) };
+}
+
+/**
+ * Rita målflaggan i en canvas på (0,0)–(width,height): stång till vänster och
+ * en rutig duk (ruttfärg/vitt) upptill med kant i ruttfärgen. Samma två färger
+ * som startcirkeln, så den syns på både ljus och mörk bakgrund.
+ */
+export function drawFinishFlag(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  color: string,
+): void {
+  const pole = Math.max(1, height * 0.13);
+  const lw = Math.max(1, height * 0.07);
+  const clothX = pole;
+  const clothY = lw / 2;
+  const clothW = Math.max(1, width - pole - lw / 2);
+  const clothH = height * 0.66;
+  ctx.clearRect(0, 0, width, height);
+  // Stång
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, pole, height);
+  // Rutig duk 3 × 2
+  const cols = 3;
+  const rows = 2;
+  const cw = clothW / cols;
+  const ch = clothH / rows;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      ctx.fillStyle = (r + c) % 2 === 0 ? color : "#FFFFFF";
+      ctx.fillRect(clothX + c * cw, clothY + r * ch, cw, ch);
+    }
+  }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.strokeRect(clothX, clothY, clothW, clothH);
+}
+
+/** Lägg till flaggbilden i kartan (en bild per färg och storlek). */
+function ensureFinishFlagImage(map: mapboxgl.Map, color: string, w: number): { id: string; pole: number } {
+  const { width, height, pole } = finishFlagSizePx(w);
+  const mapRatio = (map as unknown as { getPixelRatio?: () => number }).getPixelRatio?.() ?? 1;
+  const pr = Math.max(2, mapRatio);
+  const pw = Math.max(2, Math.ceil(width * pr));
+  const ph = Math.max(2, Math.ceil(height * pr));
+  const id = `${FLAG_IMAGE_PREFIX}${color.replace(/[^0-9a-z]/gi, "")}-${pw}x${ph}`;
+  if (!map.hasImage(id)) {
+    const canvas = document.createElement("canvas");
+    canvas.width = pw;
+    canvas.height = ph;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("canvas 2d saknas");
+    drawFinishFlag(ctx, pw, ph, color);
+    map.addImage(id, ctx.getImageData(0, 0, pw, ph), { pixelRatio: pr });
+  }
+  return { id, pole };
+}
 
 export interface RouteRenderOptions {
   style: RouteStyle;
@@ -130,7 +210,7 @@ function applyRouteUnsafe(
     map.setPaintProperty(L_LINE, "line-width", w);
   }
 
-  const ring = Math.max(1, w * 0.5);
+  const ring = markerRingPx(w);
   const circle = (
     id: string,
     kind: string,
@@ -152,8 +232,33 @@ function applyRouteUnsafe(
     }
   };
   circle(L_KM, "km", w * 0.8, "#FFFFFF", opts.color);
-  circle(L_START, "start", w * 1.35, "#FFFFFF", opts.color);
-  circle(L_FINISH, "finish", w * 1.35, opts.color, "#FFFFFF");
+  circle(L_START, "start", markerRadiusPx(w), "#FFFFFF", opts.color);
+
+  // Mål: liten flagga, lika stor som startcirkeln. Stångens fot står på
+  // målpunkten, duken vajar uppåt till höger (syns även när start och mål
+  // ligger på samma plats).
+  const flag = ensureFinishFlagImage(map, opts.color, w);
+  const existing = map.getLayer(L_FINISH);
+  if (existing && existing.type !== "symbol") map.removeLayer(L_FINISH);
+  const flagLayout = {
+    "icon-image": flag.id,
+    "icon-anchor": "bottom-left" as const,
+    "icon-offset": [-flag.pole / 2, 0] as [number, number],
+    "icon-allow-overlap": true,
+    "icon-ignore-placement": true,
+  };
+  if (!map.getLayer(L_FINISH)) {
+    map.addLayer({
+      id: L_FINISH,
+      type: "symbol",
+      source: SRC_POINTS,
+      filter: ["==", ["get", "kind"], "finish"],
+      layout: flagLayout,
+    });
+  } else {
+    for (const [k, v] of Object.entries(flagLayout)) map.setLayoutProperty(L_FINISH, k as never, v as never);
+  }
+  map.setLayoutProperty(L_FINISH, "visibility", "visible");
 }
 
 /** Synligt utsnitt som [[väst, syd], [öst, nord]] — sparas för tryck. */

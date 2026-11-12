@@ -33,7 +33,7 @@ import {
 import { iconSvgString } from "./map-icon-catalog";
 import { renderStarmap } from "./starmap-render";
 import { applyFlowLayout } from "./flow-layout";
-import { applyRouteToMap, overlayAvoidPct, paddedBounds, routeFitPaddingPx, type RouteRenderOptions, routeMapStyleId } from "./race/route-map";
+import { applyRouteToMap, isRouteLayerId, overlayAvoidPct, paddedBounds, routeFitPaddingPx, type RouteRenderOptions, routeMapStyleId } from "./race/route-map";
 import { elevationSeries } from "./race/geo";
 import { raceFieldText, raceStatItems } from "./race/derive";
 import { drawElevationProfile } from "./race/render-elevation";
@@ -251,6 +251,7 @@ async function drawMapLayer(
       const style = map.getStyle();
       if (style?.layers) {
         for (const sl of style.layers) {
+          if (isRouteLayerId(sl.id)) continue;
           if (sl.type === "symbol" || sl.id.startsWith("label-")) {
             map.setLayoutProperty(sl.id, "visibility", opts.showLabels ? "visible" : "none");
           }

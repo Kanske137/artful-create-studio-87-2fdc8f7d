@@ -31,6 +31,8 @@ export function UploadFirstCta() {
   const aiPhotoSources = useEditorStore((s) => s.aiPhotoSources);
   const aiPhotoResults = useEditorStore((s) => s.aiPhotoResults);
   const multiFacePortraits = useEditorStore((s) => s.multiFacePortraits);
+  // Löpartavlor: kunden börjar med att välja lopp, fotot är ett valfritt tillägg.
+  const isRaceTemplate = useEditorStore((s) => !!s.productOptions?.raceOptions?.enabled);
   const setAiPhotoSource = useEditorStore((s) => s.setAiPhotoSource);
   const setPhotoSourceFor = useEditorStore((s) => s.setPhotoSourceFor);
   const openSection = useResultActionsStore((s) => s.openSection);
@@ -40,6 +42,7 @@ export function UploadFirstCta() {
   const aiLayer = layers.find((l): l is AiPhotoLayer => l.type === "aiPhoto");
   const photoLayer = layers.find((l): l is PhotoLayer => l.type === "photo");
   if (!aiLayer && !photoLayer) return null; // ren kart/text-produkt — inget foto att kräva
+  if (isRaceTemplate) return null;
 
   const isMulti = (aiLayer?.defaults.multiFaceSwap?.slots?.length ?? 0) >= 2;
 

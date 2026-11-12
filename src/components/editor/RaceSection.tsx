@@ -3,9 +3,9 @@
 //  - "Dina uppgifter": texter, vad som visas på tavlan, utseende.
 // Hela lager slås av/på via editorStore.setLayerVisible (flödeslayouten
 // flyttar om tavlan); värden inne i statistikraden/kartan via raceStore.
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, Loader2, Search, Upload } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Loader2, Search, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,9 @@ import { DEFAULT_LAYOUT_ID, getAllLayouts, type RaceStatKey, type TemplateLayer 
 import { PhotoUploadSection } from "./PhotoUploadSection";
 
 type Filter = RaceCategory | "all";
+
+/** Antal lopp per sida i väljaren. */
+const RACE_PAGE_SIZE = 10;
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">{children}</h3>;
@@ -71,6 +74,14 @@ export function RacePickerPanel() {
       return hay.includes(q);
     });
   }, [races, filter, query]);
+
+  // Tio lopp i taget (största först) så att listan inte växer på höjden.
+  const [page, setPage] = useState(0);
+  useEffect(() => setPage(0), [filter, query]);
+  const pageCount = Math.max(1, Math.ceil(visible.length / RACE_PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const pageStart = safePage * RACE_PAGE_SIZE;
+  const pageRaces = visible.slice(pageStart, pageStart + RACE_PAGE_SIZE);
 
   const pick = async (race: RaceDef) => {
     setLoadingId(race.id);
@@ -147,7 +158,7 @@ export function RacePickerPanel() {
               </div>
             )}
             <ul className="space-y-1.5" role="listbox" aria-label={t("race.pickTitle")}>
-              {visible.map((r) => {
+              {pageRaces.map((r) => {
                 const active = source === "catalog" && raceId === r.id;
                 return (
                   <li key={r.id}>
@@ -179,6 +190,35 @@ export function RacePickerPanel() {
               })}
               {visible.length === 0 && <li className="text-xs text-muted-foreground">{t("race.noMatch")}</li>}
             </ul>
+            {pageCount > 1 && (
+              <div className="flex items-center justify-between gap-2" data-testid="race-pager">
+                <button
+                  type="button"
+                  onClick={() => setPage(safePage - 1)}
+                  disabled={safePage === 0}
+                  className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition hover:border-foreground/40 disabled:opacity-40 disabled:pointer-events-none"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                  {t("race.prevPage")}
+                </button>
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {t("race.pageRange", {
+                    from: pageStart + 1,
+                    to: pageStart + pageRaces.length,
+                    total: visible.length,
+                  })}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPage(safePage + 1)}
+                  disabled={safePage >= pageCount - 1}
+                  className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition hover:border-foreground/40 disabled:opacity-40 disabled:pointer-events-none"
+                >
+                  {t("race.nextPage")}
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

@@ -27,47 +27,50 @@ export interface RaceDef {
   distanceKm: number;
   /** Extra sökord i väljaren. */
   aliases?: string[];
+  /** Ungefärligt antal deltagare. Används bara för att sortera väljaren
+   *  (största loppen först); visas aldrig för kunden. */
+  size?: number;
   courses: RaceCourse[];
 }
 
 export const RACE_CATALOG: RaceDef[] = [
-  { id: "stockholm-marathon", name: "Stockholm Marathon", city: "Stockholm", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["maraton stockholm"], courses: [{ year: 2026, file: "stockholm-marathon-2026.json" }] },
-  { id: "goteborgsvarvet", name: "Göteborgsvarvet", city: "Göteborg", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["varvet"], courses: [{ year: 2026, file: "goteborgsvarvet-2026.json" }] },
-  { id: "stockholm-halvmarathon", name: "Stockholm Halvmarathon", city: "Stockholm", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton stockholm"], courses: [{ year: 2026, file: "stockholm-halvmarathon-2026.json" }] },
-  { id: "lidingoloppet-30", name: "Lidingöloppet", city: "Lidingö", country: "Sverige", category: "trail", distanceKm: 30, aliases: ["lidingö"], courses: [{ year: 2026, file: "lidingoloppet-30-2026.json" }] },
-  { id: "midnattsloppet-stockholm", name: "Midnattsloppet", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, courses: [{ year: 2026, file: "midnattsloppet-stockholm-2026.json" }] },
-  { id: "tjejmilen", name: "Tjejmilen", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, courses: [] },
-  { id: "ultravasan-90", name: "Ultravasan 90", city: "Sälen–Mora", country: "Sverige", category: "ultra", distanceKm: 92, aliases: ["vasaloppet", "ultravasan"], courses: [{ year: 2026, file: "ultravasan-90-2026.json" }] },
-  { id: "midnattsloppet-goteborg", name: "Midnattsloppet", city: "Göteborg", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["midnattsloppet göteborg"], courses: [{ year: 2026, file: "midnattsloppet-goteborg-2026.json" }] },
-  { id: "midnattsloppet-malmo", name: "Midnattsloppet", city: "Malmö", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["midnattsloppet malmö"], courses: [{ year: 2026, file: "midnattsloppet-malmo-2026.json" }] },
-  { id: "ultravasan-45", name: "Ultravasan 45", city: "Oxberg–Mora", country: "Sverige", category: "ultra", distanceKm: 45, aliases: ["vasaloppet", "ultravasan"], courses: [{ year: 2026, file: "ultravasan-45-2026.json" }] },
-  { id: "trailvasan-30", name: "Trailvasan 30", city: "Oxberg–Mora", country: "Sverige", category: "trail", distanceKm: 30, aliases: ["vasaloppet", "trailvasan"], courses: [{ year: 2026, file: "trailvasan-30-2026.json" }] },
-  { id: "helsingborg-marathon", name: "Helsingborg Marathon", city: "Helsingborg", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["hbgm", "maraton helsingborg"], courses: [{ year: 2026, file: "helsingborg-marathon-2026.json" }] },
-  { id: "helsingborg-halvmarathon", name: "Helsingborg Half Marathon", city: "Helsingborg", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["hbgm", "halvmaraton helsingborg"], courses: [{ year: 2026, file: "helsingborg-halvmarathon-2026.json" }] },
-  { id: "premiarhalvan", name: "Premiärhalvan", city: "Stockholm", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["adidas premiärhalvan", "djurgården"], courses: [{ year: 2026, file: "premiarhalvan-2026.json" }] },
-  { id: "premiarmilen", name: "Premiärmilen", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["adidas premiärmilen", "norra djurgården"], courses: [{ year: 2025, file: "premiarmilen-2025.json" }] },
-  { id: "uppsala-marathon", name: "Uppsala Marathon", city: "Uppsala", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["maraton uppsala"], courses: [{ year: 2026, file: "uppsala-marathon-2026.json" }] },
-  { id: "uppsala-halvmarathon", name: "Uppsala Halvmarathon", city: "Uppsala", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton uppsala", "uppsala marathon"], courses: [{ year: 2026, file: "uppsala-halvmarathon-2026.json" }] },
-  { id: "fjallmaraton-45", name: "Fjällmaraton", city: "Årefjällen", country: "Sverige", category: "trail", distanceKm: 45, aliases: ["kia fjällmaraton", "fjällmaraton 45", "åre", "vålådalen"], courses: [{ year: 2026, file: "fjallmaraton-45-2026.json" }] },
-  { id: "fjallmaraton-27", name: "Fjällmaraton 27K", city: "Årefjällen", country: "Sverige", category: "trail", distanceKm: 27, aliases: ["salomon 27k", "fjällmaraton", "ottsjö", "åre"], courses: [{ year: 2026, file: "fjallmaraton-27-2026.json" }] },
-  { id: "malmo-marathon", name: "Malmö Marathon", city: "Malmö", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["maraton malmö", "ribersborg"], courses: [{ year: 2026, file: "malmo-marathon-2026.json" }] },
-  { id: "malmo-the-half", name: "Malmö Marathon The Half", city: "Malmö", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton malmö", "the half"], courses: [{ year: 2026, file: "malmo-the-half-2026.json" }] },
-  { id: "lidingoloppet-15", name: "Lidingöloppet 15", city: "Lidingö", country: "Sverige", category: "trail", distanceKm: 15, aliases: ["lidingöloppet", "tcs lidingöloppet 15 km"], courses: [{ year: 2026, file: "lidingoloppet-15-2026.json" }] },
-  { id: "hasselbyloppet", name: "Hässelbyloppet", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["hässelby", "vällingby"], courses: [{ year: 2026, file: "hasselbyloppet-2026.json" }] },
-  { id: "varvetmilen-goteborg", name: "Varvetmilen", city: "Göteborg", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["varvetmilen göteborg", "göteborgsvarvet"], courses: [{ year: 2026, file: "varvetmilen-goteborg-2026.json" }] },
-  { id: "varvetmilen-malmo", name: "Varvetmilen", city: "Malmö", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["varvetmilen malmö"], courses: [{ year: 2026, file: "varvetmilen-malmo-2026.json" }] },
-  { id: "varvetmilen-jonkoping", name: "Varvetmilen", city: "Jönköping", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["varvetmilen jönköping"], courses: [{ year: 2026, file: "varvetmilen-jonkoping-2026.json" }] },
-  { id: "berlin-marathon", name: "Berlin Marathon", city: "Berlin", country: "Tyskland", category: "marathon", distanceKm: 42.195, aliases: ["bmw berlin-marathon", "generali berlin-marathon", "berlin maraton"], courses: [{ year: 2026, file: "berlin-marathon-2026.json" }] },
-  { id: "berlin-halvmarathon", name: "Berlin Half Marathon", city: "Berlin", country: "Tyskland", category: "half", distanceKm: 21.0975, aliases: ["generali berliner halbmarathon", "berlin halvmaraton"], courses: [{ year: 2026, file: "berlin-halvmarathon-2026.json" }] },
-  { id: "copenhagen-marathon", name: "Copenhagen Marathon", city: "Köpenhamn", country: "Danmark", category: "marathon", distanceKm: 42.195, aliases: ["københavn marathon", "köpenhamn maraton", "cph marathon"], courses: [{ year: 2025, file: "copenhagen-marathon-2025.json" }] },
-  { id: "copenhagen-half", name: "Copenhagen Half Marathon", city: "Köpenhamn", country: "Danmark", category: "half", distanceKm: 21.0975, aliases: ["cph half", "köpenhamn halvmaraton", "københavn halvmaraton"], courses: [{ year: 2026, file: "copenhagen-half-2026.json" }] },
-  { id: "london-marathon", name: "London Marathon", city: "London", country: "Storbritannien", category: "marathon", distanceKm: 42.195, aliases: ["tcs london marathon", "london maraton"], courses: [{ year: 2026, file: "london-marathon-2026.json" }] },
-  { id: "new-york-city-marathon", name: "New York City Marathon", city: "New York", country: "USA", category: "marathon", distanceKm: 42.195, aliases: ["tcs new york city marathon", "nyc marathon", "new york maraton"], courses: [{ year: 2026, file: "new-york-city-marathon-2026.json" }] },
-  { id: "oslo-maraton", name: "Oslo Maraton", city: "Oslo", country: "Norge", category: "marathon", distanceKm: 42.195, aliases: ["dnb oslo maraton", "oslo marathon"], courses: [{ year: 2026, file: "oslo-maraton-2026.json" }] },
-  { id: "oslo-halvmaraton", name: "Oslo Halvmaraton", city: "Oslo", country: "Norge", category: "half", distanceKm: 21.0975, aliases: ["oslo half marathon", "dnb oslo maraton"], courses: [{ year: 2026, file: "oslo-halvmaraton-2026.json" }] },
-  { id: "valencia-marathon", name: "Valencia Marathon", city: "Valencia", country: "Spanien", category: "marathon", distanceKm: 42.195, aliases: ["maratón valencia", "valencia maraton"], courses: [{ year: 2025, file: "valencia-marathon-2025.json" }] },
-  { id: "barcelona-marathon", name: "Barcelona Marathon", city: "Barcelona", country: "Spanien", category: "marathon", distanceKm: 42.195, aliases: ["zurich marató barcelona", "barcelona maraton"], courses: [{ year: 2026, file: "barcelona-marathon-2026.json" }] },
-  { id: "sevilla-marathon", name: "Sevilla Marathon", city: "Sevilla", country: "Spanien", category: "marathon", distanceKm: 42.195, aliases: ["zurich maratón de sevilla", "seville marathon", "sevilla maraton"], courses: [{ year: 2026, file: "sevilla-marathon-2026.json" }] },
+  { id: "stockholm-marathon", name: "Stockholm Marathon", city: "Stockholm", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["maraton stockholm"], size: 20000, courses: [{ year: 2026, file: "stockholm-marathon-2026.json" }] },
+  { id: "goteborgsvarvet", name: "Göteborgsvarvet", city: "Göteborg", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["varvet"], size: 45000, courses: [{ year: 2026, file: "goteborgsvarvet-2026.json" }] },
+  { id: "stockholm-halvmarathon", name: "Stockholm Halvmarathon", city: "Stockholm", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton stockholm"], size: 18000, courses: [{ year: 2026, file: "stockholm-halvmarathon-2026.json" }] },
+  { id: "lidingoloppet-30", name: "Lidingöloppet", city: "Lidingö", country: "Sverige", category: "trail", distanceKm: 30, aliases: ["lidingö"], size: 6000, courses: [{ year: 2026, file: "lidingoloppet-30-2026.json" }] },
+  { id: "midnattsloppet-stockholm", name: "Midnattsloppet", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, size: 25000, courses: [{ year: 2026, file: "midnattsloppet-stockholm-2026.json" }] },
+  { id: "tjejmilen", name: "Tjejmilen", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, size: 25000, courses: [] },
+  { id: "ultravasan-90", name: "Ultravasan 90", city: "Sälen–Mora", country: "Sverige", category: "ultra", distanceKm: 92, aliases: ["vasaloppet", "ultravasan"], size: 1500, courses: [{ year: 2026, file: "ultravasan-90-2026.json" }] },
+  { id: "midnattsloppet-goteborg", name: "Midnattsloppet", city: "Göteborg", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["midnattsloppet göteborg"], size: 8000, courses: [{ year: 2026, file: "midnattsloppet-goteborg-2026.json" }] },
+  { id: "midnattsloppet-malmo", name: "Midnattsloppet", city: "Malmö", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["midnattsloppet malmö"], size: 8000, courses: [{ year: 2026, file: "midnattsloppet-malmo-2026.json" }] },
+  { id: "ultravasan-45", name: "Ultravasan 45", city: "Oxberg–Mora", country: "Sverige", category: "ultra", distanceKm: 45, aliases: ["vasaloppet", "ultravasan"], size: 2000, courses: [{ year: 2026, file: "ultravasan-45-2026.json" }] },
+  { id: "trailvasan-30", name: "Trailvasan 30", city: "Oxberg–Mora", country: "Sverige", category: "trail", distanceKm: 30, aliases: ["vasaloppet", "trailvasan"], size: 2000, courses: [{ year: 2026, file: "trailvasan-30-2026.json" }] },
+  { id: "helsingborg-marathon", name: "Helsingborg Marathon", city: "Helsingborg", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["hbgm", "maraton helsingborg"], size: 2000, courses: [{ year: 2026, file: "helsingborg-marathon-2026.json" }] },
+  { id: "helsingborg-halvmarathon", name: "Helsingborg Half Marathon", city: "Helsingborg", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["hbgm", "halvmaraton helsingborg"], size: 4000, courses: [{ year: 2026, file: "helsingborg-halvmarathon-2026.json" }] },
+  { id: "premiarhalvan", name: "Premiärhalvan", city: "Stockholm", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["adidas premiärhalvan", "djurgården"], size: 5000, courses: [{ year: 2026, file: "premiarhalvan-2026.json" }] },
+  { id: "premiarmilen", name: "Premiärmilen", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["adidas premiärmilen", "norra djurgården"], size: 6000, courses: [{ year: 2025, file: "premiarmilen-2025.json" }] },
+  { id: "uppsala-marathon", name: "Uppsala Marathon", city: "Uppsala", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["maraton uppsala"], size: 2000, courses: [{ year: 2026, file: "uppsala-marathon-2026.json" }] },
+  { id: "uppsala-halvmarathon", name: "Uppsala Halvmarathon", city: "Uppsala", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton uppsala", "uppsala marathon"], size: 3000, courses: [{ year: 2026, file: "uppsala-halvmarathon-2026.json" }] },
+  { id: "fjallmaraton-45", name: "Fjällmaraton", city: "Årefjällen", country: "Sverige", category: "trail", distanceKm: 45, aliases: ["kia fjällmaraton", "fjällmaraton 45", "åre", "vålådalen"], size: 800, courses: [{ year: 2026, file: "fjallmaraton-45-2026.json" }] },
+  { id: "fjallmaraton-27", name: "Fjällmaraton 27K", city: "Årefjällen", country: "Sverige", category: "trail", distanceKm: 27, aliases: ["salomon 27k", "fjällmaraton", "ottsjö", "åre"], size: 1000, courses: [{ year: 2026, file: "fjallmaraton-27-2026.json" }] },
+  { id: "malmo-marathon", name: "Malmö Marathon", city: "Malmö", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["maraton malmö", "ribersborg"], size: 2000, courses: [{ year: 2026, file: "malmo-marathon-2026.json" }] },
+  { id: "malmo-the-half", name: "Malmö Marathon The Half", city: "Malmö", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton malmö", "the half"], size: 3000, courses: [{ year: 2026, file: "malmo-the-half-2026.json" }] },
+  { id: "lidingoloppet-15", name: "Lidingöloppet 15", city: "Lidingö", country: "Sverige", category: "trail", distanceKm: 15, aliases: ["lidingöloppet", "tcs lidingöloppet 15 km"], size: 3000, courses: [{ year: 2026, file: "lidingoloppet-15-2026.json" }] },
+  { id: "hasselbyloppet", name: "Hässelbyloppet", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["hässelby", "vällingby"], size: 3000, courses: [{ year: 2026, file: "hasselbyloppet-2026.json" }] },
+  { id: "varvetmilen-goteborg", name: "Varvetmilen", city: "Göteborg", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["varvetmilen göteborg", "göteborgsvarvet"], size: 10000, courses: [{ year: 2026, file: "varvetmilen-goteborg-2026.json" }] },
+  { id: "varvetmilen-malmo", name: "Varvetmilen", city: "Malmö", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["varvetmilen malmö"], size: 5000, courses: [{ year: 2026, file: "varvetmilen-malmo-2026.json" }] },
+  { id: "varvetmilen-jonkoping", name: "Varvetmilen", city: "Jönköping", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["varvetmilen jönköping"], size: 4000, courses: [{ year: 2026, file: "varvetmilen-jonkoping-2026.json" }] },
+  { id: "berlin-marathon", name: "Berlin Marathon", city: "Berlin", country: "Tyskland", category: "marathon", distanceKm: 42.195, aliases: ["bmw berlin-marathon", "generali berlin-marathon", "berlin maraton"], size: 50000, courses: [{ year: 2026, file: "berlin-marathon-2026.json" }] },
+  { id: "berlin-halvmarathon", name: "Berlin Half Marathon", city: "Berlin", country: "Tyskland", category: "half", distanceKm: 21.0975, aliases: ["generali berliner halbmarathon", "berlin halvmaraton"], size: 38000, courses: [{ year: 2026, file: "berlin-halvmarathon-2026.json" }] },
+  { id: "copenhagen-marathon", name: "Copenhagen Marathon", city: "Köpenhamn", country: "Danmark", category: "marathon", distanceKm: 42.195, aliases: ["københavn marathon", "köpenhamn maraton", "cph marathon"], size: 15000, courses: [{ year: 2025, file: "copenhagen-marathon-2025.json" }] },
+  { id: "copenhagen-half", name: "Copenhagen Half Marathon", city: "Köpenhamn", country: "Danmark", category: "half", distanceKm: 21.0975, aliases: ["cph half", "köpenhamn halvmaraton", "københavn halvmaraton"], size: 25000, courses: [{ year: 2026, file: "copenhagen-half-2026.json" }] },
+  { id: "london-marathon", name: "London Marathon", city: "London", country: "Storbritannien", category: "marathon", distanceKm: 42.195, aliases: ["tcs london marathon", "london maraton"], size: 56000, courses: [{ year: 2026, file: "london-marathon-2026.json" }] },
+  { id: "new-york-city-marathon", name: "New York City Marathon", city: "New York", country: "USA", category: "marathon", distanceKm: 42.195, aliases: ["tcs new york city marathon", "nyc marathon", "new york maraton"], size: 55000, courses: [{ year: 2026, file: "new-york-city-marathon-2026.json" }] },
+  { id: "oslo-maraton", name: "Oslo Maraton", city: "Oslo", country: "Norge", category: "marathon", distanceKm: 42.195, aliases: ["dnb oslo maraton", "oslo marathon"], size: 4000, courses: [{ year: 2026, file: "oslo-maraton-2026.json" }] },
+  { id: "oslo-halvmaraton", name: "Oslo Halvmaraton", city: "Oslo", country: "Norge", category: "half", distanceKm: 21.0975, aliases: ["oslo half marathon", "dnb oslo maraton"], size: 10000, courses: [{ year: 2026, file: "oslo-halvmaraton-2026.json" }] },
+  { id: "valencia-marathon", name: "Valencia Marathon", city: "Valencia", country: "Spanien", category: "marathon", distanceKm: 42.195, aliases: ["maratón valencia", "valencia maraton"], size: 35000, courses: [{ year: 2025, file: "valencia-marathon-2025.json" }] },
+  { id: "barcelona-marathon", name: "Barcelona Marathon", city: "Barcelona", country: "Spanien", category: "marathon", distanceKm: 42.195, aliases: ["zurich marató barcelona", "barcelona maraton"], size: 20000, courses: [{ year: 2026, file: "barcelona-marathon-2026.json" }] },
+  { id: "sevilla-marathon", name: "Sevilla Marathon", city: "Sevilla", country: "Spanien", category: "marathon", distanceKm: 42.195, aliases: ["zurich maratón de sevilla", "seville marathon", "sevilla maraton"], size: 13000, courses: [{ year: 2026, file: "sevilla-marathon-2026.json" }] },
 ];
 
 export const RACE_CATEGORY_LABELS: Record<RaceCategory | "all", { sv: string; en: string }> = {
@@ -82,8 +85,12 @@ export const RACE_CATEGORY_LABELS: Record<RaceCategory | "all", { sv: string; en
 };
 
 /** Lopp som har minst en ritad bana — bara de visas för kunden. */
+/** Lopp med bana, största först (lika stora: i katalogordning). */
 export function availableRaces(): RaceDef[] {
-  return RACE_CATALOG.filter((r) => r.courses.length > 0);
+  return RACE_CATALOG.filter((r) => r.courses.length > 0)
+    .map((r, i) => ({ r, i }))
+    .sort((a, b) => (b.r.size ?? 0) - (a.r.size ?? 0) || a.i - b.i)
+    .map(({ r }) => r);
 }
 
 /** Senaste banan som gällde ett visst år (eller den nyaste). */

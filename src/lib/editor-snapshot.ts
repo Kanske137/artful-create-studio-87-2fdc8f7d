@@ -4,6 +4,7 @@
 // `renderHiresSnapshotSafe`.
 import mapboxgl from "mapbox-gl";
 import { getMapboxToken, styleUrl } from "./mapbox";
+import { isRouteLayerId } from "./race/route-map";
 import type { MapShape } from "@/stores/editorStore";
 import type { LayoutDef } from "./product-config";
 
@@ -165,6 +166,7 @@ export async function renderArtworkSnapshot(input: SnapshotInput): Promise<strin
       const style = map.getStyle();
       if (style?.layers) {
         for (const layer of style.layers) {
+          if (isRouteLayerId(layer.id)) continue;
           if (layer.type === "symbol" || layer.id.startsWith("label-")) {
             map.setLayoutProperty(layer.id, "visibility", input.showLabels ? "visible" : "none");
           }
