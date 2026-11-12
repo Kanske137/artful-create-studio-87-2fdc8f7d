@@ -50,6 +50,13 @@ export const RACE_CATALOG: RaceDef[] = [
   { id: "uppsala-halvmarathon", name: "Uppsala Halvmarathon", city: "Uppsala", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton uppsala", "uppsala marathon"], courses: [{ year: 2026, file: "uppsala-halvmarathon-2026.json" }] },
   { id: "fjallmaraton-45", name: "Fjällmaraton", city: "Årefjällen", country: "Sverige", category: "trail", distanceKm: 45, aliases: ["kia fjällmaraton", "fjällmaraton 45", "åre", "vålådalen"], courses: [{ year: 2026, file: "fjallmaraton-45-2026.json" }] },
   { id: "fjallmaraton-27", name: "Fjällmaraton 27K", city: "Årefjällen", country: "Sverige", category: "trail", distanceKm: 27, aliases: ["salomon 27k", "fjällmaraton", "ottsjö", "åre"], courses: [{ year: 2026, file: "fjallmaraton-27-2026.json" }] },
+  { id: "malmo-marathon", name: "Malmö Marathon", city: "Malmö", country: "Sverige", category: "marathon", distanceKm: 42.195, aliases: ["maraton malmö", "ribersborg"], courses: [{ year: 2026, file: "malmo-marathon-2026.json" }] },
+  { id: "malmo-the-half", name: "Malmö Marathon The Half", city: "Malmö", country: "Sverige", category: "half", distanceKm: 21.0975, aliases: ["halvmaraton malmö", "the half"], courses: [{ year: 2026, file: "malmo-the-half-2026.json" }] },
+  { id: "lidingoloppet-15", name: "Lidingöloppet 15", city: "Lidingö", country: "Sverige", category: "trail", distanceKm: 15, aliases: ["lidingöloppet", "tcs lidingöloppet 15 km"], courses: [{ year: 2026, file: "lidingoloppet-15-2026.json" }] },
+  { id: "hasselbyloppet", name: "Hässelbyloppet", city: "Stockholm", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["hässelby", "vällingby"], courses: [{ year: 2026, file: "hasselbyloppet-2026.json" }] },
+  { id: "varvetmilen-goteborg", name: "Varvetmilen", city: "Göteborg", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["varvetmilen göteborg", "göteborgsvarvet"], courses: [{ year: 2026, file: "varvetmilen-goteborg-2026.json" }] },
+  { id: "varvetmilen-malmo", name: "Varvetmilen", city: "Malmö", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["varvetmilen malmö"], courses: [{ year: 2026, file: "varvetmilen-malmo-2026.json" }] },
+  { id: "varvetmilen-jonkoping", name: "Varvetmilen", city: "Jönköping", country: "Sverige", category: "10k", distanceKm: 10, aliases: ["varvetmilen jönköping"], courses: [{ year: 2026, file: "varvetmilen-jonkoping-2026.json" }] },
 ];
 
 export const RACE_CATEGORY_LABELS: Record<RaceCategory | "all", { sv: string; en: string }> = {
