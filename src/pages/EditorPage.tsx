@@ -246,7 +246,7 @@ export default function EditorPage() {
     const active = resolveConfigForHandle(configs, handleParam, typeParam);
     if (active) {
       setNotFound(false);
-      // Maratontavla/Halvmaratontavla läser layouten från Lopptavla.
+      // Maratontavla/Halvmaratontavla läser layouten från Löpartavla.
       setConfig(withTemplateAlias(active, configs, RACE_TEMPLATE_ALIASES));
     } else {
       setNotFound(true);

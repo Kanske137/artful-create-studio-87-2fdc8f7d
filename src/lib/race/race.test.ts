@@ -141,7 +141,7 @@ describe("katalog och produkter", () => {
   it("väljer kundvagnsprodukt utifrån kategori", () => {
     expect(productHandleForCategory("marathon")).toBe("maratontavla");
     expect(productHandleForCategory("half")).toBe("halvmaratontavla");
-    expect(productHandleForCategory("trail")).toBe("lopptavla");
+    expect(productHandleForCategory("trail")).toBe("lopartavla");
   });
 
   it("läser banfiler med och utan höjd", () => {

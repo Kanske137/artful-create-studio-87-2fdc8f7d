@@ -27,7 +27,7 @@ export function buildPrintableTemplate(
 }
 
 /**
- * Produkter som delar en huvudmall (t.ex. Maratontavla → Lopptavla) läser
+ * Produkter som delar en huvudmall (t.ex. Maratontavla → Löpartavla) läser
  * mallen från huvudprodukten men behåller sina egna Shopify-/Gelato-uppgifter.
  */
 export function withTemplateAlias<C extends { shopify_handle: string; product_type: string }>(

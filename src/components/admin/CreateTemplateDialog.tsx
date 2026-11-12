@@ -242,7 +242,7 @@ export default function CreateTemplateDialog({ open, onOpenChange }: Props) {
             <div className="grid grid-cols-2 gap-2">
               {([
                 { id: "empty", label: "Tom mall", hint: "Bygg från grunden" },
-                { id: "race", label: "Lopptavla", hint: "Rutt, höjdprofil, statistik" },
+                { id: "race", label: "Löpartavla", hint: "Rutt, höjdprofil, statistik" },
               ] as const).map((p) => (
                 <button
                   key={p.id}

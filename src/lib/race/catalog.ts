@@ -105,11 +105,11 @@ export function categoryForDistance(km: number): RaceCategory {
 }
 
 // ---------- produkter ----------
-// Tre Shopify-produkter delar EN mall (lopptavla). Kundvagnen får alltid den
+// Tre Shopify-produkter delar EN mall (lopartavla, produkten Löpartavla). Kundvagnen får alltid den
 // produkt som matchar det valda loppets kategori — samma mönster som
 // drinktavlorna.
 
-export const RACE_MASTER_HANDLE = "lopptavla";
+export const RACE_MASTER_HANDLE = "lopartavla";
 
 /** Produkter som läser sin layout från huvudmallen. */
 export const RACE_TEMPLATE_ALIASES: Record<string, string> = {
@@ -121,7 +121,7 @@ export const RACE_TEMPLATE_ALIASES: Record<string, string> = {
 export const RACE_DEFAULT_FILTER: Record<string, RaceCategory | "all"> = {
   maratontavla: "marathon",
   halvmaratontavla: "half",
-  lopptavla: "all",
+  lopartavla: "all",
 };
 
 export function productHandleForCategory(category: RaceCategory): string {

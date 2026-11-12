@@ -6,7 +6,7 @@ import { applyFlowToLayout } from "./flow-layout";
 import { orientationLayoutSchema } from "./template-schema";
 
 describe("withTemplateAlias", () => {
-  const master = { shopify_handle: "lopptavla", product_type: "multi", template: { id: "master" } };
+  const master = { shopify_handle: "lopartavla", product_type: "multi", template: { id: "master" } };
   const marathon = { shopify_handle: "maratontavla", product_type: "multi", template: { id: "egen" } };
   const other = { shopify_handle: "karttavla", product_type: "multi", template: { id: "karta" } };
   const configs = [master, marathon, other];
