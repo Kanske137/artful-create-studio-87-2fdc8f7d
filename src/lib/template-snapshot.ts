@@ -33,6 +33,7 @@ import {
 import { iconSvgString } from "./map-icon-catalog";
 import { renderStarmap } from "./starmap-render";
 import { applyFlowLayout } from "./flow-layout";
+import { wrapPieceLines } from "./text-wrap";
 import { applyRouteToMap, isRouteLayerId, overlayAvoidPct, paddedBounds, routeFitPaddingPx, type RouteRenderOptions, routeMapStyleId } from "./race/route-map";
 import { elevationSeries } from "./race/geo";
 import { raceFieldText, raceStatItems } from "./race/derive";
@@ -398,7 +399,7 @@ function drawTextLayer(
   // Segmentera texten med spans (samma helper som editorn) och bryt i rader.
   const segments = resolveSpans(text, liveSpans ?? d.spans);
   type Piece = { text: string; px: number; font: string; color: string; bold: boolean; italic: boolean; underline: boolean };
-  const lines: Piece[][] = [[]];
+  let lines: Piece[][] = [[]];
   for (const s of segments) {
     const px = s.fontSizePt ? resolveFontPx({ fontSizePt: s.fontSizePt }, canvasShortPx) : basePx;
     const style: Omit<Piece, "text"> = {
@@ -427,6 +428,19 @@ function drawTextLayer(
   const setPieceFont = (p: Piece) => {
     ctx.font = `${p.italic ? "italic " : ""}${p.bold ? 700 : 400} ${Math.round(p.px)}px "${p.font}", Inter, sans-serif`;
   };
+
+  // Automatisk radbrytning som i editorn (pre-wrap) — annars blir en rubrik
+  // som visas på två rader en enda rad i tryckfilen, utanför sin ruta.
+  // Bryts mot hela rutans bredd: något generösare än editorn (som har 4 px
+  // inre marginal), så en rad som får plats i editorn bryts aldrig här.
+  lines = wrapPieceLines(
+    lines,
+    (p, s) => {
+      setPieceFont(p);
+      return ctx.measureText(s).width;
+    },
+    rect.w,
+  );
 
   // Radmått: DOM-paritet — containerns fontstorlek ger en STRUT per rad
   // (line-height × basPx gäller även rader med enbart mindre segment),

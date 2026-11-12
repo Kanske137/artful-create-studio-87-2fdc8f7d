@@ -340,3 +340,19 @@ describe("målflaggan", () => {
   });
 });
 
+
+import { viewBoundsOf } from "./route-map";
+
+describe("viewBoundsOf", () => {
+  it("räknar hela kartrutan, oavsett kvarlämnad padding", () => {
+    // Enkel linjär karta: x 0..600 → lng 18..19, y 0..800 → lat 60..59.
+    const map = {
+      getContainer: () => ({ clientWidth: 600, clientHeight: 800 }) as HTMLElement,
+      unproject: ([x, y]: [number, number]) => ({ lng: 18 + x / 600, lat: 60 - y / 800 }),
+    };
+    expect(viewBoundsOf(map as unknown as Parameters<typeof viewBoundsOf>[0])).toEqual([
+      [18, 59],
+      [19, 60],
+    ]);
+  });
+});

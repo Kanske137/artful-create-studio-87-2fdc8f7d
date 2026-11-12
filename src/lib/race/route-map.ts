@@ -261,12 +261,25 @@ function applyRouteUnsafe(
   map.setLayoutProperty(L_FINISH, "visibility", "visible");
 }
 
-/** Synligt utsnitt som [[väst, syd], [öst, nord]] — sparas för tryck. */
-export function viewBoundsOf(map: mapboxgl.Map): Bounds {
-  const b = map.getBounds();
+/**
+ * Synligt utsnitt som [[väst, syd], [öst, nord]] — sparas för tryck.
+ *
+ * Räknas från kartrutans hörn, inte med map.getBounds(): fitBounds med
+ * padding lämnar kvar padding på kartan (Mapbox GL v3), och då ger
+ * getBounds() bara den inre ytan. Tryckfilen zoomade därför in rutten
+ * större än förhandsvisningen, närmare rubrik och höjdprofil.
+ */
+export function viewBoundsOf(
+  map: Pick<mapboxgl.Map, "getContainer" | "unproject">,
+): Bounds {
+  const c = map.getContainer();
+  const w = c.clientWidth;
+  const h = c.clientHeight;
+  const sw = map.unproject([0, h]);
+  const ne = map.unproject([w, 0]);
   return [
-    [b.getWest(), b.getSouth()],
-    [b.getEast(), b.getNorth()],
+    [sw.lng, sw.lat],
+    [ne.lng, ne.lat],
   ];
 }
 
