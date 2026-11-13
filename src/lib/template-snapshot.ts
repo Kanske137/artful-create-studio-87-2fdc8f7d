@@ -200,7 +200,7 @@ async function drawMapLayer(
     /** Ruttkarta: banan som ska ritas i kartan. */
     route?: { route: RaceRoute; opts: RouteRenderOptions } | null;
     /** Vanliga kartor: rita samma område som i editorn (se map-print-view). */
-    view?: { front: PxRect; viewWidthPx?: number | null; pixelRatio: number } | null;
+    view?: { front: PxRect; viewWidthPx?: number | null; referencePxPerCssPx: number } | null;
     /** Punkter (lng, lat) att projicera till utdata-px, t.ex. kundens ikoner. */
     points?: Array<[number, number]>;
   },
@@ -214,11 +214,12 @@ async function drawMapLayer(
           front: opts.view.front,
           zoom: opts.zoom,
           viewWidthPx: opts.view.viewWidthPx,
-          pixelRatio: opts.view.pixelRatio,
+          referencePxPerCssPx: opts.view.referencePxPerCssPx,
         })
       : null;
-  if (pv && Math.abs(pv.pixelRatio - 1) > 1e-3) {
-    return withDevicePixelRatio(pv.pixelRatio, () => drawMapLayerInner(ctx, rect, opts, pv));
+  if (pv) {
+    // Fast värde (även 1) så att resultatet inte beror på kundens skärm.
+    return withDevicePixelRatio(pv.devicePixelRatio, () => drawMapLayerInner(ctx, rect, opts, pv));
   }
   return drawMapLayerInner(ctx, rect, opts, pv);
 }
@@ -851,8 +852,8 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
   const w = Math.round(wCm * PX_PER_CM * scale);
   const h = Math.round(hCm * PX_PER_CM * scale);
   const pxPerMm = (PX_PER_CM * scale) / 10;
-  // Kartor ritas med kundvagnsbildens täthet och skalas upp (se map-print-view):
-  // samma område och samma linjeproportioner i kundvagn, mockup och tryck.
+  // Kundvagnsbildens kart-täthet — reserv för designer utan editorns rutbredd
+  // (se map-print-view).
   const mapPxPerCssPx = (PX_PER_CM * scale) / mapReferencePxPerCm(wCm, hCm);
 
   // Front-zone rect (where layer % coords live). Canvas templates with the
@@ -1026,7 +1027,7 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
         shape,
         bounds: routeStyle ? mv?.viewBounds ?? null : null,
         route: routeRender,
-        view: { front: frontRect, viewWidthPx: mv?.viewWidthPx ?? null, pixelRatio: mapPxPerCssPx },
+        view: { front: frontRect, viewWidthPx: mv?.viewWidthPx ?? null, referencePxPerCssPx: mapPxPerCssPx },
         points: iconPoints,
       });
       await drawMapIcons(ctx, rect, shape, icons, projected);

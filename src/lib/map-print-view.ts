@@ -1,18 +1,14 @@
-// Hur en kartlager ritas i kundvagnsbild, mockup och tryckfil så att exakt
-// samma område syns som i editorn.
+// Hur ett kartlager ritas i kundvagnsbild, mockup och tryckfil så att det
+// blir samma karta som i editorn.
 //
 // Mapbox visar olika mycket beroende på kartrutans bredd: samma center/zoom i
 // en 4800 px bred ruta visar ~6 gånger större område än i editorns ~800 px.
 // Tidigare ritades tryckfilen så — kunden fick en helt annan karta än den hon
-// valde. Nu:
-//   1. Kartan ritas i en ruta med "referensbredd" i CSS-px (samma täthet som
-//      kundvagnsbilden: 24 px/cm, max 1800 px långsida) och skalas upp med
-//      devicePixelRatio. Linjer och etiketter får då samma proportioner i
-//      tryck som i kundvagnsbilden, bara skarpare.
-//   2. Zoomen räknas om från editorns rutbredd (viewWidthPx) till
-//      referensbredden, så att området blir exakt detsamma som i editorn.
-//      Saknas viewWidthPx (äldre designer) blir området detsamma som i
-//      kundvagnsbilden, som kunden och analytics har sett.
+// valde. Nu ritas kartan i en ruta med EDITORNS bredd i CSS-px, med kundens
+// egen zoom, och skalas upp med devicePixelRatio till utdatans upplösning.
+// Då blir området, gatorna och linjetjockleken exakt som i editorn, bara
+// skarpare. Saknas editorns bredd (äldre designer) används kundvagnsbildens
+// täthet (24 px/cm, max 1800 px långsida) — det kunden och analytics har sett.
 
 export interface PxRect {
   x: number;
@@ -31,9 +27,10 @@ export interface MapPrintView {
   /** Kartrutans storlek i CSS-px (hela ytan, inklusive utfallszon). */
   cssW: number;
   cssH: number;
-  /** devicePixelRatio under ritningen: utdata-px per CSS-px. */
-  pixelRatio: number;
-  /** Zoom att rita med i rutan ovan. */
+  /** devicePixelRatio under ritningen. Aldrig under 1: en mindre bild
+   *  (kundvagn, mockup) ritas i full skala och skalas ned efteråt. */
+  devicePixelRatio: number;
+  /** Zoom att rita med — alltid kundens egen. */
   zoom: number;
   /** Var lagrets egen mittpunkt ligger relativt rutans mitt, i CSS-px.
    *  Skiljer sig från noll när bara en sida förlängts med utfall. */
@@ -49,15 +46,16 @@ export function mapPrintView(args: {
   zoom: number;
   /** Editorns kartrutebredd i CSS-px när zoomen sattes. */
   viewWidthPx?: number | null;
-  /** Utdata-px per CSS-px (tryck: hires-täthet / referenstäthet). */
-  pixelRatio: number;
+  /** Utdata-px per CSS-px med kundvagnsbildens täthet (reserv för äldre designer). */
+  referencePxPerCssPx: number;
 }): MapPrintView {
-  const k = args.pixelRatio > 0 ? args.pixelRatio : 1;
-  const frontCssW = args.front.w / k;
-  const zoom =
-    args.viewWidthPx && args.viewWidthPx > 0 && frontCssW > 0
-      ? args.zoom + Math.log2(frontCssW / args.viewWidthPx)
-      : args.zoom;
+  // Utdata-px per CSS-px: lagrets yta motsvarar editorns ruta.
+  const k =
+    args.viewWidthPx && args.viewWidthPx > 0 && args.front.w > 0
+      ? args.front.w / args.viewWidthPx
+      : args.referencePxPerCssPx > 0
+        ? args.referencePxPerCssPx
+        : 1;
   const rectCx = args.rect.x + args.rect.w / 2;
   const rectCy = args.rect.y + args.rect.h / 2;
   const frontCx = args.front.x + args.front.w / 2;
@@ -65,8 +63,8 @@ export function mapPrintView(args: {
   return {
     cssW: args.rect.w / k,
     cssH: args.rect.h / k,
-    pixelRatio: k,
-    zoom,
+    devicePixelRatio: Math.max(1, k),
+    zoom: args.zoom,
     frontCenterOffsetCss: { x: (frontCx - rectCx) / k, y: (frontCy - rectCy) / k },
   };
 }
