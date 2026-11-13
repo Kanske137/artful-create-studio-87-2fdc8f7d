@@ -451,6 +451,12 @@ export default function EditorPage() {
       _print_file_url: printFileUrl,
       _session_id: getSessionKey(),
     };
+    // Kartrutans bredd i editorn: med center/zoom räcker den för att återskapa
+    // exakt det område kunden såg (support/omtryck).
+    const firstMapValue = Object.values(layerValues ?? {}).find((v) => v?.kind === "map");
+    if (firstMapValue && firstMapValue.kind === "map" && firstMapValue.viewWidthPx) {
+      properties._map_view_w = String(Math.round(firstMapValue.viewWidthPx));
+    }
     if (isRaceTemplate && raceState.route) {
       // Synligt i kundvagn/order — underlättar support.
       properties.Lopp = raceState.fields.title || (raceState.source === "gpx" ? "Egen GPX-fil" : "");

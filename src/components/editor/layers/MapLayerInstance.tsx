@@ -145,6 +145,7 @@ export function MapLayerInstance({
 
       map.on("load", () => {
         map.resize();
+        useEditorStore.getState().setLayerMapViewWidth(layerId, map.getContainer().clientWidth);
         applyLabelVisibility(map, showLabels);
         syncRoute(map);
       });
@@ -159,9 +160,13 @@ export function MapLayerInstance({
         // kunden inte själv panorerat följer utsnittet med banan.
         const r = routeRef.current;
         if (r?.route && !userMovedRef.current) fitToRoute(map, r.route, r.opts);
+        // center/zoom visar olika mycket beroende på rutans bredd — spara den
+        // så att kundvagnsbild och tryckfil visar exakt samma område.
+        useEditorStore.getState().setLayerMapViewWidth(layerId, map.getContainer().clientWidth);
       });
 
       map.on("moveend", (e: { originalEvent?: unknown }) => {
+        useEditorStore.getState().setLayerMapViewWidth(layerId, map.getContainer().clientWidth);
         if (routeRef.current) {
           // Tryckfilen återskapar exakt detta utsnitt.
           useEditorStore.getState().setLayerMapViewBounds(layerId, viewBoundsOf(map));

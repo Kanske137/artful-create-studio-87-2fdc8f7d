@@ -80,6 +80,10 @@ export interface MapLayerValue {
    *  anpassar sig till detta i stället för center/zoom, så banan hamnar
    *  likadant oavsett upplösning. */
   viewBounds?: Bounds;
+  /** Kartrutans bredd i CSS-px i editorn när kunden senast flyttade/zoomade
+   *  (eller rutan ändrade storlek). center/zoom betyder bara något ihop med
+   *  den: tryckfilen räknar om zoomen så att samma område syns som i editorn. */
+  viewWidthPx?: number;
 }
 
 export interface TextLayerValue {
@@ -324,6 +328,7 @@ interface EditorState {
   setLayerMapCenter: (id: string, c: [number, number]) => void;
   setLayerMapZoom: (id: string, z: number) => void;
   setLayerMapViewBounds: (id: string, bounds: Bounds) => void;
+  setLayerMapViewWidth: (id: string, widthPx: number) => void;
   setLayerMapStyle: (id: string, s: string) => void;
   setLayerMapShape: (id: string, s: MapShape) => void;
   setLayerShowLabels: (id: string, v: boolean) => void;
@@ -1602,6 +1607,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   setLayerMapCenter: (id, c) => updateMap(set, get, id, { center: c }),
   setLayerMapZoom: (id, z) => updateMap(set, get, id, { zoom: z }),
   setLayerMapViewBounds: (id, bounds) => updateMap(set, get, id, { viewBounds: bounds }),
+  setLayerMapViewWidth: (id, widthPx) => {
+    const cur = get().layerValues[id];
+    if (!(widthPx > 0) || !cur || cur.kind !== "map" || cur.viewWidthPx === widthPx) return;
+    updateMap(set, get, id, { viewWidthPx: widthPx });
+  },
   setLayerMapStyle: (id, s) => updateMap(set, get, id, { styleId: s }),
   setLayerMapShape: (id, s) => updateMap(set, get, id, { shape: s }),
   setLayerShowLabels: (id, v) => updateMap(set, get, id, { showLabels: v }),

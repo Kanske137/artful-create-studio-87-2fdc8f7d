@@ -34,6 +34,7 @@ import { iconSvgString } from "./map-icon-catalog";
 import { renderStarmap } from "./starmap-render";
 import { applyFlowLayout } from "./flow-layout";
 import { wrapPieceLines } from "./text-wrap";
+import { mapPrintView, mapReferencePxPerCm, withDevicePixelRatio, type MapPrintView, type PxRect } from "./map-print-view";
 import { applyRouteToMap, isRouteLayerId, overlayAvoidPct, paddedBounds, routeFitPaddingPx, type RouteRenderOptions, routeMapStyleId } from "./race/route-map";
 import { elevationSeries } from "./race/geo";
 import { raceFieldText, raceStatItems } from "./race/derive";
@@ -198,12 +199,42 @@ async function drawMapLayer(
     bounds?: Bounds | null;
     /** Ruttkarta: banan som ska ritas i kartan. */
     route?: { route: RaceRoute; opts: RouteRenderOptions } | null;
+    /** Vanliga kartor: rita samma område som i editorn (se map-print-view). */
+    view?: { front: PxRect; viewWidthPx?: number | null; pixelRatio: number } | null;
+    /** Punkter (lng, lat) att projicera till utdata-px, t.ex. kundens ikoner. */
+    points?: Array<[number, number]>;
   },
-): Promise<void> {
-  const container = createOffscreen(rect.w, rect.h);
+): Promise<Array<{ x: number; y: number }>> {
+  const isRouteMap = !!(opts.bounds || opts.route);
+  // Ruttkartor anpassar sig själva till utsnittet (bounds) — de ritas som förut.
+  const pv =
+    !isRouteMap && opts.view
+      ? mapPrintView({
+          rect,
+          front: opts.view.front,
+          zoom: opts.zoom,
+          viewWidthPx: opts.view.viewWidthPx,
+          pixelRatio: opts.view.pixelRatio,
+        })
+      : null;
+  if (pv && Math.abs(pv.pixelRatio - 1) > 1e-3) {
+    return withDevicePixelRatio(pv.pixelRatio, () => drawMapLayerInner(ctx, rect, opts, pv));
+  }
+  return drawMapLayerInner(ctx, rect, opts, pv);
+}
+
+async function drawMapLayerInner(
+  ctx: CanvasRenderingContext2D,
+  rect: { x: number; y: number; w: number; h: number },
+  opts: Parameters<typeof drawMapLayer>[2],
+  pv: MapPrintView | null,
+): Promise<Array<{ x: number; y: number }>> {
+  const cssW = pv ? pv.cssW : rect.w;
+  const cssH = pv ? pv.cssH : rect.h;
+  const container = createOffscreen(cssW, cssH);
   const mapDiv = document.createElement("div");
-  mapDiv.style.width = `${rect.w}px`;
-  mapDiv.style.height = `${rect.h}px`;
+  mapDiv.style.width = `${cssW}px`;
+  mapDiv.style.height = `${cssH}px`;
   container.appendChild(mapDiv);
 
   let map: mapboxgl.Map | null = null;
@@ -219,7 +250,7 @@ async function drawMapLayer(
               padding: routeFitPaddingPx(opts.route.opts.style, rect.w, rect.h, opts.route.opts.avoidPct),
             },
           }
-        : { center: opts.center, zoom: opts.zoom };
+        : { center: opts.center, zoom: pv ? pv.zoom : opts.zoom };
     map = new mapboxgl.Map({
       container: mapDiv,
       style: styleUrl(opts.styleId),
@@ -229,6 +260,15 @@ async function drawMapLayer(
       preserveDrawingBuffer: true,
       fadeDuration: 0,
     });
+
+    if (pv && (pv.frontCenterOffsetCss.x !== 0 || pv.frontCenterOffsetCss.y !== 0)) {
+      // Utfall bara på ena sidan: kundens mittpunkt ska hamna i lagrets egen
+      // mitt, inte i den förlängda ytans mitt.
+      const p = map.project(opts.center);
+      map.jumpTo({
+        center: map.unproject([p.x - pv.frontCenterOffsetCss.x, p.y - pv.frontCenterOffsetCss.y]),
+      });
+    }
 
     await new Promise<void>((resolve, reject) => {
       const t = window.setTimeout(() => reject(new Error("Map render timeout")), 30000);
@@ -275,6 +315,13 @@ async function drawMapLayer(
     clipForShape(ctx, opts.shape, rect.x, rect.y, rect.w, rect.h);
     ctx.drawImage(mapCanvas, rect.x, rect.y, rect.w, rect.h);
     ctx.restore();
+    // Samma projektion som kartan just ritades med (CSS-px → utdata-px).
+    const sx = rect.w / cssW;
+    const sy = rect.h / cssH;
+    return (opts.points ?? []).map(([lng, lat]) => {
+      const p = map!.project([lng, lat]);
+      return { x: rect.x + p.x * sx, y: rect.y + p.y * sy };
+    });
   } finally {
     try {
       map?.remove();
@@ -295,39 +342,25 @@ function loadSvgAsImage(svg: string): Promise<HTMLImageElement> {
   });
 }
 
-/** Project a geographic point to a pixel inside the given rect using the same
- *  Web Mercator projection Mapbox uses at pitch=0/bearing=0 (always our
- *  case). Mirrors what `map.project` would return in the editor. */
-function projectLngLatToRectPx(
-  lng: number,
-  lat: number,
-  center: [number, number],
-  zoom: number,
-  w: number,
-  h: number,
-): { x: number; y: number } {
-  const scale = 256 * Math.pow(2, zoom);
-  const merc = (lon: number, la: number) => {
-    const x = ((lon + 180) / 360) * scale;
-    const s = Math.sin((la * Math.PI) / 180);
-    const y = (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * scale;
-    return { x, y };
-  };
-  const c = merc(center[0], center[1]);
-  const p = merc(lng, lat);
-  return { x: w / 2 + (p.x - c.x), y: h / 2 + (p.y - c.y) };
-}
-
 /** Draw customer-placed icons on top of a map layer, clipped to its shape. */
 async function drawMapIcons(
   ctx: CanvasRenderingContext2D,
   rect: { x: number; y: number; w: number; h: number },
   shape: string,
   icons: MapIcon[],
-  center: [number, number],
-  zoom: number,
+  /** Utdata-px för ikonerna med lng/lat, i samma ordning (från kartan som ritades). */
+  projected: Array<{ x: number; y: number }>,
 ): Promise<void> {
   if (!icons || icons.length === 0) return;
+  // Koppla varje geo-ikon till sin projicerade punkt (samma ordning som anroparen).
+  const geoPos = new Map<MapIcon, { x: number; y: number }>();
+  let pi = 0;
+  for (const ic of icons) {
+    if (typeof ic.lng === "number" && typeof ic.lat === "number") {
+      const p = projected[pi++];
+      if (p) geoPos.set(ic, p);
+    }
+  }
   // Same proportion as editor preview — 6% of the layer's short side.
   const sizePx = Math.max(8, Math.min(rect.w, rect.h) * 0.06);
   ctx.save();
@@ -340,9 +373,10 @@ async function drawMapIcons(
       let cx: number;
       let cy: number;
       if (typeof ic.lng === "number" && typeof ic.lat === "number") {
-        const p = projectLngLatToRectPx(ic.lng, ic.lat, center, zoom, rect.w, rect.h);
-        cx = rect.x + p.x;
-        cy = rect.y + p.y;
+        const p = geoPos.get(ic);
+        if (!p) continue;
+        cx = p.x;
+        cy = p.y;
       } else if (typeof ic.xPct === "number" && typeof ic.yPct === "number") {
         cx = rect.x + (ic.xPct / 100) * rect.w;
         cy = rect.y + (ic.yPct / 100) * rect.h;
@@ -817,6 +851,9 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
   const w = Math.round(wCm * PX_PER_CM * scale);
   const h = Math.round(hCm * PX_PER_CM * scale);
   const pxPerMm = (PX_PER_CM * scale) / 10;
+  // Kartor ritas med kundvagnsbildens täthet och skalas upp (se map-print-view):
+  // samma område och samma linjeproportioner i kundvagn, mockup och tryck.
+  const mapPxPerCssPx = (PX_PER_CM * scale) / mapReferencePxPerCm(wCm, hCm);
 
   // Front-zone rect (where layer % coords live). Canvas templates with the
   // legacy fullArea coord-space still anchor layers to the FULL surface;
@@ -932,6 +969,8 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
     const bleedEligible =
       layer.type === "map" || layer.type === "image" ||
       layer.type === "photo" || layer.type === "aiPhoto";
+    // Lagrets egen yta före utfallsförlängningen — motsvarar editorns ruta.
+    const frontRect: PxRect = { ...rect };
     if (wrapPxExtra > 0 && bleedEligible) {
       if (eff.xPct <= BLEED_EPS) { rect.x -= wrapPxExtra; rect.w += wrapPxExtra; }
       if (eff.yPct <= BLEED_EPS) { rect.y -= wrapPxExtra; rect.h += wrapPxExtra; }
@@ -975,7 +1014,11 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
               },
             }
           : null;
-      await drawMapLayer(ctx, rect, {
+      const icons = (mv?.icons ?? []) as MapIcon[];
+      const iconPoints = icons
+        .filter((ic) => typeof ic.lng === "number" && typeof ic.lat === "number")
+        .map((ic) => [ic.lng!, ic.lat!] as [number, number]);
+      const projected = await drawMapLayer(ctx, rect, {
         center,
         zoom,
         styleId,
@@ -983,9 +1026,10 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
         shape,
         bounds: routeStyle ? mv?.viewBounds ?? null : null,
         route: routeRender,
+        view: { front: frontRect, viewWidthPx: mv?.viewWidthPx ?? null, pixelRatio: mapPxPerCssPx },
+        points: iconPoints,
       });
-      const icons = (mv?.icons ?? []) as MapIcon[];
-      await drawMapIcons(ctx, rect, shape, icons, center, zoom);
+      await drawMapIcons(ctx, rect, shape, icons, projected);
     } else if (layer.type === "text") {
       const lv = input.layerValues?.[layer.id];
       const tv = lv && lv.kind === "text" ? lv : null;
