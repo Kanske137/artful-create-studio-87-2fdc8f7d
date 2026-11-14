@@ -374,3 +374,31 @@ describe("dold karta och utsnitt", () => {
     expect(usableBounds([[18, 59.2], [18.2, 59.4]])).toEqual([[18, 59.2], [18.2, 59.4]]);
   });
 });
+
+import { routeViewLimits } from "./route-map";
+
+describe("routeViewLimits", () => {
+  const base = { width: 400, height: 600, zoom: 12, marginPx: 10 };
+
+  it("ingen panorering när rutten ryms, och maxzoom där den precis ryms", () => {
+    const r = routeViewLimits({ ...base, box: { x0: 100, y0: 200, x1: 290, y1: 400 } });
+    expect(r.pan).toEqual([0, 0]);
+    // 190 px bred → ryms 380/190 = 2× → en zoomnivå till
+    expect(r.maxZoom).toBeCloseTo(13);
+    expect(r.minZoom).toBeCloseTo(10);
+  });
+
+  it("drar tillbaka rutten när den panorerats ut åt vänster eller nedåt", () => {
+    const r = routeViewLimits({ ...base, box: { x0: -50, y0: 450, x1: 150, y1: 650 } });
+    // vänsterkant -50 → ska till 10: panBy(-60) flyttar innehållet 60 px åt höger
+    expect(r.pan[0]).toBeCloseTo(-60);
+    // underkant 650 → ska till 590: panBy(+60) flyttar innehållet uppåt
+    expect(r.pan[1]).toBeCloseTo(60);
+  });
+
+  it("centrerar en rutt som är för stor för rutan", () => {
+    const r = routeViewLimits({ ...base, box: { x0: -100, y0: 0, x1: 500, y1: 300 } });
+    expect(r.pan[0]).toBeCloseTo(0);
+    expect(r.maxZoom).toBeLessThan(12);
+  });
+});

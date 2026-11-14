@@ -376,3 +376,37 @@ export function usableBounds(b: Bounds | null | undefined): Bounds | null {
   const ok = [w, s, e, n].every(Number.isFinite) && e - w > 1e-6 && n - s > 1e-6;
   return ok ? b : null;
 }
+
+/**
+ * Gränser för kundens zoom/panorering på en ruttkarta: rutten ska alltid
+ * ligga helt inom kartrutan (med en liten marginal).
+ *
+ * `box` är ruttens rektangel i skärm-px vid nuvarande `zoom`. Svaret ger
+ * högsta tillåtna zoom (där rutten precis ryms), lägsta zoom (några steg
+ * utzoomat) och hur mycket kartan ska panoreras (Mapbox `panBy`) för att
+ * dra tillbaka rutten in i rutan. pan = [0, 0] när allt redan ryms.
+ */
+export function routeViewLimits(args: {
+  box: { x0: number; y0: number; x1: number; y1: number };
+  width: number;
+  height: number;
+  zoom: number;
+  marginPx: number;
+}): { maxZoom: number; minZoom: number; pan: [number, number] } {
+  const { box, width: W, height: H, zoom, marginPx: m } = args;
+  const bw = Math.max(1e-6, box.x1 - box.x0);
+  const bh = Math.max(1e-6, box.y1 - box.y0);
+  const fit = Math.min((W - 2 * m) / bw, (H - 2 * m) / bh);
+  const maxZoom = zoom + Math.log2(Math.max(1e-6, fit));
+  const minZoom = Math.max(0, maxZoom - 3);
+
+  // Panorering per axel: ryms rutten → tryck in den kant som sticker ut;
+  // ryms den inte (mitt i en zoom) → centrera.
+  const axis = (lo: number, hi: number, size: number): number => {
+    if (hi - lo > size - 2 * m) return (lo + hi) / 2 - size / 2;
+    if (lo < m) return lo - m; // innehållet ska åt höger/ned → panorera negativt
+    if (hi > size - m) return hi - (size - m);
+    return 0;
+  };
+  return { maxZoom, minZoom, pan: [axis(box.x0, box.x1, W), axis(box.y0, box.y1, H)] };
+}

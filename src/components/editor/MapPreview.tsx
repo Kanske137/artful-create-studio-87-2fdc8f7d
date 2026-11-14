@@ -726,10 +726,7 @@ export function MapPreview({
                     center={effectiveCenter}
                     zoom={effectiveZoom}
                     showLabels={effectiveLabels}
-                    // Ruttkartor (löpartavlor) är låsta: rutten anpassas alltid
-                    // automatiskt efter ytan och kan inte zoomas eller panoreras
-                    // utanför tavlan. Då rullar sidan också normalt över tavlan.
-                    interactive={!l.locks.position && !routeStyle}
+                    interactive={!l.locks.position}
                     clipPath={clip}
                     onMapReady={(m) => {
                       mapInstances.current[l.id] = m;

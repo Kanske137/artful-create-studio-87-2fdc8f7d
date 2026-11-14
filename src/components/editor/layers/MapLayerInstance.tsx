@@ -12,6 +12,7 @@ import {
   isRouteLayerId,
   paddedBounds,
   routeFitPaddingPx,
+  routeViewLimits,
   viewBoundsOf,
   type RouteRenderOptions,
 } from "@/lib/race/route-map";
@@ -32,7 +33,37 @@ export const ROUTE_FIT_FRAC = 0.06;
 function fitToRoute(map: mapboxgl.Map, route: RaceRoute, opts: RouteRenderOptions | null): void {
   const c = map.getContainer();
   const padding = routeFitPaddingPx(opts?.style as RouteStyle | undefined, c.clientWidth, c.clientHeight, opts?.avoidPct);
+  // Släpp förra banans zoomgränser innan vi anpassar till den här.
+  map.setMinZoom(0);
+  map.setMaxZoom(22);
   map.fitBounds(paddedBounds(route.bbox, ROUTE_FIT_FRAC), { padding, duration: 0 });
+  constrainToRoute(map, route);
+}
+
+/**
+ * Kunden får zooma och panorera ruttkartan, men rutten ska alltid ligga helt
+ * inom kartrutan: högsta zoom = där rutten precis ryms, och panorering
+ * stoppas vid kanten.
+ */
+function constrainToRoute(map: mapboxgl.Map, route: RaceRoute): void {
+  const c = map.getContainer();
+  const W = c.clientWidth;
+  const H = c.clientHeight;
+  if (!(W > 0 && H > 0)) return;
+  const [[w, s], [e, n]] = route.bbox;
+  const a = map.project([w, n]);
+  const b = map.project([e, s]);
+  const lim = routeViewLimits({
+    box: { x0: Math.min(a.x, b.x), y0: Math.min(a.y, b.y), x1: Math.max(a.x, b.x), y1: Math.max(a.y, b.y) },
+    width: W,
+    height: H,
+    zoom: map.getZoom(),
+    marginPx: Math.max(4, Math.min(W, H) * 0.02),
+  });
+  if (Math.abs(map.getMaxZoom() - lim.maxZoom) > 0.01) map.setMaxZoom(lim.maxZoom);
+  if (Math.abs(map.getMinZoom() - lim.minZoom) > 0.01) map.setMinZoom(lim.minZoom);
+  const [dx, dy] = lim.pan;
+  if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) map.panBy([dx, dy], { duration: 0, animate: false });
 }
 
 const avoidKeyOf = (o: RouteRenderOptions | null | undefined) =>
@@ -107,6 +138,11 @@ export function MapLayerInstance({
       });
     }
     const avoidKey = avoidKeyOf(r.opts);
+    if (!r.route) {
+      // Ingen bana vald: inga gränser.
+      map.setMinZoom(0);
+      map.setMaxZoom(22);
+    }
     if (r.route && fittedNonceRef.current !== r.fitNonce) {
       // Ny bana: anpassa alltid, och glöm kundens tidigare panorering.
       fittedNonceRef.current = r.fitNonce;
@@ -172,9 +208,23 @@ export function MapLayerInstance({
         // kunden inte själv panorerat följer utsnittet med banan.
         const r = routeRef.current;
         if (r?.route && !userMovedRef.current) fitToRoute(map, r.route, r.opts);
+        else if (r?.route) constrainToRoute(map, r.route);
         // center/zoom visar olika mycket beroende på rutans bredd — spara den
         // så att kundvagnsbild och tryckfil visar exakt samma område.
         useEditorStore.getState().setLayerMapViewWidth(layerId, map.getContainer().clientWidth);
+      });
+
+      // Håll rutten inom bild medan kunden zoomar/panorerar.
+      let constraining = false;
+      map.on("move", () => {
+        const r = routeRef.current;
+        if (constraining || !r?.route || isHidden()) return;
+        constraining = true;
+        try {
+          constrainToRoute(map, r.route);
+        } finally {
+          constraining = false;
+        }
       });
 
       map.on("moveend", (e: { originalEvent?: unknown }) => {
