@@ -56,3 +56,43 @@ export async function grabDocument(opts = {}) {
   const r = extractDocument({ maxPts: 240, ...opts }); const names = r.names; delete r.names;
   return `${r.distKm} km | tracks ${r.tracks} ${JSON.stringify(names).slice(0, 80)}\n${await pack(r)}`;
 }
+
+// ---- Sammansättning (varvbanor, vändpunktsbanor) och spårning längs vägnätet ----
+import { parse, summarize } from "./route-extract.mjs";
+
+/** Hämta GPX/KML (samma ursprung) → segment {coords, ele}. */
+export async function seg(url, pick = null) {
+  const p = parse(await (await fetch(url)).text(), pick);
+  return { coords: p.coords, ele: p.ele };
+}
+export const rev = (s) => ({ coords: [...s.coords].reverse(), ele: [...s.ele].reverse() });
+/** Slå ihop segment i ordning (dubblerad skarvpunkt tas bort). */
+export function join(...segs) {
+  const coords = [], ele = [];
+  for (const s of segs) {
+    s.coords.forEach((c, i) => {
+      const last = coords[coords.length - 1];
+      if (i === 0 && last && Math.abs(last[0] - c[0]) < 1e-6 && Math.abs(last[1] - c[1]) < 1e-6) return;
+      coords.push(c); ele.push(s.ele[i] ?? null);
+    });
+  }
+  return { coords, ele };
+}
+/** Spåra längs vägnätet (BRouter, OSM-data, med höjd). lonlats: [[lng,lat],...] */
+export async function trace(lonlats, profile = "trekking") {
+  const coords = [], ele = [];
+  // BRouter klarar många punkter i ett anrop; dela ändå upp för säkerhets skull.
+  for (let i = 0; i < lonlats.length - 1; i += 20) {
+    const part = lonlats.slice(i, Math.min(i + 21, lonlats.length));
+    const u = `https://brouter.de/brouter?lonlats=${part.map((p) => p.join(",")).join("|")}&profile=${profile}&alternativeidx=0&format=geojson`;
+    const j = await (await fetch(u)).json();
+    const c = j.features[0].geometry.coordinates;
+    c.forEach((p, k) => { if (k === 0 && coords.length) return; coords.push([p[0], p[1]]); ele.push(p[2] ?? null); });
+  }
+  return { coords, ele };
+}
+/** Förenkla + packa ett sammansatt segment. */
+export async function finish(s, opts = {}) {
+  const r = summarize(s.coords, s.ele, opts.maxPts ?? 240);
+  return `${r.distKm} km | ${r.kept} p\n${await pack(r)}`;
+}
