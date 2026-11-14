@@ -1,0 +1,1019 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "slideshow": {
+      "type": "slideshow",
+      "blocks": {
+        "image_f6nHgM": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Namnlos_-_11_november_2026_kl._20.42.45.png",
+            "image_mobile": "shopify://shop_images/file_00000000b39881f4a69116248a31d34a.png",
+            "heading": "Årets julklapp?&nbsp;",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "button_label": "Ge bort konst som betyder något",
+            "button_link": "shopify://collections",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "slide-husdjur": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Namnlos_-_11_november_2026_kl._20.42.45-2_1.png",
+            "image_mobile": "shopify://shop_images/ChatGPT_Image_8_juni_2026_15_12_54.png",
+            "heading": "Kung eller drottning, förvandla nu",
+            "heading_size": "title-md",
+            "heading_tag": "h1",
+            "button_label": "Designa kung/drottningsporträtt",
+            "button_link": "shopify://collections/kung-och-drottningtavlor",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "slide-portratt": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/file_00000000ca2071fdaf83ca1383fc2e4e.png",
+            "image_mobile": "shopify://shop_images/file_00000000ca2071fdaf83ca1383fc2e4e.png",
+            "heading": "Föreviga det första ögonblicket",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "button_label": "Utforska födelsetavla",
+            "button_link": "shopify://collections/fodelse-och-barn",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "slide-karta": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Skandinavisk_hall_med_personliga_tavlor.png",
+            "image_mobile": "shopify://shop_images/Stilren_Stockholmstavla_med_varm_belysning.png",
+            "heading": "Platsen som betyder något",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "button_label": "Designa karttavla",
+            "button_link": "shopify://collections/karttavlor",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "image_f6nHgM",
+        "slide-husdjur",
+        "slide-portratt",
+        "slide-karta"
+      ],
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 7,
+        "show_navigation": true,
+        "image_height": "100vh",
+        "content_width": "small",
+        "image_height_mobile": "auto",
+        "accessibility_info": "Slideshow med Arthenas tre största produktkategorier",
+        "color_text": "#ffffff",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#000000",
+        "overlay_opacity": 25,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": true,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich-text-intro": {
+      "type": "rich-text",
+      "blocks": {
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Hos Arthena är tavlan din egen — husdjuret, platsen, ögonblicket. Vi erbjuder fyra format: poster, canvas, metall och plexiglas/akryl. Tryckt nära dig och levererat inom Sverige på 3–6 arbetsdagar för poster och 4–7 arbetsdagar för övriga format.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text"
+      ],
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "Designa din tavla. <em>Berätta din historia.</em>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "scribble",
+        "highlighted_scribble": "basic-underline",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 80,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "kategori-grid": {
+      "type": "collection-list",
+      "blocks": {
+        "cat-husdjur": {
+          "type": "collection",
+          "settings": {
+            "collection": "superhjaltetavlor",
+            "title": "Superhjältetavlor",
+            "description": "Bli en hjälte från ett foto",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "cat-karta": {
+          "type": "collection",
+          "settings": {
+            "collection": "karttavlor",
+            "title": "Karta & plats",
+            "description": "Karttavlor över hemstaden eller resmålet",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "cat-portratt": {
+          "type": "collection",
+          "settings": {
+            "collection": "jubileumsposters",
+            "title": "Jubileumstavlor",
+            "description": "Föreviga er dag",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "cat-foto": {
+          "type": "collection",
+          "settings": {
+            "collection": "fototavlor",
+            "title": "Foto & minnen",
+            "description": "Eget foto, kollage eller foto till konst",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "cat-presenter": {
+          "type": "collection",
+          "settings": {
+            "collection": "inflyttningspresenter",
+            "title": "Presenter",
+            "description": "Bröllop, inflyttning, jubileum & barn",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        }
+      },
+      "block_order": [
+        "cat-husdjur",
+        "cat-karta",
+        "cat-portratt",
+        "cat-foto",
+        "cat-presenter"
+      ],
+      "settings": {
+        "columns": 5,
+        "carousel_on_desktop": false,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Vad vill du <em>designa</em>?",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "scribble",
+        "highlighted_scribble": "basic-underline",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 80,
+        "padding_bottom": 100,
+        "divider": false,
+        "full_width": false,
+        "rounded": true
+      }
+    },
+    "tre-steg": {
+      "type": "rich-text",
+      "blocks": {
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Hitta motivet — Husdjuret, platsen, ögonblicket eller ansiktet som betyder något.</p><p>Gör det till ditt — Se tavlan ta form i din egen design.</p><p>Hem till väggen — Tryckt nära dig och levererat på 3–7 arbetsdagar inom Sverige, beroende på format.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 28,
+            "text_line_height": 1.8,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text"
+      ],
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "Från idé till <em>vägg</em>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "medium",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "scribble",
+        "highlighted_scribble": "basic-underline",
+        "color_text": "",
+        "color_background": "#faf8f5",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 80,
+        "padding_bottom": 80,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image-comparison": {
+      "type": "image-comparison",
+      "blocks": {
+        "image-1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/ChatGPT_Image_12_juni_2026_15_52_55.png",
+            "image_mobile": "shopify://shop_images/ChatGPT_Image_12_juni_2026_15_52_55.png",
+            "subheading": "Ditt foto",
+            "heading": "Innan",
+            "content_position": "end",
+            "color_text": "#ffffff"
+          }
+        },
+        "image-2": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Screenshot_2026-06-12_at_15-54-18_Foto_till_konst_omvandla_foto_till_konststil_Arthena.png",
+            "image_mobile": "shopify://shop_images/Screenshot_2026-06-12_at_15-54-18_Foto_till_konst_omvandla_foto_till_konststil_Arthena.png",
+            "subheading": "Din egen tavla",
+            "heading": "Efter",
+            "content_position": "end",
+            "color_text": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "image-1",
+        "image-2"
+      ],
+      "settings": {
+        "layout": "horizontal",
+        "image_height": "750px",
+        "image_height_mobile": "350px",
+        "heading": "Från foto till <em>minne</em>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "Börja designa",
+        "button_link": "shopify://products/foto-till-konst",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "text",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "linear-gradient(90deg, rgba(249, 197, 141, 1), rgba(43, 43, 43, 1) 100%)",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 80,
+        "padding_bottom": 80,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "bastsaljare": {
+      "type": "featured-collections",
+      "blocks": {
+        "bs-husdjur": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "husdjursportratt",
+              "hund-som-kung",
+              "katt-som-drottning",
+              "husdjur-i-renassansportratt"
+            ],
+            "title": "Husdjursporträtt"
+          }
+        },
+        "bs-karta": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "karttavla",
+              "brollopskarta",
+              "husposter",
+              "stjarnhimmelsposter"
+            ],
+            "title": "Karta & plats"
+          }
+        },
+        "bs-portratt": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "kungtavla",
+              "drottningtavla",
+              "renassansportratt",
+              "superhjaltetavla"
+            ],
+            "title": "Personliga porträtt"
+          }
+        },
+        "bs-foto": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "personlig-fototavla",
+              "familjefototavla",
+              "fotokollage",
+              "foto-till-konst"
+            ],
+            "title": "Foto & minnen"
+          }
+        }
+      },
+      "block_order": [
+        "bs-husdjur",
+        "bs-karta",
+        "bs-portratt",
+        "bs-foto"
+      ],
+      "settings": {
+        "product_limit": 4,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "<em>Bästsäljare</em>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "scribble",
+        "highlighted_scribble": "basic-underline",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 100,
+        "padding_bottom": 100,
+        "divider": false,
+        "full_width": false,
+        "rounded": true
+      }
+    },
+    "testimonials-banner": {
+      "type": "testimonials-banner",
+      "blocks": {
+        "testimonial-1": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "5-stars",
+            "text": "<p>Jag tryckte en stiliserad poster på mina hundar och är riktigt nöjd över resultatet!</p>",
+            "author": "Adam",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial-2": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "5-stars",
+            "text": "<p>Är nöjd! Denna passar perfekt in i vardagsrummet som minne av vårt bröllop</p>",
+            "author": "Lisa",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial-3": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "5-stars",
+            "text": "<p>Jättenöjd med postern, smart och lättanpassad design jag inte sett förut, skarpa färger och fin kvalitet. Enda minimala minuset är att den doftade lite av trycksvärta vid uppackning, men det försvann snabbt. Rekommenderas!</p>",
+            "author": "Cecilia",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial-1",
+        "testimonial-2",
+        "testimonial-3"
+      ],
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/blank-notebook-and-writing-flatlay.jpg",
+        "image_height": "650px",
+        "content_position": "md:items-center md:justify-center",
+        "image_height_mobile": "500px",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#000000",
+        "overlay_opacity": 45,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": true,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "presenttillfallen": {
+      "type": "collection-list",
+      "blocks": {
+        "p-brollop": {
+          "type": "collection",
+          "settings": {
+            "collection": "brollopstavlor",
+            "title": "Bröllopspresent",
+            "description": "Personlig tavla över dagen",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 35
+          }
+        },
+        "p-inflyttning": {
+          "type": "collection",
+          "settings": {
+            "collection": "inflyttningspresenter",
+            "title": "Inflyttning",
+            "description": "Husportraitt eller karttavla",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 35
+          }
+        },
+        "p-fodelse": {
+          "type": "collection",
+          "settings": {
+            "collection": "fodelse-och-barn",
+            "title": "Födelse & barn",
+            "description": "Födelsetavlor och hjältar",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 35
+          }
+        },
+        "p-jubileum": {
+          "type": "collection",
+          "settings": {
+            "collection": "jubileumsposters",
+            "title": "Jubileum",
+            "description": "Milstolpar och årsdagar",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 35
+          }
+        }
+      },
+      "block_order": [
+        "p-brollop",
+        "p-inflyttning",
+        "p-fodelse",
+        "p-jubileum"
+      ],
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": false,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "Personliga <em>presenter</em>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Personliga tavlor som visar att du tänkt till. <a href=\"/pages/presenter\">Utforska alla presentkategorier →</a></p>",
+        "highlighted_text": "scribble",
+        "highlighted_scribble": "basic-underline",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 100,
+        "padding_bottom": 100,
+        "divider": false,
+        "full_width": false,
+        "rounded": true
+      }
+    },
+    "faq-accordion": {
+      "type": "faq",
+      "blocks": {
+        "faq-1": {
+          "type": "question",
+          "settings": {
+            "title": "Hur lång är leveranstiden?",
+            "text": "<p>Till adresser i Sverige tar en poster normalt 3–6 arbetsdagar från beställning till brevlådan, och canvas, metall och plexiglas/akryl 4–7 arbetsdagar. Till övriga EU räknar vi med 4–7 arbetsdagar för poster och 5–8 arbetsdagar för övriga material. Du får alltid en spårningslänk när tavlan skickas.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "faq-2": {
+          "type": "question",
+          "settings": {
+            "title": "Kan jag se hur min tavla blir innan jag beställer?",
+            "text": "<p>Ja, alltid. Du ser en realtidsförhandsgranskning av exakt det utsnitt, färgtema och den text du har valt — i sin riktiga proportion innan du lägger till tavlan i varukorgen.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "faq-3": {
+          "type": "question",
+          "settings": {
+            "title": "Vilka husdjur kan jag göra porträtt av?",
+            "text": "<p>I princip alla husdjur — hund, katt, kanin, marsvin, häst, papegoja och fågel, råtta, ödla eller orm. Även mer ovanliga djur som igelkott eller mård fungerar så länge fotot är tydligt. Har du ett djur du är osäker på, ladda upp en bild och se hur förhandsgranskningen blir.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "faq-4": {
+          "type": "question",
+          "settings": {
+            "title": "Kan jag beställa porträtt av ett husdjur som gått bort?",
+            "text": "<p>Absolut — många beställer just som ett minnesporträtt. Du kan använda ett befintligt foto, även äldre bilder. Lägg gärna till djurets namn och årtal som text för att hedra minnet. Det blir en personlig tröst som påminner om alla fina år tillsammans.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "faq-5": {
+          "type": "question",
+          "settings": {
+            "title": "Vilken bildupplösning behöver jag?",
+            "text": "<p>För bästa resultat rekommenderar vi minst 2000×3000 pixlar för storlekar upp till 50×70 cm. För större format (70×100 cm och uppåt) bör bilden vara minst 3000×4500 pixlar. Mobilbilder från de senaste åren håller oftast tillräcklig kvalitet. Du får en varning om bilden är för låg upplösning för vald storlek.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "faq-6": {
+          "type": "question",
+          "settings": {
+            "title": "Funkar det som överraskningspresent?",
+            "text": "<p>Perfekt för det. Du kan smyga ett porträttfoto från sociala medier eller en gammal bild — fotot behöver inte vara taget för tavlan. Leveranstiden inom Sverige är 3–6 arbetsdagar för poster och 4–7 arbetsdagar för canvas, metall och plexiglas/akryl, så beställ gärna en dryg vecka innan tillfället.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "faq-7": {
+          "type": "question",
+          "settings": {
+            "title": "Kan jag ge bort en husposter innan inflyttningen?",
+            "text": "<p>Ja — en husposter är en av våra mest uppskattade inflyttningspresenter. Du kan beställa baserat på en mäklarbild eller egen bild som tagits vid visningen. Lägg gärna till inflyttningsdatumet och familjenamnet på tavlan så blir den ännu mer personlig.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "faq-8": {
+          "type": "question",
+          "settings": {
+            "title": "Vad gäller om tavlan skadas under transporten?",
+            "text": "<p>Vi packar varje tavla i hållbart skyddsmaterial och har låg skaderisk i transit. Skulle ändå något hända — om paketet skadats eller produkten inte motsvarar det du beställt — kontakta oss inom 14 dagar med en bild så hittar vi en lösning.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "faq-1",
+        "faq-2",
+        "faq-3",
+        "faq-4",
+        "faq-5",
+        "faq-6",
+        "faq-7",
+        "faq-8"
+      ],
+      "settings": {
+        "style": "with-background",
+        "heading": "Vanliga <em>frågor</em>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "scribble",
+        "highlighted_scribble": "basic-underline",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 80,
+        "padding_bottom": 80,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "final-cta": {
+      "type": "rich-text",
+      "blocks": {
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Personliga konsttavlor som poster, canvas, metall eller plexiglas/akryl. Tryckt nära dig och levererat på 3–7 arbetsdagar inom Sverige, beroende på format.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 28,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "Börja designa <em>nu</em>",
+        "heading_size": "title-lg",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "medium",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "Utforska alla personliga tavlor",
+        "button_link": "shopify://collections/husdjursportratt",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "scribble",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#faf8f5",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 100,
+        "padding_bottom": 100,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "blog-posts-collage": {
+      "type": "blog-posts-collage",
+      "settings": {
+        "blog": "news",
+        "post_limit": 4,
+        "show_view_all": true,
+        "image_ratio": "square",
+        "show_tags": true,
+        "show_date": true,
+        "show_comments": false,
+        "show_author": false,
+        "show_excerpt": false,
+        "heading": "Senaste <em>stories</em>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "scribble",
+        "highlighted_scribble": "basic-underline",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 100,
+        "padding_bottom": 100,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "seo-content-footer": {
+      "type": "rich-text",
+      "blocks": {
+        "heading-h2": {
+          "type": "heading",
+          "settings": {
+            "heading": "Personliga konsttavlor från Arthena",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text-intro": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Arthena är en svensk e-handel för personliga konsttavlor. Vi gör tavlor som inte finns någon annanstans — husdjuret, platsen, ögonblicket eller personen som betyder något för dig.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "heading-vad": {
+          "type": "heading",
+          "settings": {
+            "heading": "Vad är en personlig tavla?",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text-vad": {
+          "type": "text",
+          "settings": {
+            "text": "<p>En personlig tavla är en konsttavla med ditt eget innehåll — ett foto, en plats, ett namn, ett datum eller en stilisering av någon eller något du tycker om. Till skillnad från färdiga posters där alla får samma motiv, blir varje personlig tavla unik. Hos Arthena finns bredden av personliga motiv — husdjursporträtt med AI-stilisering, karttavla över en betydelsefull plats, fotokollage av familjebilder, personligt porträtt i kunglig eller renässansstil, stjärnhimmel över ett ögonblick, husposter över hemmet, bröllopstavla, jubileumsposter och mer.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "heading-material": {
+          "type": "heading",
+          "settings": {
+            "heading": "Fyra format för olika hem",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text-material": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Du väljer mellan fyra format: poster (matt papper med rik färgåtergivning, perfekt att rama in), canvas (bomullsduk spänd på träram, hängklar utan ram), metall (borstad aluminium med premium-känsla och flytande effekt mot väggen) och plexiglas/akryl (glansigt djup och färgmättnad för en modern look). Storlekarna går från 13×18 cm (passar små väggytor och som del av tavelvägg) till 70×100 cm (statement-format för matsal eller över soffan). De vanligaste storlekarna är 30×40 cm och 50×70 cm.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "heading-present": {
+          "type": "heading",
+          "settings": {
+            "heading": "Personliga presentidéer",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text-present": {
+          "type": "text",
+          "settings": {
+            "text": "<p>En personlig tavla är en av de mest uppskattade presenterna eftersom mottagaren känner att gåvan är skapad just för dem. Till bröllop är karttavlan över bröllopslokalen eller stjärnhimmel över bröllopskvällen klassiska val. Till inflyttning är husposter eller karttavla över den nya stadsdelen ett naturligt val. Vid födelse är personlig fototavla, en hjältetavla där barnet får bli superhjälte eller prinsessa, eller stjärnhimmel över födelseögonblicket vanliga val. Vid jubileum och bröllopsdagar väljer många jubileumsposter med årtal eller en tavla som speglar parets gemensamma resa. Och för djurälskaren — ett husdjursporträtt i kunglig eller renässansstil, eller ett minnesporträtt av ett husdjur som gått bort, ger en oerhört personlig och hållbar present.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "heading-varfor": {
+          "type": "heading",
+          "settings": {
+            "heading": "Tryckt nära dig",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text-varfor": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Beställningar inom Sverige trycks oftast i Sverige. Och när vi inte gör det, trycker vi hos vår närmaste produktionspartner i Europa. Det håller leveranstiderna snabba, transportvägarna korta och kvaliteten på nivå som vi står för. Vi använder FSC-certifierat papper och vatten-baserade trycksvärtor där det är möjligt.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading-h2",
+        "text-intro",
+        "heading-vad",
+        "text-vad",
+        "heading-material",
+        "text-material",
+        "heading-present",
+        "text-present",
+        "heading-varfor",
+        "text-varfor"
+      ],
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-start",
+        "heading_width": "large",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#3a3a3a",
+        "color_background": "#faf8f5",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "divider": true,
+        "narrow": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "slideshow",
+    "rich-text-intro",
+    "kategori-grid",
+    "tre-steg",
+    "image-comparison",
+    "bastsaljare",
+    "testimonials-banner",
+    "presenttillfallen",
+    "faq-accordion",
+    "final-cta",
+    "blog-posts-collage",
+    "seo-content-footer"
+  ]
+}
