@@ -356,3 +356,21 @@ describe("viewBoundsOf", () => {
     ]);
   });
 });
+
+import { usableBounds } from "./route-map";
+
+describe("dold karta och utsnitt", () => {
+  it("viewBoundsOf ger null för en dold (0×0) karta", () => {
+    const map = {
+      getContainer: () => ({ clientWidth: 0, clientHeight: 0 }) as HTMLElement,
+      unproject: () => ({ lng: 18, lat: 59 }),
+    };
+    expect(viewBoundsOf(map as unknown as Parameters<typeof viewBoundsOf>[0])).toBeNull();
+  });
+
+  it("usableBounds avvisar ett utsnitt som är en punkt", () => {
+    expect(usableBounds([[18.02, 59.34], [18.02, 59.34]])).toBeNull();
+    expect(usableBounds(null)).toBeNull();
+    expect(usableBounds([[18, 59.2], [18.2, 59.4]])).toEqual([[18, 59.2], [18.2, 59.4]]);
+  });
+});

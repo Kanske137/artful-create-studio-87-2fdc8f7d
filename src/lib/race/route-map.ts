@@ -271,10 +271,12 @@ function applyRouteUnsafe(
  */
 export function viewBoundsOf(
   map: Pick<mapboxgl.Map, "getContainer" | "unproject">,
-): Bounds {
+): Bounds | null {
   const c = map.getContainer();
   const w = c.clientWidth;
   const h = c.clientHeight;
+  // Dold karta (0×0 px): inget utsnitt att spara.
+  if (!(w > 0 && h > 0)) return null;
   const sw = map.unproject([0, h]);
   const ne = map.unproject([w, 0]);
   return [
@@ -365,4 +367,12 @@ export function routeFitPaddingPx(
  */
 export function routeMapStyleId(): string {
   return BLANK_MAP_STYLE_ID;
+}
+
+/** Ett sparat utsnitt duger bara om det har yta (inte en punkt eller linje). */
+export function usableBounds(b: Bounds | null | undefined): Bounds | null {
+  if (!b) return null;
+  const [[w, s], [e, n]] = b;
+  const ok = [w, s, e, n].every(Number.isFinite) && e - w > 1e-6 && n - s > 1e-6;
+  return ok ? b : null;
 }

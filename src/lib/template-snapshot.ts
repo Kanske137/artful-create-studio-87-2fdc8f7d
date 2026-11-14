@@ -35,7 +35,7 @@ import { renderStarmap } from "./starmap-render";
 import { applyFlowLayout } from "./flow-layout";
 import { wrapPieceLines } from "./text-wrap";
 import { mapPrintView, mapReferencePxPerCm, withDevicePixelRatio, type MapPrintView, type PxRect } from "./map-print-view";
-import { applyRouteToMap, isRouteLayerId, overlayAvoidPct, paddedBounds, routeFitPaddingPx, type RouteRenderOptions, routeMapStyleId } from "./race/route-map";
+import { applyRouteToMap, isRouteLayerId, overlayAvoidPct, paddedBounds, routeFitPaddingPx, type RouteRenderOptions, routeMapStyleId, usableBounds } from "./race/route-map";
 import { elevationSeries } from "./race/geo";
 import { raceFieldText, raceStatItems } from "./race/derive";
 import { drawElevationProfile } from "./race/render-elevation";
@@ -1025,7 +1025,7 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
         styleId,
         showLabels,
         shape,
-        bounds: routeStyle ? mv?.viewBounds ?? null : null,
+        bounds: routeStyle ? usableBounds(mv?.viewBounds) : null,
         route: routeRender,
         view: { front: frontRect, viewWidthPx: mv?.viewWidthPx ?? null, referencePxPerCssPx: mapPxPerCssPx },
         points: iconPoints,

@@ -145,7 +145,9 @@ export function MapLayerInstance({
 
       map.on("load", () => {
         map.resize();
-        useEditorStore.getState().setLayerMapViewWidth(layerId, map.getContainer().clientWidth);
+        if (!isHidden()) {
+          useEditorStore.getState().setLayerMapViewWidth(layerId, map.getContainer().clientWidth);
+        }
         applyLabelVisibility(map, showLabels);
         syncRoute(map);
       });
@@ -155,7 +157,17 @@ export function MapLayerInstance({
         const r = routeRef.current;
         if (r) applyRouteToMap(map, r.route, r.opts);
       });
+      // Editorn kan ha en dold kopia av förhandsvisningen (0×0 px, t.ex.
+      // mobil-/desktoplayouten som inte syns). Den får aldrig skriva till
+      // butiken: dess utsnitt är en punkt och skrev över det synliga, så att
+      // löpartavlans tryckfil blev utan rutt.
+      const isHidden = () => {
+        const c = map.getContainer();
+        return c.clientWidth <= 0 || c.clientHeight <= 0;
+      };
+
       map.on("resize", () => {
+        if (isHidden()) return;
         // Kartan ändrar storlek när fält slås av/på (flödeslayout). Har
         // kunden inte själv panorerat följer utsnittet med banan.
         const r = routeRef.current;
@@ -166,10 +178,15 @@ export function MapLayerInstance({
       });
 
       map.on("moveend", (e: { originalEvent?: unknown }) => {
+        if (isHidden()) {
+          programmaticRef.current = false;
+          return;
+        }
         useEditorStore.getState().setLayerMapViewWidth(layerId, map.getContainer().clientWidth);
         if (routeRef.current) {
           // Tryckfilen återskapar exakt detta utsnitt.
-          useEditorStore.getState().setLayerMapViewBounds(layerId, viewBoundsOf(map));
+          const vb = viewBoundsOf(map);
+          if (vb) useEditorStore.getState().setLayerMapViewBounds(layerId, vb);
           if (e?.originalEvent) userMovedRef.current = true;
         }
         if (programmaticRef.current) {
