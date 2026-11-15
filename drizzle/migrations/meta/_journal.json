@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794753121120,
+      "tag": "0000_admin_write_product_configs_and_sync_state",
+      "breakpoints": true
+    }
+  ]
+}
