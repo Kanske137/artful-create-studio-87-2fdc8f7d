@@ -5,7 +5,7 @@ import { Check, Loader2, Palette, ShoppingCart, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useResultActionsStore } from "@/stores/resultActionsStore";
 import { useShopContextStore } from "@/stores/shopContextStore";
-import { formatPrice, formatMoney } from "@/lib/format-price";
+import { formatPrice, formatMoney, hasKnownRate } from "@/lib/format-price";
 import { useShopifyPriceMap, priceFromMap } from "@/hooks/useShopifyPriceMap";
 import { translateVariantName } from "@/lib/variant-labels";
 import { useEditorStore } from "@/stores/editorStore";
@@ -115,11 +115,15 @@ export default function EditorPage() {
   const { activeHintSection } = useOnboarding();
   const showCartHint = activeHintSection === null;
   const livePrice = priceFromMap(shopifyPriceMap, size, variant);
+  // Utan Shopify-pris och utan känd växelkurs (DKK/EUR-marknader) visas
+  // inget belopp än — hellre "…" en sekund än ett SEK-belopp med fel valuta.
   const displayPrice = livePrice
     ? formatMoney(livePrice.amount, livePrice.currencyCode, shopCtx.locale)
     : derivedFx
       ? formatMoney(currentPrice() * derivedFx.rate, derivedFx.currencyCode, shopCtx.locale)
-      : formatPrice(currentPrice(), shopCtx);
+      : hasKnownRate(shopCtx)
+        ? formatPrice(currentPrice(), shopCtx)
+        : "…";
   // Rea-läge: Shopifys compareAtPrice (jämförpris) > pris → visa överstruket
   // ordinarie pris + REA-badge i CTA:n. Styrs helt från Shopify — ta bort
   // jämförpriserna där så försvinner rean här automatiskt.
@@ -587,9 +591,12 @@ export default function EditorPage() {
   // Fri frakt-tröskeln kommer från fraktpolicyn (SEK) och formateras i kundens
   // valuta med samma Shopify-rate som alla andra priser i editorn (formatPrice),
   // så beloppet är konsekvent med det kunden ser i övrigt. null (DK/FI) → dölj raden.
+  // Visas bara när beloppet går att räkna om korrekt. Marknader med egen
+  // valuta (Danmark, Finland) saknar växelkurs i editorn, och kassan räknar om
+  // 599 kr med Shopifys dagskurs — då visar vi hellre ingen gräns än fel belopp.
   const freeShipThreshold = freeShippingThresholdSek(shopCtx.country);
   const freeShipDisplay =
-    freeShipThreshold != null ? formatPrice(freeShipThreshold, shopCtx) : undefined;
+    freeShipThreshold != null && hasKnownRate(shopCtx) ? formatPrice(freeShipThreshold, shopCtx) : undefined;
   // Vald drinks/generering-resultat: visa 👍/👎-feedback PROMINENT precis under
   // förhandsvisningen (i CTA-blocket, alltid synligt — ej gömt i mobil-drawern),
   // så vi faktiskt fångar om kunden gillar resultatet (Akram: gömd tidigare).

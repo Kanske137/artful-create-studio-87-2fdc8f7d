@@ -8,6 +8,18 @@ import type { ShopContext } from "@/stores/shopContextStore";
 const ZERO_DECIMAL_CURRENCIES = new Set(["SEK", "NOK", "DKK", "ISK", "JPY", "HUF"]);
 
 /**
+ * True när editorn kan räkna om ett SEK-belopp till kundens valuta.
+ * Marknader med egen basvaluta (Danmark i DKK, Finland i EUR, med fasta
+ * prislistor) får `cart.currency.rate` = 1 från temat, alltså ingen riktig
+ * växelkurs. Där visar vi bara belopp som kommer direkt från Shopify.
+ */
+export function hasKnownRate(ctx: Pick<ShopContext, "currency" | "rate">): boolean {
+  const currency = ctx.currency || "SEK";
+  if (currency === "SEK") return true;
+  return typeof ctx.rate === "number" && ctx.rate > 0 && ctx.rate !== 1;
+}
+
+/**
  * Format a SEK amount into the customer's currency + locale.
  * Mirrors Shopify's own conversion: amount * rate, rounded to currency norms.
  */
