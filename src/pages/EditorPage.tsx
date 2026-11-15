@@ -585,8 +585,10 @@ export default function EditorPage() {
 
   // Fri frakt-tröskeln kommer från fraktpolicyn (SEK) och formateras i kundens
   // valuta med samma Shopify-rate som alla andra priser i editorn (formatPrice),
-  // så beloppet är konsekvent med det kunden ser i övrigt.
-  const freeShipDisplay = formatPrice(freeShippingThresholdSek(shopCtx.country), shopCtx);
+  // så beloppet är konsekvent med det kunden ser i övrigt. null (DK/FI) → dölj raden.
+  const freeShipThreshold = freeShippingThresholdSek(shopCtx.country);
+  const freeShipDisplay =
+    freeShipThreshold != null ? formatPrice(freeShipThreshold, shopCtx) : undefined;
   // Vald drinks/generering-resultat: visa 👍/👎-feedback PROMINENT precis under
   // förhandsvisningen (i CTA-blocket, alltid synligt — ej gömt i mobil-drawern),
   // så vi faktiskt fångar om kunden gillar resultatet (Akram: gömd tidigare).

@@ -1,7 +1,7 @@
 {
   "sale": {
     "badge": "UDSALG -25%",
-    "campaign": "🔥 Tidsbegrænset udsalg — 25 % på plakater & canvas"
+    "campaign": "🔥 Tidsbegrænset udsalg — 25 % på plakater & lærred"
   },
   "editor": {
     "uploadFirstCta": "Upload dit foto",
@@ -50,7 +50,9 @@
     "style": "Stil",
     "layers": "Lag",
     "starmap": "Stjernehimmel",
-    "variant": "Motiv"
+    "variant": "Motiv",
+    "race": "Løb",
+    "raceDetails": "Dine oplysninger"
   },
   "format": {
     "backgroundColor": "Baggrundsfarve",
@@ -69,8 +71,8 @@
   "productKind": {
     "poster": "Plakat",
     "canvas": "Lærred",
-    "aluminum": "Metalplakat",
-    "acrylic": "Plexiglas"
+    "aluminum": "Metal",
+    "acrylic": "Akryl"
   },
   "frame": {
     "none": "Ingen",
@@ -199,6 +201,11 @@
     "rateLimited": "Du har nået dagens grænse for AI-genereringer. Prøv igen i morgen.",
     "successToast": "Færdig! Fortsæt med at skabe."
   },
+  "result": {
+    "done": "Færdig! Sådan bliver dit billede.",
+    "changePhoto": "Skift foto",
+    "changeStyle": "Skift stil"
+  },
   "feedback": {
     "question": "Blev resultatet godt?",
     "up": "Tommel op",
@@ -248,7 +255,8 @@
     "variantUnavailable": "Denne kombination er endnu ikke tilgængelig i butikken",
     "variantUnavailableHint": "{{size}} · {{variant}} blev ikke fundet for {{handle}}.",
     "freeformEmpty": "Tilføj noget til dit design først",
-    "freeformEmptyHint": "Tilføj mindst ét billede, kort eller tekst, før du går til kassen."
+    "freeformEmptyHint": "Tilføj mindst ét billede, kort eller tekst, før du går til kassen.",
+    "blockedRace": "Vælg et løb, eller upload din GPX-fil, før du bestiller"
   },
   "scene": {
     "livingroom": "Stue",
@@ -333,6 +341,9 @@
     "maxReached": "Maks antal lag nået",
     "moveUp": "Flyt op",
     "moveDown": "Flyt ned",
+    "dragHandle": "Træk for at omarrangere",
+    "toggleVisible": "Vis lag",
+    "toggleHidden": "Skjul lag",
     "delete": "Slet lag",
     "deleteDisabledTpl": "Skabelonens lag kan ikke slettes",
     "addPhoto": "Billede",
@@ -342,9 +353,6 @@
     "addShape": "Form",
     "addLine": "Linje",
     "addMargin": "Margen",
-    "dragHandle": "Træk for at omarrangere",
-    "toggleVisible": "Vis lag",
-    "toggleHidden": "Skjul lag",
     "onboarding": {
       "title": "Sådan fungerer Lav selv",
       "body": "Tilføj billeder, kort, tekst og dekoration. Træk for at ændre rækkefølge, tryk på øjet for at skjule, og papirkurven for at fjerne.",
@@ -394,7 +402,9 @@
     "format": "Vælg størrelse og evt. ramme.",
     "lager": "Tilføj billeder, tekst eller former.",
     "startHere": "Start her",
-    "continueHere": "Fortsæt her"
+    "continueHere": "Fortsæt her",
+    "lopp": "Vælg dit løb på listen – eller upload din GPX-fil.",
+    "loppinfo": "Skriv dit navn og din tid, og vælg, hvad der skal vises på plakaten."
   },
   "starmap": {
     "date": "Dato",
@@ -403,9 +413,58 @@
     "grid": "Gradnet",
     "tip": "Himlen beregnes astronomisk for den valgte dato, klokkeslæt og sted."
   },
-  "result": {
-    "done": "Færdig! Sådan bliver dit billede.",
-    "changePhoto": "Skift foto",
-    "changeStyle": "Skift stil"
+  "race": {
+    "pickTitle": "Vælg dit løb",
+    "pickHint": "Ruten tegnes op på kortet med det samme.",
+    "search": "Søg efter løb eller by",
+    "noRaces": "Der er endnu ingen løb på listen – upload din GPX-fil nedenfor, så tegnes din rute op med det samme.",
+    "noMatch": "Intet løb matcher søgningen.",
+    "prevPage": "Forrige",
+    "nextPage": "Næste",
+    "pageRange": "{{from}}–{{to}} af {{total}}",
+    "loading": "Henter ruten …",
+    "loadFailed": "Ruten kunne ikke hentes. Prøv igen.",
+    "gpxTitle": "Løb du et andet løb?",
+    "gpxHint": "Upload filen fra din aktivitet, så tegnes din egen rute op med tid og kilometertider. Virker med GPX, TCX og FIT fra f.eks. Strava, Garmin Connect, Polar, Suunto og Apple Watch-apps. Filen bliver i din browser.",
+    "gpxButton": "Upload aktivitetsfil",
+    "gpxReplace": "Skift fil",
+    "gpxActive": "Din rute: {{distance}}",
+    "fieldsTitle": "Tekst på plakaten",
+    "title": "Løbets navn",
+    "titlePlaceholder": "f.eks. Copenhagen Marathon",
+    "city": "By",
+    "runnerName": "Dit navn",
+    "date": "Dato",
+    "finishTime": "Sluttid",
+    "finishTimePlaceholder": "f.eks. 3:45:12",
+    "finishTimeInvalid": "Skriv tiden som t:mm:ss, f.eks. 3:45:12",
+    "bib": "Startnummer",
+    "placement": "Placering",
+    "customLine": "Egen linje",
+    "customLinePlaceholder": "f.eks. Mit første maraton",
+    "showTitle": "Vis på plakaten",
+    "show": {
+      "photo": "Foto",
+      "elevation": "Højdeprofil",
+      "stats": "Statistiklinje",
+      "subtitle": "By og dato",
+      "runnerName": "Navn",
+      "date": "Dato",
+      "customLine": "Egen linje",
+      "distance": "Distance",
+      "time": "Sluttid",
+      "pace": "Tempo (beregnes automatisk)",
+      "bib": "Startnummer",
+      "placement": "Placering",
+      "startFinish": "Start og mål",
+      "kmMarkers": "Km-markeringer",
+      "splits": "Kilometertider"
+    },
+    "look": "Udseende",
+    "routeColor": "Rutens farve",
+    "background": "Baggrund",
+    "distanceField": "Distance (km)",
+    "paceField": "Tempo (min/km)",
+    "pacePlaceholder": "Beregnes"
   }
 }

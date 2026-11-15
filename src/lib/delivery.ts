@@ -32,8 +32,14 @@ export function deliveryEstimate(
   return se ? { minDays: 4, maxDays: 7 } : { minDays: 5, maxDays: 8 };
 }
 
-/** Gräns för fri frakt i SEK per marknad (policyns värden). */
-export function freeShippingThresholdSek(country: string | null | undefined): number {
+/** Marknader där vi inte visar någon fri-frakt-gräns (fraktvillkor ej fastställda
+ *  för de nya DK/FI-marknaderna – Drift är sanningskälla). */
+const NO_FREE_SHIPPING_CLAIM = new Set(["DK", "FI"]);
+
+/** Gräns för fri frakt i SEK per marknad (policyns värden), eller null när
+ *  ingen gräns ska visas för marknaden. */
+export function freeShippingThresholdSek(country: string | null | undefined): number | null {
+  if (NO_FREE_SHIPPING_CLAIM.has((country ?? "").toUpperCase())) return null;
   return isSweden(country) ? 499 : 599;
 }
 

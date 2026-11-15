@@ -1,7 +1,7 @@
 {
   "sale": {
     "badge": "ALE -25%",
-    "campaign": "🔥 Rajoitetun ajan alennus — 25 % julisteista & kankaista"
+    "campaign": "🔥 Rajoitetun ajan alennus — 25 % julisteista & kangastauluista"
   },
   "editor": {
     "uploadFirstCta": "Lataa kuvasi",
@@ -50,7 +50,9 @@
     "style": "Tyyli",
     "layers": "Tasot",
     "starmap": "Tähtitaivas",
-    "variant": "Aihe"
+    "variant": "Aihe",
+    "race": "Juoksutapahtuma",
+    "raceDetails": "Tietosi"
   },
   "format": {
     "backgroundColor": "Taustaväri",
@@ -68,9 +70,9 @@
   },
   "productKind": {
     "poster": "Juliste",
-    "canvas": "Kangas",
-    "aluminum": "Metallijuliste",
-    "acrylic": "Pleksilasi"
+    "canvas": "Kangastaulu",
+    "aluminum": "Metallitaulu",
+    "acrylic": "Akryylitaulu"
   },
   "frame": {
     "none": "Ei mitään",
@@ -199,6 +201,11 @@
     "rateLimited": "Olet saavuttanut päivän tekoälygenerointien rajan. Yritä uudelleen huomenna.",
     "successToast": "Valmis! Jatka luomista."
   },
+  "result": {
+    "done": "Valmis! Tältä kuvasi näyttää.",
+    "changePhoto": "Vaihda kuva",
+    "changeStyle": "Vaihda tyyli"
+  },
   "feedback": {
     "question": "Oliko tulos hyvä?",
     "up": "Peukku ylös",
@@ -248,7 +255,8 @@
     "variantUnavailable": "Tämä yhdistelmä ei ole vielä saatavilla kaupassa",
     "variantUnavailableHint": "{{size}} · {{variant}} ei löytynyt tuotteelle {{handle}}.",
     "freeformEmpty": "Lisää ensin jotain suunnitelmaasi",
-    "freeformEmptyHint": "Lisää vähintään yksi kuva, kartta tai teksti ennen kassalle siirtymistä."
+    "freeformEmptyHint": "Lisää vähintään yksi kuva, kartta tai teksti ennen kassalle siirtymistä.",
+    "blockedRace": "Valitse juoksutapahtuma tai lataa GPX-tiedostosi ennen tilaamista"
   },
   "scene": {
     "livingroom": "Olohuone",
@@ -333,6 +341,9 @@
     "maxReached": "Tasojen enimmäismäärä saavutettu",
     "moveUp": "Siirrä ylös",
     "moveDown": "Siirrä alas",
+    "dragHandle": "Vedä järjestääksesi",
+    "toggleVisible": "Näytä taso",
+    "toggleHidden": "Piilota taso",
     "delete": "Poista taso",
     "deleteDisabledTpl": "Mallin tasoja ei voi poistaa",
     "addPhoto": "Kuva",
@@ -342,9 +353,6 @@
     "addShape": "Muoto",
     "addLine": "Viiva",
     "addMargin": "Marginaali",
-    "dragHandle": "Vedä järjestääksesi",
-    "toggleVisible": "Näytä taso",
-    "toggleHidden": "Piilota taso",
     "onboarding": {
       "title": "Näin Tee itse toimii",
       "body": "Lisää kuvia, kartta, tekstiä ja koristeita. Vedä järjestääksesi, napauta silmää piilottaaksesi ja roskakoria poistaaksesi.",
@@ -394,7 +402,9 @@
     "format": "Valitse koko ja kehys.",
     "lager": "Lisää kuvia, tekstiä tai muotoja.",
     "startHere": "Aloita tästä",
-    "continueHere": "Jatka tästä"
+    "continueHere": "Jatka tästä",
+    "lopp": "Valitse juoksutapahtumasi listalta – tai lataa GPX-tiedostosi.",
+    "loppinfo": "Kirjoita nimesi ja aikasi ja valitse, mitä tauluun tulee näkyviin."
   },
   "starmap": {
     "date": "Päivämäärä",
@@ -403,9 +413,58 @@
     "grid": "Koordinaatisto",
     "tip": "Taivas lasketaan tähtitieteellisesti valitulle päivälle, ajalle ja paikalle."
   },
-  "result": {
-    "done": "Valmis! Tältä kuvasi näyttää.",
-    "changePhoto": "Vaihda kuva",
-    "changeStyle": "Vaihda tyyli"
+  "race": {
+    "pickTitle": "Valitse juoksutapahtumasi",
+    "pickHint": "Reitti piirretään kartalle heti.",
+    "search": "Hae tapahtumaa tai kaupunkia",
+    "noRaces": "Listalla ei ole vielä tapahtumia – lataa GPX-tiedostosi alla, niin reittisi piirretään heti.",
+    "noMatch": "Mikään tapahtuma ei vastaa hakua.",
+    "prevPage": "Edellinen",
+    "nextPage": "Seuraava",
+    "pageRange": "{{from}}–{{to}} / {{total}}",
+    "loading": "Haetaan reittiä …",
+    "loadFailed": "Reittiä ei voitu hakea. Yritä uudelleen.",
+    "gpxTitle": "Juoksitko jonkin muun tapahtuman?",
+    "gpxHint": "Lataa aktiviteettisi tiedosto, niin oma reittisi piirretään aikoineen ja kilometriaikoineen. Toimii GPX-, TCX- ja FIT-tiedostoilla esim. Stravasta, Garmin Connectista, Polarista, Suuntosta ja Apple Watch -sovelluksista. Tiedosto pysyy selaimessasi.",
+    "gpxButton": "Lataa aktiviteettitiedosto",
+    "gpxReplace": "Vaihda tiedosto",
+    "gpxActive": "Reittisi: {{distance}}",
+    "fieldsTitle": "Taulun tekstit",
+    "title": "Tapahtuman nimi",
+    "titlePlaceholder": "esim. Helsinki City Marathon",
+    "city": "Paikkakunta",
+    "runnerName": "Nimesi",
+    "date": "Päivämäärä",
+    "finishTime": "Loppuaika",
+    "finishTimePlaceholder": "esim. 3:45:12",
+    "finishTimeInvalid": "Kirjoita aika muodossa t:mm:ss, esim. 3:45:12",
+    "bib": "Kilpailunumero",
+    "placement": "Sijoitus",
+    "customLine": "Oma rivi",
+    "customLinePlaceholder": "esim. Ensimmäinen maratonini",
+    "showTitle": "Näytä taulussa",
+    "show": {
+      "photo": "Kuva",
+      "elevation": "Korkeusprofiili",
+      "stats": "Tilastorivi",
+      "subtitle": "Paikkakunta ja päivämäärä",
+      "runnerName": "Nimi",
+      "date": "Päivämäärä",
+      "customLine": "Oma rivi",
+      "distance": "Matka",
+      "time": "Loppuaika",
+      "pace": "Vauhti (lasketaan automaattisesti)",
+      "bib": "Kilpailunumero",
+      "placement": "Sijoitus",
+      "startFinish": "Lähtö ja maali",
+      "kmMarkers": "Kilometrimerkinnät",
+      "splits": "Kilometriajat"
+    },
+    "look": "Ulkoasu",
+    "routeColor": "Reitin väri",
+    "background": "Tausta",
+    "distanceField": "Matka (km)",
+    "paceField": "Vauhti (min/km)",
+    "pacePlaceholder": "Lasketaan"
   }
 }
