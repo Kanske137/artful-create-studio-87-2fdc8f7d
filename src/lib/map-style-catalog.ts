@@ -77,6 +77,7 @@ export const MAP_STYLE_CATALOG: MapStyleCatalogEntry[] = [
   {
     id: "blatryck",
     label: "Blåtryck",
+    labelKey: "mapStyle.blatryck",
     previewBg: "linear-gradient(135deg, #16395E, #0D2743)",
     styleUrl: "mapbox://styles/maybe137/cms14qgka00qh01qz8xe0cic7",
     thumbnailUrl:
@@ -85,6 +86,7 @@ export const MAP_STYLE_CATALOG: MapStyleCatalogEntry[] = [
   {
     id: "guldlinje",
     label: "Guldlinje",
+    labelKey: "mapStyle.guldlinje",
     previewBg: "linear-gradient(135deg, #181512, #0D0B09)",
     styleUrl: "mapbox://styles/maybe137/cms14qgrn00rg01schtwa6w3e",
     thumbnailUrl:
@@ -93,6 +95,7 @@ export const MAP_STYLE_CATALOG: MapStyleCatalogEntry[] = [
   {
     id: "noir",
     label: "Noir",
+    labelKey: "mapStyle.noir",
     previewBg: "linear-gradient(135deg, #111111, #060606)",
     styleUrl: "mapbox://styles/maybe137/cms14qgzb00oz01qkf11fdlnb",
     thumbnailUrl:

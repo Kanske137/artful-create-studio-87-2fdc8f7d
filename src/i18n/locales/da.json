@@ -115,7 +115,10 @@
     "size": "Størrelse",
     "tipMove": "Tip: træk ✥-håndtaget på laget i forhåndsvisningen for at flytte det.",
     "imageTab": "Billede {{n}}",
-    "transformationTab": "Forvandling {{n}}"
+    "transformationTab": "Forvandling {{n}}",
+    "moveHandle": "Flyt lag",
+    "moveHandleHint": "Træk for at flytte laget",
+    "resizeHandleShort": "Skift størrelse"
   },
   "photo": {
     "uploadCta": "Upload billede",
@@ -152,7 +155,9 @@
     "overlay": {
       "title": "Opretter dit billede",
       "subtitle": "Dette tager kun et øjeblik …"
-    }
+    },
+    "stageSlow": "Det tager lidt længere tid end normalt…",
+    "stagePrepShort": "Forbereder…"
   },
   "aiPhoto": {
     "yourImage": "Dit billede",
@@ -293,7 +298,10 @@
     "mintgron": "Mintgrøn/Salvie",
     "marinbla": "Marinblå",
     "varmbeige": "Varm Beige/Creme",
-    "skogsgron": "Dyb Skovgrøn/Sort"
+    "skogsgron": "Dyb Skovgrøn/Sort",
+    "blatryck": "Blåtryk",
+    "guldlinje": "Guldlinje",
+    "noir": "Noir"
   },
   "mapIcons": {
     "heading": "Ikoner",
@@ -466,5 +474,10 @@
     "distanceField": "Distance (km)",
     "paceField": "Tempo (min/km)",
     "pacePlaceholder": "Beregnes"
+  },
+  "cartProps": {
+    "orientation": "Orientering",
+    "race": "Løb",
+    "ownGpx": "Egen GPX-fil"
   }
 }

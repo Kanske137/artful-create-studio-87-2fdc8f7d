@@ -654,8 +654,8 @@ export function MapPreview({
               onPointerDown={(e) => onDragStart(l, e)}
               className="absolute w-7 h-7 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center text-[12px] cursor-move touch-none ring-2 ring-background"
               style={{ top: -14, left: -14, zIndex: 39, pointerEvents: "auto" }}
-              aria-label="Flytta lager"
-              title="Dra för att flytta lagret"
+              aria-label={t("layer.moveHandle")}
+              title={t("layer.moveHandleHint")}
             >
               ✥
             </button>
@@ -666,8 +666,8 @@ export function MapPreview({
               onPointerDown={(e) => onResizeStart(l, e)}
               className="absolute w-6 h-6 rounded-md bg-primary text-primary-foreground shadow-lg flex items-center justify-center text-[10px] cursor-nwse-resize touch-none ring-2 ring-background"
               style={{ bottom: -12, right: -12, zIndex: 39, pointerEvents: "auto" }}
-              aria-label="Ändra storlek"
-              title="Dra för att ändra storlek"
+              aria-label={t("layer.resizeHandleShort")}
+              title={t("layers.resizeHandle")}
             >
               ⤡
             </button>

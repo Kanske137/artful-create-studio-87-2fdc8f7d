@@ -96,7 +96,7 @@ export function AiStyleSection({ presets, layerId }: Props) {
       return url;
     } catch (e) {
       console.error("[AiStyle] upload failed", e);
-      toast.error("Kunde inte ladda upp bilden");
+      toast.error(t("ai.uploadFailed"));
       return null;
     }
   };
@@ -116,7 +116,7 @@ export function AiStyleSection({ presets, layerId }: Props) {
 
   const applyStyle = async (preset: AiStylePreset) => {
     if (!photoFile) {
-      toast.error("Ladda upp en bild först");
+      toast.error(t("ai.uploadFirstShort"));
       return;
     }
     // Gate-pre-flight FÖRE busy-overlayen: dialogen ska aldrig tävla med
@@ -126,8 +126,8 @@ export function AiStyleSection({ presets, layerId }: Props) {
     const jobId = `ai-style:${layerId}:${preset.id}`;
     const { startAiJob, updateAiJobStage, endAiJob } = useAiBusyStore.getState();
     setBusyId(preset.id);
-    setStage("Förbereder din bild…");
-    startAiJob(jobId, { label: t("ai.creatingImage"), expectedSeconds: 12, stage: "Förbereder din bild…" });
+    setStage(t("ai.stagePrep"));
+    startAiJob(jobId, { label: t("ai.creatingImage"), expectedSeconds: 12, stage: t("ai.stagePrep") });
     try {
       // Resolve a stable cache key first (the hash) — never the upload URL.
       const hash = await ensurePhotoHash();
@@ -135,20 +135,20 @@ export function AiStyleSection({ presets, layerId }: Props) {
         const cached = getCachedAiResult(hash, preset.id);
         if (cached) {
           setAiPrintFileUrlFor(layerId, cached);
-          toast.success(`Stil "${preset.label}" återanvänd`);
+          toast.success(t("ai.styleReused", { name: preset.label }));
           return;
         }
       }
 
       // Cache miss → ensure the photo is uploaded so Replicate can fetch it.
-      setStage("Laddar upp din bild…");
-      updateAiJobStage(jobId, "Laddar upp din bild…");
+      setStage(t("ai.stageUpload"));
+      updateAiJobStage(jobId, t("ai.stageUpload"));
       const imageUrl = await ensureUploadedPhotoUrl();
       if (!imageUrl) return;
 
       const designId = (crypto as any)?.randomUUID?.() ?? `${Date.now()}`;
-      setStage("Skapar din bild…");
-      updateAiJobStage(jobId, "Skapar din bild…");
+      setStage(t("ai.stageCreate"));
+      updateAiJobStage(jobId, t("ai.stageCreate"));
       const res = await invokeWithSubscriberGate<{ printFileUrl?: string }>("replicate-style", {
         imageUrl,
         prompt: preset.prompt,
@@ -158,19 +158,19 @@ export function AiStyleSection({ presets, layerId }: Props) {
       if (res.handled) return;
       const { data, error } = res;
       if (error) throw error;
-      setStage("Hämtar resultat…");
-      updateAiJobStage(jobId, "Hämtar resultat…");
+      setStage(t("ai.stageFetch"));
+      updateAiJobStage(jobId, t("ai.stageFetch"));
       const printFileUrl = (data as { printFileUrl?: string })?.printFileUrl;
-      if (!printFileUrl) throw new Error("Tjänsten returnerade ingen bild");
+      if (!printFileUrl) throw new Error(t("ai.noResult"));
       setAiPrintFileUrlFor(layerId, printFileUrl);
       if (hash) addAiResultToCache(hash, preset.id, preset.label, printFileUrl);
       markFreeGenerationUsed();
       invalidatePreviousResults();
-      toast.success(`Stil "${preset.label}" tillämpad`);
+      toast.success(t("ai.styleApplied", { name: preset.label }));
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Okänt fel";
+      const msg = e instanceof Error ? e.message : t("common.unknownError");
       console.error("[AiStyle] failed", e);
-      toast.error("Kunde inte tillämpa stilen", { description: msg });
+      toast.error(t("ai.styleFailed"), { description: msg });
     } finally {
       setBusyId(null);
       setStage(null);
@@ -221,7 +221,7 @@ export function AiStyleSection({ presets, layerId }: Props) {
       <AiProgress
         active={busyId !== null}
         expectedSeconds={12}
-        label="Skapar bild"
+        label={t("ai.creatingImage")}
         stage={stage}
       />
     );
@@ -286,7 +286,7 @@ export function AiStyleSection({ presets, layerId }: Props) {
       <AiProgress
         active={busyId !== null}
         expectedSeconds={12}
-        label="Skapar bild"
+        label={t("ai.creatingImage")}
         stage={stage}
       />
 
@@ -304,7 +304,7 @@ export function AiStyleSection({ presets, layerId }: Props) {
                     type="button"
                     onClick={() => {
                       setAiPrintFileUrlFor(layerId, entry.url);
-                      toast.success(`Stil "${entry.presetLabel}" återanvänd`);
+                      toast.success(t("ai.styleReused", { name: entry.presetLabel }));
                     }}
                     className={cn(
                       "block w-16 h-16 rounded-lg overflow-hidden ring-1 ring-border bg-muted hover:-translate-y-0.5 transition",
@@ -325,7 +325,7 @@ export function AiStyleSection({ presets, layerId }: Props) {
                       clearAiResult(entry.photoHash, entry.presetId);
                     }}
                     className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-background/90 ring-1 ring-border flex items-center justify-center text-muted-foreground hover:text-foreground"
-                    aria-label="Ta bort från historik"
+                    aria-label={t("ai.removeFromHistory")}
                   >
                     <X className="h-2.5 w-2.5" />
                   </button>

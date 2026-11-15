@@ -116,12 +116,14 @@ export const useRaceStore = create<RaceStoreState>((set, get) => ({
 }));
 
 /** Ögonblicksbild för rendering (editor, mockup, kundvagn, tryck). */
-export function raceRenderInput(locale: "sv" | "en"): RaceRenderInput {
+export function raceRenderInput(locale: "sv" | "en" | "da" | "fi"): RaceRenderInput {
   const s = useRaceStore.getState();
   return { route: s.route, fields: s.fields, show: s.show, routeColor: s.routeColor, locale, splits: s.splits };
 }
 
 /** Loppetiketternas språk utifrån editorns språk. */
-export function raceLocaleFor(lang: string | undefined): "sv" | "en" {
-  return (lang ?? "sv").toLowerCase().startsWith("sv") ? "sv" : "en";
+export function raceLocaleFor(lang: string | undefined): "sv" | "en" | "da" | "fi" {
+  const base = (lang ?? "sv").toLowerCase().split(/[-_]/)[0];
+  if (base === "sv" || base === "da" || base === "fi") return base;
+  return "en";
 }

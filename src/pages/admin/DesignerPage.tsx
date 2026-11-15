@@ -44,6 +44,7 @@ import LayerCanvas from "@/components/admin/LayerCanvas";
 import LayerList, { toggleAllLocks } from "@/components/admin/LayerList";
 import LayerInspector from "@/components/admin/LayerInspector";
 import DeleteTemplateDialog from "@/components/admin/DeleteTemplateDialog";
+import TemplateTranslationsDialog from "@/components/admin/TemplateTranslationsDialog";
 import TemplateThumbnail from "@/components/admin/TemplateThumbnail";
 
 export default function DesignerPage() {
@@ -471,6 +472,11 @@ export default function DesignerPage() {
                 Visa som kund
               </a>
             </Button>
+            <TemplateTranslationsDialog
+              template={template}
+              handle={config.shopify_handle}
+              onApply={(i18n) => commitTemplate({ ...template, i18n })}
+            />
             <Button
               variant="ghost"
               size="sm"

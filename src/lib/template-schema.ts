@@ -632,6 +632,10 @@ export const aiStylePresetSchema = z.object({
    *  `prompt`; if that's also missing it falls back to the legacy Nano-Banana
    *  pipeline. Ignored when simpleStyleMode is off. */
   styleInstruction: z.string().optional(),
+  /** Sätts bara i kundeditorn av localizeTemplate(): den svenska
+   *  originaletiketten när `label` har översatts. Skickas till AI-funktionerna
+   *  (som tolkar stilnamnet) och sparas aldrig i databasen. */
+  sourceLabel: z.string().optional(),
 });
 export type AiStylePreset = z.infer<typeof aiStylePresetSchema>;
 
@@ -761,6 +765,11 @@ export const templateSchema = z
     /** Optional thumbnail URL for the Standard layout shown in the "Stil"-row. */
     defaultLayoutThumbnailUrl: z.string().url().optional(),
     sizeOverrides: z.record(z.string(), sizeOverrideSchema).default({}),
+    /** Mallens egna översättningar: språk → (svensk källtext → översättning).
+     *  T.ex. { en: { "Rubrik": "Title" }, da: {…}, fi: {…} }. Kompletterar den
+     *  gemensamma ordlistan i src/i18n/template-strings och vinner över den.
+     *  Saknas en översättning visas svenskan. Se src/lib/template-i18n.ts. */
+    i18n: z.record(z.string(), z.record(z.string(), z.string())).optional(),
     /** Extra named layouts ("Stilar") in addition to the implicit
      *  "Standard"-layout backed by `defaultLayout`/`canvasLayout`. When the
      *  customer switches stil, the renderer reads the matching block via

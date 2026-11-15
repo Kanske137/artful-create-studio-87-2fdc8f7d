@@ -9,6 +9,9 @@ import type { Bounds } from "@/lib/race/types";
 import { useRaceStore } from "@/stores/raceStore";
 import { raceInactiveLayerIds } from "@/lib/race/derive";
 import { resolveTemplate } from "@/lib/template-migrate";
+import { localizeTemplate } from "@/lib/template-i18n";
+import { TEMPLATE_STRINGS } from "@/i18n/template-strings";
+import i18n from "@/i18n";
 import { clampLayerRect } from "@/lib/layer-utils";
 import {
   createFreeformLayer,
@@ -28,6 +31,17 @@ import {
   saveFaceSwapCache,
 } from "@/lib/face-swap-cache";
 import { track } from "@/lib/analytics";
+
+/** Namn på lager som kunden lägger till själv (fri mall), på kundens språk. */
+const FREEFORM_LAYER_NAME_KEY: Record<string, string> = {
+  photo: "layers.addPhoto",
+  aiPhoto: "layers.addAiPhoto",
+  map: "layers.addMap",
+  text: "layers.addText",
+  shape: "layers.addShape",
+  line: "layers.addLine",
+  margin: "layers.addMargin",
+};
 
 // Engagemangs-events för produkter UTAN fotouppladdning (kartor/text/drink) —
 // utan dessa ser kartprodukter falskt "döda" ut i tratten (2026-08-02).
@@ -732,7 +746,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const prevVariant = state.variant;
 
     const rawTemplate = (config as unknown as { template?: unknown }).template;
-    const { template } = resolveTemplate(config, rawTemplate);
+    // Mallen skrivs på svenska i admin; kunden får den på sitt språk. Allt
+    // nedströms (förhandsvisning, tryckfil, kundvagnsbild) läser denna kopia.
+    const template = localizeTemplate(resolveTemplate(config, rawTemplate).template, i18n.language, TEMPLATE_STRINGS);
     const productOptions = template.productOptions;
 
     // Effective sizes (legacy `config.sizes` if present, otherwise derived
@@ -1733,6 +1749,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!tpl || !config) return null;
     const block = getActiveLayoutBlock(tpl, config.product_type, state.layoutId)[state.orientation];
     const newLayer = createFreeformLayer(type, {
+      name: i18n.t(FREEFORM_LAYER_NAME_KEY[type] ?? "layers.addText"),
       zIndex: nextTopZIndex(block.layers),
       defaultFont: tpl.productOptions?.allowedFonts?.[0] ?? undefined,
       defaultMapStyleId: tpl.productOptions?.mapStyles?.[0]?.id ?? undefined,

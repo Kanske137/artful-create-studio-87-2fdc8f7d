@@ -15,7 +15,7 @@ export class GpxError extends Error {
   }
 }
 
-export const GPX_ERROR_MESSAGES: Record<"sv" | "en", Record<GpxErrorCode, string>> = {
+export const GPX_ERROR_MESSAGES: Record<"sv" | "en" | "da" | "fi", Record<GpxErrorCode, string>> = {
   sv: {
     "not-xml": "Filen kunde inte läsas. Välj en GPX-, TCX- eller FIT-fil exporterad från t.ex. Strava, Garmin eller Apple Watch.",
     "not-gpx": "Det här verkar inte vara en GPX-, TCX- eller FIT-fil. Exportera aktiviteten och försök igen.",
@@ -27,6 +27,18 @@ export const GPX_ERROR_MESSAGES: Record<"sv" | "en", Record<GpxErrorCode, string
     "not-gpx": "This doesn't look like a GPX, TCX or FIT file. Export the activity and try again.",
     "no-points": "The file contains no route. Make sure you exported the activity itself.",
     "too-few-points": "The route in the file is too short to draw.",
+  },
+  da: {
+    "not-xml": "Filen kunne ikke læses. Vælg en GPX-, TCX- eller FIT-fil eksporteret fra f.eks. Strava, Garmin eller Apple Watch.",
+    "not-gpx": "Det ligner ikke en GPX-, TCX- eller FIT-fil. Eksportér aktiviteten, og prøv igen.",
+    "no-points": "Filen indeholder ingen rute. Kontrollér, at du har eksporteret selve aktiviteten.",
+    "too-few-points": "Ruten i filen er for kort til at kunne tegnes.",
+  },
+  fi: {
+    "not-xml": "Tiedostoa ei voitu lukea. Valitse GPX-, TCX- tai FIT-tiedosto, jonka olet vienyt esimerkiksi Stravasta, Garminista tai Apple Watchista.",
+    "not-gpx": "Tämä ei näytä GPX-, TCX- tai FIT-tiedostolta. Vie suoritus uudelleen ja yritä uudestaan.",
+    "no-points": "Tiedostossa ei ole reittiä. Tarkista, että veit itse suorituksen.",
+    "too-few-points": "Tiedoston reitti on liian lyhyt piirrettäväksi.",
   },
 };
 

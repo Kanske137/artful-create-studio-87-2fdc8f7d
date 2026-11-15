@@ -115,7 +115,10 @@
     "size": "Storlek",
     "tipMove": "Tips: dra ✥-handtaget på lagret i förhandsvisningen för att flytta det.",
     "imageTab": "Bild {{n}}",
-    "transformationTab": "Förvandling {{n}}"
+    "transformationTab": "Förvandling {{n}}",
+    "moveHandle": "Flytta lager",
+    "moveHandleHint": "Dra för att flytta lagret",
+    "resizeHandleShort": "Ändra storlek"
   },
   "photo": {
     "uploadCta": "Ladda upp bild",
@@ -152,7 +155,9 @@
     "overlay": {
       "title": "Skapar din bild",
       "subtitle": "Det här tar bara en stund …"
-    }
+    },
+    "stageSlow": "Tar lite längre tid än vanligt…",
+    "stagePrepShort": "Förbereder…"
   },
   "aiPhoto": {
     "yourImage": "Din bild",
@@ -293,7 +298,10 @@
     "mintgron": "Mintgrön/Salvia",
     "marinbla": "Marin Blå",
     "varmbeige": "Varm Beige/Cream",
-    "skogsgron": "Djup Skogsgrön/Svart"
+    "skogsgron": "Djup Skogsgrön/Svart",
+    "blatryck": "Blåtryck",
+    "guldlinje": "Guldlinje",
+    "noir": "Noir"
   },
   "mapIcons": {
     "heading": "Ikoner",
@@ -466,5 +474,10 @@
     "distanceField": "Distans (km)",
     "paceField": "Tempo (min/km)",
     "pacePlaceholder": "Räknas ut"
+  },
+  "cartProps": {
+    "orientation": "Orientering",
+    "race": "Lopp",
+    "ownGpx": "Egen GPX-fil"
   }
 }

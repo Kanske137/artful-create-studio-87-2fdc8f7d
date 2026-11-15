@@ -86,7 +86,7 @@ export interface RaceRenderInput {
   show: RaceShow;
   /** Kundens ruttfärg, eller null ⇒ mallens standard. */
   routeColor: string | null;
-  locale: "sv" | "en";
+  locale: "sv" | "en" | "da" | "fi";
   /** Kilometertider (bara från GPX med tidsstämplar). */
   splits?: RaceSplit[] | null;
 }

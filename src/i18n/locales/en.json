@@ -115,7 +115,10 @@
     "size": "Size",
     "tipMove": "Tip: drag the ✥ handle on the layer in the preview to move it.",
     "imageTab": "Image {{n}}",
-    "transformationTab": "Transformation {{n}}"
+    "transformationTab": "Transformation {{n}}",
+    "moveHandle": "Move layer",
+    "moveHandleHint": "Drag to move the layer",
+    "resizeHandleShort": "Resize"
   },
   "photo": {
     "uploadCta": "Upload image",
@@ -152,7 +155,9 @@
     "overlay": {
       "title": "Creating your image",
       "subtitle": "This only takes a moment …"
-    }
+    },
+    "stageSlow": "Taking a little longer than usual…",
+    "stagePrepShort": "Preparing…"
   },
   "aiPhoto": {
     "yourImage": "Your image",
@@ -288,7 +293,10 @@
     "mintgron": "Mint Green/Sage",
     "marinbla": "Marine Blue",
     "varmbeige": "Warm Beige/Cream",
-    "skogsgron": "Deep Forest Green/Black"
+    "skogsgron": "Deep Forest Green/Black",
+    "blatryck": "Blueprint",
+    "guldlinje": "Gold line",
+    "noir": "Noir"
   },
   "mapIcons": {
     "heading": "Icons",
@@ -466,5 +474,10 @@
     "distanceField": "Distance (km)",
     "paceField": "Pace (min/km)",
     "pacePlaceholder": "Calculated"
+  },
+  "cartProps": {
+    "orientation": "Orientation",
+    "race": "Race",
+    "ownGpx": "Your own GPX file"
   }
 }

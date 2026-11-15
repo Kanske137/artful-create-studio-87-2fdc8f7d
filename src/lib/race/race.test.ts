@@ -124,6 +124,10 @@ describe("format", () => {
     expect(formatDistance(30.24, "en")).toBe("30.2 km");
     expect(formatRaceDate("2026-05-30")).toBe("30 maj 2026");
     expect(formatRaceDate("2026-05-30", "en")).toBe("30 May 2026");
+    expect(formatRaceDate("2026-05-30", "da")).toBe("30. maj 2026");
+    expect(formatRaceDate("2026-06-07", "fi")).toBe("7. kesäkuuta 2026");
+    expect(formatDistance(30.24, "da")).toBe("30,2 km");
+    expect(formatDistance(30.24, "fi")).toBe("30,2 km");
     expect(formatRaceDate("trasig")).toBe("");
   });
 });

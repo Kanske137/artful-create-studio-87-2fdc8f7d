@@ -430,7 +430,8 @@ export default function EditorPage() {
     }
 
     const properties: Record<string, string> = {
-      Orientering: orientation === "portrait" ? "Stående" : "Liggande",
+      // Synlig egenskap på kundens språk. Ordersystemet läser _orientation.
+      [t("cartProps.orientation")]: t(orientation === "portrait" ? "orientation.portrait" : "orientation.landscape"),
       _map_style: mapStyleId,
       _map_center: `${mapCenter[1].toFixed(6)},${mapCenter[0].toFixed(6)}`,
       _map_zoom: mapZoom.toFixed(2),
@@ -459,7 +460,7 @@ export default function EditorPage() {
     }
     if (isRaceTemplate && raceState.route) {
       // Synligt i kundvagn/order — underlättar support.
-      properties.Lopp = raceState.fields.title || (raceState.source === "gpx" ? "Egen GPX-fil" : "");
+      properties[t("cartProps.race")] = raceState.fields.title || (raceState.source === "gpx" ? t("cartProps.ownGpx") : "");
       properties._race_source = raceState.source ?? "";
       if (raceState.raceId) properties._race_id = raceState.raceId;
     }

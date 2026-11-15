@@ -217,7 +217,7 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
       return url;
     } catch (e) {
       console.error("[AiPhoto] upload failed", e);
-      toast.error("Kunde inte ladda upp bilden");
+      toast.error(t("ai.uploadFailed"));
       return null;
     }
   };
@@ -337,7 +337,8 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
         sessionKey: getSessionKey(),
         removeBackgroundStyleId: selectedPreset?.id ?? null,
         removeBackgroundStylePrompt: selectedPreset?.prompt ?? null,
-        removeBackgroundStyleLabel: selectedPreset?.label ?? null,
+        // Svenska originalnamnet: funktionen tolkar stilnamnet (t.ex. "akvarell").
+        removeBackgroundStyleLabel: selectedPreset?.sourceLabel ?? selectedPreset?.label ?? null,
         targetAspectRatio,
         backdropColor: layer.defaults.backdropColor ?? null,
         fillFrame: layer.defaults.fillFrame ?? null,

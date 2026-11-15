@@ -1,7 +1,7 @@
 // Formatering av loppdata: tid, tempo, distans, datum, etiketter.
 import type { RaceStatKey } from "@/lib/template-schema";
 
-export type RaceLocale = "sv" | "en";
+export type RaceLocale = "sv" | "en" | "da" | "fi";
 
 /** "3:45:12", "45:12", "3.45.12", "03:45" (mm:ss) → sekunder. Null om ogiltigt. */
 export function parseDuration(input: string): number | null {
@@ -44,7 +44,7 @@ const HALF = 21.0975;
 
 /** "42,195 km", "21,1 km", "10 km", "30,2 km". */
 export function formatDistance(km: number, locale: RaceLocale = "sv"): string {
-  const dec = locale === "sv" ? "," : ".";
+  const dec = locale === "en" ? "." : ",";
   if (Math.abs(km - MARATHON) < 0.0005) return `42${dec}195 km`;
   if (Math.abs(km - HALF) < 0.0005) return `21${dec}1 km`;
   const rounded = Math.round(km * 10) / 10;
@@ -55,15 +55,21 @@ export function formatDistance(km: number, locale: RaceLocale = "sv"): string {
 const MONTHS: Record<RaceLocale, string[]> = {
   sv: ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"],
   en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  da: ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"],
+  fi: ["tammikuuta", "helmikuuta", "maaliskuuta", "huhtikuuta", "toukokuuta", "kesäkuuta", "heinäkuuta", "elokuuta", "syyskuuta", "lokakuuta", "marraskuuta", "joulukuuta"],
 };
 
-/** "2026-05-30" → "30 maj 2026" / "30 May 2026". Ogiltigt ⇒ "". */
+/** "2026-05-30" → "30 maj 2026" / "30 May 2026" / "30. maj 2026" /
+ *  "30. toukokuuta 2026". Ogiltigt ⇒ "". */
 export function formatRaceDate(dateISO: string, locale: RaceLocale = "sv"): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateISO.trim());
   if (!m) return "";
   const month = MONTHS[locale][parseInt(m[2]!, 10) - 1];
   if (!month) return "";
-  return `${parseInt(m[3]!, 10)} ${month} ${m[1]}`;
+  const day = parseInt(m[3]!, 10);
+  // Danska och finska skriver dagen som ordningstal med punkt.
+  const dayStr = locale === "da" || locale === "fi" ? `${day}.` : String(day);
+  return `${dayStr} ${month} ${m[1]}`;
 }
 
 export function yearOf(dateISO: string): string {
@@ -74,6 +80,8 @@ export function yearOf(dateISO: string): string {
 export const RACE_STAT_LABELS: Record<RaceLocale, Record<RaceStatKey, string>> = {
   sv: { distance: "DISTANS", time: "TID", pace: "TEMPO", bib: "STARTNR", placement: "PLACERING" },
   en: { distance: "DISTANCE", time: "TIME", pace: "PACE", bib: "BIB", placement: "PLACE" },
+  da: { distance: "DISTANCE", time: "TID", pace: "TEMPO", bib: "STARTNR.", placement: "PLACERING" },
+  fi: { distance: "MATKA", time: "AIKA", pace: "VAUHTI", bib: "NUMERO", placement: "SIJOITUS" },
 };
 
 /** "42,195", "42.2", "21,1 km" → km. Null om ogiltigt. */

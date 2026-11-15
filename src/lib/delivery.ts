@@ -32,9 +32,10 @@ export function deliveryEstimate(
   return se ? { minDays: 4, maxDays: 7 } : { minDays: 5, maxDays: 8 };
 }
 
-/** Marknader där vi inte visar någon fri-frakt-gräns (fraktvillkor ej fastställda
- *  för de nya DK/FI-marknaderna – Drift är sanningskälla). */
-const NO_FREE_SHIPPING_CLAIM = new Set(["DK", "FI"]);
+/** Marknader där vi inte visar någon fri-frakt-gräns. Tom: Danmark och Finland
+ *  har samma villkor som övriga EU (beslut 2026-11-15, Drift är sanningskälla).
+ *  Lägg till en landskod här om en marknad får villkor som inte är fastställda. */
+const NO_FREE_SHIPPING_CLAIM = new Set<string>();
 
 /** Gräns för fri frakt i SEK per marknad (policyns värden), eller null när
  *  ingen gräns ska visas för marknaden. */

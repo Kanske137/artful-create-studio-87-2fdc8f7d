@@ -115,7 +115,10 @@
     "size": "Koko",
     "tipMove": "Vinkki: vedä ✥-kahvasta esikatselussa siirtääksesi tasoa.",
     "imageTab": "Kuva {{n}}",
-    "transformationTab": "Muunnos {{n}}"
+    "transformationTab": "Muunnos {{n}}",
+    "moveHandle": "Siirrä tasoa",
+    "moveHandleHint": "Siirrä tasoa vetämällä",
+    "resizeHandleShort": "Muuta kokoa"
   },
   "photo": {
     "uploadCta": "Lataa kuva",
@@ -152,7 +155,9 @@
     "overlay": {
       "title": "Luodaan kuvaasi",
       "subtitle": "Tämä kestää vain hetken …"
-    }
+    },
+    "stageSlow": "Tämä kestää tavallista vähän kauemmin…",
+    "stagePrepShort": "Valmistellaan…"
   },
   "aiPhoto": {
     "yourImage": "Kuvasi",
@@ -293,7 +298,10 @@
     "mintgron": "Mintunvihreä/Salvia",
     "marinbla": "Merensininen",
     "varmbeige": "Lämmin Beige/Kerma",
-    "skogsgron": "Syvä Metsänvihreä/Musta"
+    "skogsgron": "Syvä Metsänvihreä/Musta",
+    "blatryck": "Sinikopio",
+    "guldlinje": "Kultaviiva",
+    "noir": "Noir"
   },
   "mapIcons": {
     "heading": "Kuvakkeet",
@@ -466,5 +474,10 @@
     "distanceField": "Matka (km)",
     "paceField": "Vauhti (min/km)",
     "pacePlaceholder": "Lasketaan"
+  },
+  "cartProps": {
+    "orientation": "Suunta",
+    "race": "Tapahtuma",
+    "ownGpx": "Oma GPX-tiedosto"
   }
 }

@@ -7,6 +7,7 @@
 // synchronous from our edge function's perspective), so this is an honest
 // best-effort indicator. It never hits 100% before the work is actually done.
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -25,10 +26,11 @@ interface AiProgressProps {
 export function AiProgress({
   active,
   expectedSeconds,
-  label = "Skapar bild",
+  label,
   stage,
   className,
 }: AiProgressProps) {
+  const { t } = useTranslation();
   const [pct, setPct] = useState(0);
   const [visible, setVisible] = useState(false);
   const [slowHint, setSlowHint] = useState(false);
@@ -90,8 +92,8 @@ export function AiProgress({
 
   const displayPct = Math.round(pct);
   const subText = slowHint && active
-    ? "Tar lite längre tid än vanligt…"
-    : stage ?? "Förbereder…";
+    ? t("ai.stageSlow")
+    : stage ?? t("ai.stagePrepShort");
 
   return (
     <div
@@ -106,7 +108,7 @@ export function AiProgress({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-medium text-foreground">
           <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-          <span>{label}</span>
+          <span>{label ?? t("ai.creatingImage")}</span>
         </div>
         <span className="text-xs font-semibold tabular-nums text-muted-foreground">
           {displayPct}%

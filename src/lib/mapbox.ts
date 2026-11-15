@@ -1,6 +1,15 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { StyleSpecification } from "mapbox-gl";
 import { isBlankMapStyle, mapStyleUrl } from "@/lib/map-style-catalog";
+import i18n from "@/i18n";
+
+/** Språk för platsnamn från geokodern (t.ex. "Köpenhamn" eller "København").
+ *  Följer kundens språk i editorn; okända språk ger engelska namn. */
+function geocoderLanguage(): string {
+  const base = (i18n.language ?? "sv").toLowerCase().split(/[-_]/)[0];
+  if (base === "no" || base === "nb") return "nb";
+  return ["sv", "en", "da", "fi", "de", "fr", "es", "it", "nl", "pl"].includes(base) ? base : "en";
+}
 
 let cachedToken: string | null = null;
 
@@ -38,7 +47,7 @@ export async function geocode(query: string): Promise<GeocodeResult[]> {
   if (!token || !query.trim()) return [];
   const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
     query
-  )}.json?access_token=${token}&limit=4&language=sv`;
+  )}.json?access_token=${token}&limit=4&language=${geocoderLanguage()}`;
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
@@ -59,7 +68,7 @@ export async function reverseGeocode(
 ): Promise<GeocodeResult | null> {
   const token = await getMapboxToken();
   if (!token) return null;
-  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${token}&limit=1&language=sv&types=place,locality,neighborhood,address,region,country`;
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${token}&limit=1&language=${geocoderLanguage()}&types=place,locality,neighborhood,address,region,country`;
   const res = await fetch(url);
   if (!res.ok) return null;
   const data = await res.json();

@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { deliveryEstimate, freeShippingThresholdSek } from "./delivery";
 
 describe("delivery", () => {
-  it("visar ingen fri-frakt-gräns för DK och FI", () => {
-    expect(freeShippingThresholdSek("DK")).toBeNull();
-    expect(freeShippingThresholdSek("fi")).toBeNull();
+  it("ger DK och FI samma fri-frakt-gräns som övriga EU", () => {
+    expect(freeShippingThresholdSek("DK")).toBe(599);
+    expect(freeShippingThresholdSek("fi")).toBe(599);
   });
 
   it("behåller policyns gränser för SE och övriga EU", () => {

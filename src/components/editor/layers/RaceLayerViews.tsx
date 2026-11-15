@@ -2,6 +2,7 @@
 // Ritas av SAMMA funktioner som tryckfilen (src/lib/race/render-*.ts) —
 // paritet editor↔tryck per konstruktion, som StarmapLayerView.
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import type { TemplateLayer } from "@/lib/template-schema";
 import type { RaceStatItem } from "@/lib/race/derive";
 import { drawElevationProfile } from "@/lib/race/render-elevation";
@@ -55,13 +56,14 @@ interface ElevationProps {
 }
 
 export function RaceElevationView({ layer, series, routeColor, canvasShortPx }: ElevationProps) {
+  const { t } = useTranslation();
   const ref = useLayerCanvas(
     (ctx, w, h, scale) => {
       drawElevationProfile(ctx, { x: 0, y: 0, w, h }, series, layer.defaults, routeColor, canvasShortPx * scale);
     },
     [layer, series, routeColor, canvasShortPx],
   );
-  return <canvas ref={ref} className="w-full h-full block" aria-label="Höjdprofil" />;
+  return <canvas ref={ref} className="w-full h-full block" aria-label={t("race.show.elevation")} />;
 }
 
 interface StatsProps {
@@ -71,6 +73,7 @@ interface StatsProps {
 }
 
 export function RaceStatsView({ layer, items, canvasShortPx }: StatsProps) {
+  const { t } = useTranslation();
   const itemsKey = items.map((i) => `${i.key}=${i.label}:${i.value}`).join("|");
   const ref = useLayerCanvas(
     async (ctx, w, h, scale) => {
@@ -80,7 +83,7 @@ export function RaceStatsView({ layer, items, canvasShortPx }: StatsProps) {
     },
     [layer, itemsKey, canvasShortPx],
   );
-  return <canvas ref={ref} className="w-full h-full block" aria-label="Loppstatistik" />;
+  return <canvas ref={ref} className="w-full h-full block" aria-label={t("race.show.stats")} />;
 }
 
 interface SplitsProps {
@@ -91,6 +94,7 @@ interface SplitsProps {
 }
 
 export function RaceSplitsView({ layer, splits, routeColor, canvasShortPx }: SplitsProps) {
+  const { t } = useTranslation();
   const key = splits.map((s) => `${s.km}:${Math.round(s.seconds)}`).join("|");
   const ref = useLayerCanvas(
     async (ctx, w, h, scale) => {
@@ -106,5 +110,5 @@ export function RaceSplitsView({ layer, splits, routeColor, canvasShortPx }: Spl
     },
     [layer, key, routeColor, canvasShortPx],
   );
-  return <canvas ref={ref} className="w-full h-full block" aria-label="Kilometertider" />;
+  return <canvas ref={ref} className="w-full h-full block" aria-label={t("race.show.splits")} />;
 }
