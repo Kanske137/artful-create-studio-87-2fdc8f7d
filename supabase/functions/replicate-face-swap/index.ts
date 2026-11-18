@@ -1111,10 +1111,22 @@ Deno.serve(async (req) => {
             });
 
     if (!result.ok) {
+      // Spara den faktiska orsaken (fallbackResponse lägger den i `error`) så
+      // att editorns analys visar varför genereringen misslyckades, i stället
+      // för en generisk text. Läses från en klon; svaret till kunden är oförändrat.
+      let reason = "model fallback (se funktionsloggar)";
+      try {
+        const body = await result.response.clone().json();
+        if (body && typeof body.error === "string" && body.error.trim()) {
+          reason = `model fallback: ${body.error}`.slice(0, 500);
+        }
+      } catch {
+        /* behåll den generiska texten */
+      }
       await genLogEnd(genId, {
         status: "failed",
         duration_ms: Date.now() - genT0,
-        error: "model fallback (se funktionsloggar)",
+        error: reason,
       });
       return result.response;
     }
