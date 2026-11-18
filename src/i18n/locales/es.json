@@ -34,7 +34,8 @@
     "total": "Total",
     "checkout": "Pagar",
     "readyHint": "¿Te gusta? Añadir al carrito",
-    "order": "Pedir"
+    "order": "Pedir",
+    "update": "Actualizar"
   },
   "orientation": {
     "portrait": "Vertical",
@@ -248,7 +249,8 @@
     "variantUnavailable": "Esta combinación aún no está disponible en la tienda",
     "variantUnavailableHint": "{{size}} · {{variant}} no encontrado para {{handle}}.",
     "freeformEmpty": "Añade algo a tu diseño primero",
-    "freeformEmptyHint": "Añade al menos una imagen, mapa o texto antes de finalizar la compra."
+    "freeformEmptyHint": "Añade al menos una imagen, mapa o texto antes de finalizar la compra.",
+    "updated": "Carrito actualizado"
   },
   "scene": {
     "livingroom": "Salón",
@@ -407,5 +409,9 @@
     "done": "¡Listo! Aquí está tu diseño.",
     "changePhoto": "Cambiar foto",
     "changeStyle": "Cambiar estilo"
+  },
+  "editRestore": {
+    "loading": "Abriendo tu diseño…",
+    "failed": "No se pudo abrir tu diseño guardado. Tu cuadro sigue en el carrito."
   }
 }

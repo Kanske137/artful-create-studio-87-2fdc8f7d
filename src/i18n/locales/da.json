@@ -34,7 +34,8 @@
     "total": "I alt",
     "checkout": "Til kassen",
     "readyHint": "Tilfreds? Læg i kurven",
-    "order": "Bestil"
+    "order": "Bestil",
+    "update": "Opdater"
   },
   "orientation": {
     "portrait": "Stående",
@@ -261,7 +262,8 @@
     "variantUnavailableHint": "{{size}} · {{variant}} blev ikke fundet for {{handle}}.",
     "freeformEmpty": "Tilføj noget til dit design først",
     "freeformEmptyHint": "Tilføj mindst ét billede, kort eller tekst, før du går til kassen.",
-    "blockedRace": "Vælg et løb, eller upload din GPX-fil, før du bestiller"
+    "blockedRace": "Vælg et løb, eller upload din GPX-fil, før du bestiller",
+    "updated": "Kurven er opdateret"
   },
   "scene": {
     "livingroom": "Stue",
@@ -479,5 +481,9 @@
     "orientation": "Orientering",
     "race": "Løb",
     "ownGpx": "Egen GPX-fil"
+  },
+  "editRestore": {
+    "loading": "Åbner dit design…",
+    "failed": "Det gemte design kunne ikke åbnes. Dit billede ligger stadig i kurven."
   }
 }

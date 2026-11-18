@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Check, Loader2, Palette, ShoppingCart, Upload } from "lucide-react";
@@ -43,6 +43,7 @@ import { raceLocaleFor, raceRenderInput, useRaceStore } from "@/stores/raceStore
 import { ensureSession, getSessionKey, track } from "@/lib/analytics";
 import { SubscriberGateDialog } from "@/components/editor/SubscriberGateDialog";
 import { toast } from "sonner";
+import { editDesignIdFrom, loadDesignSnapshot, restoreDesignSnapshot, saveDesignSnapshot } from "@/lib/design-snapshot";
 
 // OBS: värdena är identitetsnycklar för textureForHex (lib/frame-textures) —
 // samma hex som frameColorFromVariant i mockup-scenes. Ändras de tappar
@@ -70,6 +71,10 @@ export default function EditorPage() {
   const [params, setParams] = useSearchParams();
   const handleParam = params.get("handle") ?? "personlig-karta-poster";
   const typeParam = normalizeType(params.get("type"));
+  // "Redigera design" från kundvagnen: temat skickar radens _design_id som ?edit=.
+  const editId = editDesignIdFrom(params.get("edit"));
+  const editAttempted = useRef(false);
+  const [editRestored, setEditRestored] = useState(false);
   const [configs, setConfigs] = useState<ProductConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -317,6 +322,40 @@ export default function EditorPage() {
       ? t("cartAdd.freeformEmpty")
       : undefined;
 
+  // Återställ sparad design när rätt mall och material är laddade. Byter
+  // först till radens material om sidan öppnades med ett annat.
+  useEffect(() => {
+    if (!editId || editAttempted.current || !config || configs.length === 0) return;
+    const snap = loadDesignSnapshot(editId);
+    if (!snap) {
+      editAttempted.current = true;
+      toast.error(t("editRestore.failed"));
+      return;
+    }
+    if (snap.productType && snap.productType !== config.product_type) {
+      const target = configs.find(
+        (c) => c.shopify_handle === config.shopify_handle && c.product_type === snap.productType,
+      );
+      if (target) {
+        onProductChange(target.shopify_handle, target.product_type);
+        return;
+      }
+    }
+    editAttempted.current = true;
+    const toastId = toast.loading(t("editRestore.loading"));
+    restoreDesignSnapshot(snap)
+      .then(() => {
+        setEditRestored(true);
+        toast.dismiss(toastId);
+      })
+      .catch((err) => {
+        console.error("[edit-design] restore failed", err);
+        toast.dismiss(toastId);
+        toast.error(t("editRestore.failed"));
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editId, config, configs]);
+
   const handleAddToCart = async () => {
     if (!config || !size || !variant) return;
     if (isFreeform && !hasDesignContent()) {
@@ -400,6 +439,9 @@ export default function EditorPage() {
     };
 
     setIsPreparing(true);
+    // Spara designen för "Redigera design" i kundvagnen parallellt med
+    // tryckfilen. Misslyckas den får raden bara ingen redigera-länk.
+    const snapshotSaved = saveDesignSnapshot(designId);
     let previewUrl = "";
     let printFileUrl = "";
     try {
@@ -456,6 +498,7 @@ export default function EditorPage() {
       _print_file_url: printFileUrl,
       _session_id: getSessionKey(),
     };
+    if (await snapshotSaved) properties._edit_snapshot = "1";
     // Kartrutans bredd i editorn: med center/zoom räcker den för att återskapa
     // exakt det område kunden såg (support/omtryck).
     const firstMapValue = Object.values(layerValues ?? {}).find((v) => v?.kind === "map");
@@ -505,10 +548,13 @@ export default function EditorPage() {
           productTypeLabel: productTypeLabel(config.product_type),
           quantity: 1,
           properties,
+          // Temat byter ut kundvagnsraden (?line=) bara när designen faktiskt
+          // återställdes; annars läggs en ny rad till som vanligt.
+          replaceLine: editRestored,
         },
         "*",
       );
-      toast.success(t("cartAdd.added"));
+      toast.success(t(editRestored ? "cartAdd.updated" : "cartAdd.added"));
       return;
     }
 
@@ -669,6 +715,7 @@ export default function EditorPage() {
         disabledHint={blockHint}
         onAdd={handleAddToCart}
         showCartHint={showCartHint}
+        isUpdate={editRestored}
       />
       {firstAiResult && (
         <GenerationFeedback resultUrl={firstAiResult} className="mx-4 mt-3 mb-2" />

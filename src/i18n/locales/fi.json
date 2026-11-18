@@ -34,7 +34,8 @@
     "total": "Yhteensä",
     "checkout": "Kassalle",
     "readyHint": "Tyytyväinen? Lisää ostoskoriin",
-    "order": "Tilaa"
+    "order": "Tilaa",
+    "update": "Päivitä"
   },
   "orientation": {
     "portrait": "Pystysuora",
@@ -261,7 +262,8 @@
     "variantUnavailableHint": "{{size}} · {{variant}} ei löytynyt tuotteelle {{handle}}.",
     "freeformEmpty": "Lisää ensin jotain suunnitelmaasi",
     "freeformEmptyHint": "Lisää vähintään yksi kuva, kartta tai teksti ennen kassalle siirtymistä.",
-    "blockedRace": "Valitse juoksutapahtuma tai lataa GPX-tiedostosi ennen tilaamista"
+    "blockedRace": "Valitse juoksutapahtuma tai lataa GPX-tiedostosi ennen tilaamista",
+    "updated": "Ostoskori on päivitetty"
   },
   "scene": {
     "livingroom": "Olohuone",
@@ -479,5 +481,9 @@
     "orientation": "Suunta",
     "race": "Tapahtuma",
     "ownGpx": "Oma GPX-tiedosto"
+  },
+  "editRestore": {
+    "loading": "Avataan suunnitelmaasi…",
+    "failed": "Tallennettua suunnitelmaa ei voitu avata. Taulusi on yhä ostoskorissa."
   }
 }

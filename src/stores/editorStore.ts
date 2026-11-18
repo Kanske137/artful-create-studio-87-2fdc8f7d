@@ -193,7 +193,7 @@ export interface PhotoLayerSource {
   originalUrl: string | null;
 }
 
-interface EditorState {
+export interface EditorState {
   config: ProductConfig | null;
   template: Template | null;
   productOptions: ProductOptions | null;
@@ -394,6 +394,10 @@ interface EditorState {
   isLayerHidden: (id: string) => boolean;
   /** Skriv om zIndex enligt orderedIds (TOPP-först = högst zIndex). */
   reorderLayers: (orderedIds: string[]) => void;
+  /** Återställ en sparad design ("Redigera design" från kundvagnen).
+   *  Sätter fälten i patch och räknar om spegelfälten för första karta,
+   *  text och foto. Se src/lib/design-snapshot.ts. */
+  restoreDesign: (patch: Partial<EditorState>) => void;
   /** True om fri mall har minst en designkälla med riktigt innehåll. */
   hasDesignContent: () => boolean;
 
@@ -738,6 +742,20 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     );
     const next: MapLayerValue = { ...cur, icons };
     set({ layerValues: { ...state.layerValues, [layerId]: next } });
+  },
+
+  restoreDesign: (patch) => {
+    set((s) => {
+      const next = { ...s, ...patch } as EditorState;
+      const photo = mirrorPhoto(next);
+      return {
+        ...patch,
+        ...mirrorLegacy(next),
+        ...photo,
+        // Variant-id:t slås upp på nytt för återställd storlek/utförande.
+        shopifyVariantId: null,
+      };
+    });
   },
 
   setConfig: (config) => {

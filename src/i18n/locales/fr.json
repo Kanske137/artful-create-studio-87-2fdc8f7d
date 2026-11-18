@@ -34,7 +34,8 @@
     "total": "Total",
     "checkout": "Commander",
     "readyHint": "Satisfait ? Ajouter au panier",
-    "order": "Commander"
+    "order": "Commander",
+    "update": "Mettre à jour"
   },
   "orientation": {
     "portrait": "Portrait",
@@ -248,7 +249,8 @@
     "variantUnavailable": "Cette combinaison n'est pas encore disponible en boutique",
     "variantUnavailableHint": "{{size}} · {{variant}} introuvable pour {{handle}}.",
     "freeformEmpty": "Ajoutez d'abord un élément à votre design",
-    "freeformEmptyHint": "Ajoutez au moins une image, une carte ou du texte avant de passer à la caisse."
+    "freeformEmptyHint": "Ajoutez au moins une image, une carte ou du texte avant de passer à la caisse.",
+    "updated": "Panier mis à jour"
   },
   "scene": {
     "livingroom": "Salon",
@@ -407,5 +409,9 @@
     "done": "C'est prêt ! Voici votre création.",
     "changePhoto": "Changer de photo",
     "changeStyle": "Changer de style"
+  },
+  "editRestore": {
+    "loading": "Ouverture de ton design…",
+    "failed": "Impossible d'ouvrir ton design enregistré. Ton tableau est toujours dans le panier."
   }
 }

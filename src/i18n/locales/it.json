@@ -34,7 +34,8 @@
     "total": "Totale",
     "checkout": "Cassa",
     "readyHint": "Soddisfatto? Aggiungi al carrello",
-    "order": "Ordina"
+    "order": "Ordina",
+    "update": "Aggiorna"
   },
   "orientation": {
     "portrait": "Verticale",
@@ -248,7 +249,8 @@
     "variantUnavailable": "Questa combinazione non è ancora disponibile in negozio",
     "variantUnavailableHint": "{{size}} · {{variant}} non trovato per {{handle}}.",
     "freeformEmpty": "Aggiungi prima qualcosa al tuo design",
-    "freeformEmptyHint": "Aggiungi almeno un'immagine, una mappa o del testo prima del checkout."
+    "freeformEmptyHint": "Aggiungi almeno un'immagine, una mappa o del testo prima del checkout.",
+    "updated": "Carrello aggiornato"
   },
   "scene": {
     "livingroom": "Soggiorno",
@@ -407,5 +409,9 @@
     "done": "Fatto! Ecco la tua creazione.",
     "changePhoto": "Cambia foto",
     "changeStyle": "Cambia stile"
+  },
+  "editRestore": {
+    "loading": "Apertura del tuo design…",
+    "failed": "Non è stato possibile aprire il tuo design salvato. Il tuo quadro è ancora nel carrello."
   }
 }

@@ -34,7 +34,8 @@
     "total": "Totaal",
     "checkout": "Afrekenen",
     "readyHint": "Tevreden? In winkelwagen",
-    "order": "Bestellen"
+    "order": "Bestellen",
+    "update": "Bijwerken"
   },
   "orientation": {
     "portrait": "Staand",
@@ -248,7 +249,8 @@
     "variantUnavailable": "Deze combinatie is nog niet beschikbaar in de winkel",
     "variantUnavailableHint": "{{size}} · {{variant}} niet gevonden voor {{handle}}.",
     "freeformEmpty": "Voeg eerst iets toe aan je ontwerp",
-    "freeformEmptyHint": "Voeg ten minste één afbeelding, kaart of tekst toe voordat je afrekent."
+    "freeformEmptyHint": "Voeg ten minste één afbeelding, kaart of tekst toe voordat je afrekent.",
+    "updated": "Winkelwagen bijgewerkt"
   },
   "scene": {
     "livingroom": "Woonkamer",
@@ -407,5 +409,9 @@
     "done": "Klaar! Dit is jouw ontwerp.",
     "changePhoto": "Foto wijzigen",
     "changeStyle": "Stijl wijzigen"
+  },
+  "editRestore": {
+    "loading": "Je ontwerp wordt geopend…",
+    "failed": "Je opgeslagen ontwerp kon niet worden geopend. Je print staat nog in je winkelwagen."
   }
 }

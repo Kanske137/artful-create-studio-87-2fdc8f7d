@@ -34,7 +34,8 @@
     "total": "Gesamt",
     "checkout": "Zur Kasse",
     "readyHint": "Zufrieden? In den Warenkorb",
-    "order": "Bestellen"
+    "order": "Bestellen",
+    "update": "Aktualisieren"
   },
   "orientation": {
     "portrait": "Hochformat",
@@ -248,7 +249,8 @@
     "variantUnavailable": "Diese Kombination ist im Shop noch nicht verfügbar",
     "variantUnavailableHint": "{{size}} · {{variant}} wurde nicht für {{handle}} gefunden.",
     "freeformEmpty": "Füge zuerst etwas zu deinem Design hinzu",
-    "freeformEmptyHint": "Füge mindestens ein Bild, eine Karte oder einen Text hinzu, bevor du zur Kasse gehst."
+    "freeformEmptyHint": "Füge mindestens ein Bild, eine Karte oder einen Text hinzu, bevor du zur Kasse gehst.",
+    "updated": "Warenkorb aktualisiert"
   },
   "scene": {
     "livingroom": "Wohnzimmer",
@@ -407,5 +409,9 @@
     "done": "Fertig! So sieht dein Motiv aus.",
     "changePhoto": "Foto ändern",
     "changeStyle": "Stil ändern"
+  },
+  "editRestore": {
+    "loading": "Dein Design wird geöffnet…",
+    "failed": "Dein gespeichertes Design konnte nicht geöffnet werden. Dein Bild liegt weiterhin im Warenkorb."
   }
 }

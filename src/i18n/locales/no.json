@@ -34,7 +34,8 @@
     "total": "Totalt",
     "checkout": "Til kassen",
     "readyHint": "Fornøyd? Legg i handlekurven",
-    "order": "Bestill"
+    "order": "Bestill",
+    "update": "Oppdater"
   },
   "orientation": {
     "portrait": "Stående",
@@ -248,7 +249,8 @@
     "variantUnavailable": "Denne kombinasjonen er ikke tilgjengelig i butikken ennå",
     "variantUnavailableHint": "{{size}} · {{variant}} ble ikke funnet for {{handle}}.",
     "freeformEmpty": "Legg til noe i designet ditt først",
-    "freeformEmptyHint": "Legg til minst ett bilde, kart eller tekst før du går til kassen."
+    "freeformEmptyHint": "Legg til minst ett bilde, kart eller tekst før du går til kassen.",
+    "updated": "Handlekurven er oppdatert"
   },
   "scene": {
     "livingroom": "Stue",
@@ -407,5 +409,9 @@
     "done": "Ferdig! Slik blir bildet ditt.",
     "changePhoto": "Bytt bilde",
     "changeStyle": "Bytt stil"
+  },
+  "editRestore": {
+    "loading": "Åpner designet ditt…",
+    "failed": "Det lagrede designet kunne ikke åpnes. Bildet ditt ligger fortsatt i handlekurven."
   }
 }

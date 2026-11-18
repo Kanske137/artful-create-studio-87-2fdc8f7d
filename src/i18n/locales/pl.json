@@ -34,7 +34,8 @@
     "total": "Razem",
     "checkout": "Do kasy",
     "readyHint": "Zadowolony? Dodaj do koszyka",
-    "order": "Zamów"
+    "order": "Zamów",
+    "update": "Aktualizuj"
   },
   "orientation": {
     "portrait": "Pionowo",
@@ -248,7 +249,8 @@
     "variantUnavailable": "Ta kombinacja nie jest jeszcze dostępna w sklepie",
     "variantUnavailableHint": "{{size}} · {{variant}} nie znaleziono dla {{handle}}.",
     "freeformEmpty": "Najpierw dodaj coś do swojego projektu",
-    "freeformEmptyHint": "Dodaj co najmniej jeden obraz, mapę lub tekst przed przejściem do kasy."
+    "freeformEmptyHint": "Dodaj co najmniej jeden obraz, mapę lub tekst przed przejściem do kasy.",
+    "updated": "Koszyk zaktualizowany"
   },
   "scene": {
     "livingroom": "Salon",
@@ -407,5 +409,9 @@
     "done": "Gotowe! Oto Twój projekt.",
     "changePhoto": "Zmień zdjęcie",
     "changeStyle": "Zmień styl"
+  },
+  "editRestore": {
+    "loading": "Otwieranie projektu…",
+    "failed": "Nie udało się otworzyć zapisanego projektu. Twój obraz nadal jest w koszyku."
   }
 }

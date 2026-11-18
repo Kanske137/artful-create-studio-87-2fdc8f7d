@@ -34,7 +34,8 @@
     "total": "Total",
     "checkout": "Checkout",
     "readyHint": "Happy with it? Add to cart",
-    "order": "Order"
+    "order": "Order",
+    "update": "Update"
   },
   "orientation": {
     "portrait": "Portrait",
@@ -256,7 +257,8 @@
     "variantUnavailableHint": "{{size}} · {{variant}} not found for {{handle}}.",
     "freeformEmpty": "Add something to your design first",
     "freeformEmptyHint": "Add at least one image, map or text before checking out.",
-    "blockedRace": "Choose a race or upload your GPX file before ordering"
+    "blockedRace": "Choose a race or upload your GPX file before ordering",
+    "updated": "Cart updated"
   },
   "scene": {
     "livingroom": "Living room",
@@ -479,5 +481,9 @@
     "orientation": "Orientation",
     "race": "Race",
     "ownGpx": "Your own GPX file"
+  },
+  "editRestore": {
+    "loading": "Opening your design…",
+    "failed": "Your saved design couldn't be opened. Your print is still in the cart."
   }
 }

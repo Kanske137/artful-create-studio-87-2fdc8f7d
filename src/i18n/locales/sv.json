@@ -34,7 +34,8 @@
     "total": "Totalt",
     "checkout": "Till kassan",
     "readyHint": "Är du nöjd? Lägg till i kundvagnen",
-    "order": "Beställ"
+    "order": "Beställ",
+    "update": "Uppdatera"
   },
   "orientation": {
     "portrait": "Stående",
@@ -261,7 +262,8 @@
     "variantUnavailableHint": "{{size}} · {{variant}} hittades inte för {{handle}}.",
     "freeformEmpty": "Lägg till något i din design först",
     "freeformEmptyHint": "Lägg till minst en bild, karta eller text innan du går till kassan.",
-    "blockedRace": "Välj ett lopp eller ladda upp din GPX-fil innan du beställer"
+    "blockedRace": "Välj ett lopp eller ladda upp din GPX-fil innan du beställer",
+    "updated": "Varukorgen är uppdaterad"
   },
   "scene": {
     "livingroom": "Vardagsrum",
@@ -479,5 +481,9 @@
     "orientation": "Orientering",
     "race": "Lopp",
     "ownGpx": "Egen GPX-fil"
+  },
+  "editRestore": {
+    "loading": "Öppnar din design…",
+    "failed": "Den sparade designen kunde inte öppnas. Din tavla ligger kvar i varukorgen."
   }
 }

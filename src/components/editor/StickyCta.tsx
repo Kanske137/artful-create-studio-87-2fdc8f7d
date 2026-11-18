@@ -17,10 +17,12 @@ interface Props {
   onAdd: () => void;
   /** Show a pulsing "Är du nöjd?"-badge above the cart button (mobile only). */
   showCartHint?: boolean;
+  /** Redigerar en rad från kundvagnen: knappen uppdaterar raden. */
+  isUpdate?: boolean;
   className?: string;
 }
 
-export function StickyCta({ price, compareAtPrice, summary, loading, disabled, disabledHint, onAdd, showCartHint, className }: Props) {
+export function StickyCta({ price, compareAtPrice, summary, loading, disabled, disabledHint, onAdd, showCartHint, isUpdate, className }: Props) {
   const { t } = useTranslation();
   const hintVisible = !!showCartHint && !loading && !disabled;
   return (
@@ -61,7 +63,7 @@ export function StickyCta({ price, compareAtPrice, summary, loading, disabled, d
       <Button
         onClick={onAdd}
         disabled={loading || disabled}
-        aria-label={t("common.addToCart")}
+        aria-label={t(isUpdate ? "cart.update" : "common.addToCart")}
         className="h-12 md:h-12 rounded-full bg-background text-foreground hover:bg-background/90 px-5 md:px-7 font-semibold disabled:opacity-50"
       >
         {loading ? (
@@ -69,7 +71,7 @@ export function StickyCta({ price, compareAtPrice, summary, loading, disabled, d
         ) : (
           <span className="flex items-center gap-2">
             <ShoppingCart className="h-4 w-4" />
-            <span>{t("cart.order", { defaultValue: "Order" })}</span>
+            <span>{isUpdate ? t("cart.update") : t("cart.order", { defaultValue: "Order" })}</span>
           </span>
         )}
       </Button>
