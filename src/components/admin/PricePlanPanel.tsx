@@ -8,22 +8,48 @@ import { supabase } from "@/integrations/supabase/client";
  * supabase/functions/_shared/price-plan.ts). Provkörningen läser bara;
  * "Tillämpa" skriver priser och rabatter i Shopify.
  */
+const PHASES = ["se", "dk", "fi", "discounts"] as const;
+
 export default function PricePlanPanel() {
   const [busy, setBusy] = useState<"dry" | "apply" | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [dryDone, setDryDone] = useState(false);
 
+  const call = async (body: Record<string, unknown>) => {
+    const { data, error } = await supabase.functions.invoke("shopify-apply-pricing", { body });
+    if (!error) return { ok: Boolean(data?.ok), data };
+    // Läs funktionens eget felmeddelande när det finns ett.
+    let detail: unknown = error.message;
+    const ctx = (error as { context?: Response }).context;
+    if (ctx && typeof ctx.text === "function") {
+      try {
+        const text = await ctx.text();
+        try { detail = JSON.parse(text); } catch { detail = `${ctx.status}: ${text.slice(0, 500)}`; }
+      } catch { /* behåll error.message */ }
+    }
+    return { ok: false, data: { error: detail } };
+  };
+
   const run = async (dryRun: boolean) => {
     setBusy(dryRun ? "dry" : "apply");
     setResult(null);
-    const { data, error } = await supabase.functions.invoke("shopify-apply-pricing", { body: { dryRun } });
-    setBusy(null);
-    if (error) {
-      setResult(`Fel: ${error.message}`);
+    if (dryRun) {
+      const r = await call({ dryRun: true });
+      setBusy(null);
+      setResult(JSON.stringify(r.data, null, 2));
+      if (r.ok) setDryDone(true);
       return;
     }
-    setResult(JSON.stringify(data, null, 2));
-    if (dryRun && data?.ok) setDryDone(true);
+    // Ett steg per anrop så att inget anrop slår i tidsgränsen.
+    const out: Record<string, unknown> = {};
+    for (const phase of PHASES) {
+      setResult(JSON.stringify({ pågår: phase, ...out }, null, 2));
+      const r = await call({ dryRun: false, phase });
+      out[phase] = r.data;
+      if (!r.ok) break;
+    }
+    setBusy(null);
+    setResult(JSON.stringify(out, null, 2));
   };
 
   return (

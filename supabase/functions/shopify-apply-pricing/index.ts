@@ -1,6 +1,9 @@
 // Tillämpar prisplanen i _shared/price-plan.ts på alla aktiva produkter.
 //
-// POST { dryRun?: boolean }   (dryRun är standard; skicka dryRun:false för att skriva)
+// POST { dryRun?: boolean, phase?: "se" | "dk" | "fi" | "discounts" | "all" }
+//   dryRun är standard; skicka dryRun:false för att skriva.
+//   phase begränsar skrivningen till ett steg så att varje anrop håller sig
+//   under edge-funktionernas tidsgräns (standard "all").
 //
 // 1. Grundpriser (Sverige): ramar och canvas enligt planen, jämförpris tas bort.
 // 2. Fasta prislistor för Danmark (DKK) och Finland (EUR): ramar, canvas,
@@ -32,6 +35,9 @@ const PRICE_LISTS: Record<Exclude<Market, "SE">, { id: string; currency: string 
 };
 
 const BUY2_TITLE = "Köp 2 posters/hängare – 15 %";
+
+type Phase = "se" | "dk" | "fi" | "discounts" | "all";
+const PHASES: Phase[] = ["se", "dk", "fi", "discounts", "all"];
 const ARTHENA15_ID = "gid://shopify/DiscountCodeNode/1848156291418";
 
 interface Variant {
@@ -73,8 +79,8 @@ const FIXED_PRICES_ADD = `
 
 const FIND_AUTOMATIC = `
   query($q: String!) {
-    automaticDiscountNodes(first: 5, query: $q) {
-      nodes { id automaticDiscount { __typename ... on DiscountAutomaticBasic { title status } } }
+    discountNodes(first: 10, query: $q) {
+      nodes { id discount { __typename ... on DiscountAutomaticBasic { title status } } }
     }
   }`;
 
@@ -160,9 +166,11 @@ Deno.serve(async (req) => {
   const admin = await requireAdmin(req);
   if (!admin) return json({ ok: false, error: "Endast admin" }, 403);
 
-  let body: { dryRun?: boolean } = {};
+  let body: { dryRun?: boolean; phase?: Phase } = {};
   try { body = await req.json(); } catch { /* tom kropp = provkörning */ }
   const dryRun = body.dryRun !== false;
+  const phase: Phase = PHASES.includes(body.phase as Phase) ? (body.phase as Phase) : "all";
+  const runs = (p: Phase) => phase === "all" || phase === p;
 
   try {
     await ensureShopifyAuth();
@@ -211,13 +219,14 @@ Deno.serve(async (req) => {
 
     const errors: string[] = [];
 
-    for (const u of baseUpdates) {
+    for (const u of runs("se") ? baseUpdates : []) {
       const r: { productVariantsBulkUpdate: { userErrors: { message: string }[] } } =
         await shopifyAdmin(VARIANTS_UPDATE, { productId: u.productId, variants: u.variants });
       for (const e of r.productVariantsBulkUpdate.userErrors) errors.push(`SE ${u.handle}: ${e.message}`);
     }
 
     for (const m of ["DK", "FI"] as const) {
+      if (!runs(m === "DK" ? "dk" : "fi")) continue;
       for (const part of chunk(fixed[m], 100)) {
         const r: { priceListFixedPricesAdd: { userErrors: { message: string }[] } } =
           await shopifyAdmin(FIXED_PRICES_ADD, { priceListId: PRICE_LISTS[m].id, prices: part });
@@ -225,12 +234,17 @@ Deno.serve(async (req) => {
       }
     }
 
+    if (!runs("discounts")) {
+      return json({ ok: errors.length === 0, dryRun: false, phase, summary, errors: errors.slice(0, 50) });
+    }
+
     // "Köp 2"-rabatten: skapa om den saknas, lägg sedan till varianterna i bitar.
-    const found: { automaticDiscountNodes: { nodes: { id: string; automaticDiscount: { title?: string } }[] } } =
-      await shopifyAdmin(FIND_AUTOMATIC, { q: `title:'${BUY2_TITLE}'` });
-    let buy2Id = found.automaticDiscountNodes.nodes.find((n) => n.automaticDiscount?.title === BUY2_TITLE)?.id ?? null;
+    const found: { discountNodes: { nodes: { id: string; discount: { title?: string } }[] } } =
+      await shopifyAdmin(FIND_AUTOMATIC, { q: "title:Köp*" });
+    let buy2Id = found.discountNodes.nodes.find((n) => n.discount?.title === BUY2_TITLE)?.id ?? null;
     const parts = chunk(discountVariantIds, 100);
     const value = { percentage: 0.15 };
+    let created = false;
     if (!buy2Id) {
       const r: { discountAutomaticBasicCreate: { automaticDiscountNode: { id: string } | null; userErrors: { message: string }[] } } =
         await shopifyAdmin(AUTOMATIC_CREATE, {
@@ -244,9 +258,11 @@ Deno.serve(async (req) => {
         });
       for (const e of r.discountAutomaticBasicCreate.userErrors) errors.push(`Köp 2: ${e.message}`);
       buy2Id = r.discountAutomaticBasicCreate.automaticDiscountNode?.id ?? null;
+      created = buy2Id !== null;
     }
     if (buy2Id) {
-      for (const part of parts) {
+      // Första biten följde med när rabatten skapades.
+      for (const part of created ? parts.slice(1) : parts) {
         const r: { discountAutomaticBasicUpdate: { userErrors: { message: string }[] } } =
           await shopifyAdmin(AUTOMATIC_UPDATE, {
             id: buy2Id,
@@ -266,7 +282,7 @@ Deno.serve(async (req) => {
       for (const e of r.discountCodeBasicUpdate.userErrors) errors.push(`ARTHENA15: ${e.message}`);
     }
 
-    return json({ ok: errors.length === 0, dryRun: false, summary, buy2Id, errors: errors.slice(0, 50) });
+    return json({ ok: errors.length === 0, dryRun: false, phase, summary, buy2Id, errors: errors.slice(0, 50) });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("[apply-pricing]", msg);
