@@ -703,7 +703,7 @@ export default function EditorPage() {
       />
       {compareAtDisplay && (
         <div className="mx-4 mb-1 rounded-md bg-red-50 border border-red-200 px-3 py-1.5 text-center text-xs font-semibold text-red-700">
-          {t("sale.campaign", { defaultValue: "🔥 Julkampanj — 25 % på posters och canvas" })}
+          {t("sale.campaign", { defaultValue: "🔥 Julkampanj — 25 % på posters" })}
         </div>
       )}
       <StickyCta

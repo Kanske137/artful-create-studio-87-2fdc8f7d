@@ -17,26 +17,26 @@ export const POSTER_FRAMES = [
 // Hängare har egna priser baserat på Gelatos wall-hanging-produkter.
 // Finns inte i 13x18 (Gelato erbjuder ingen hängare i den storleken).
 export const POSTER_PRICES: Record<string, Record<string, number>> = {
-  "13x18": { Ingen: 149, Vit: 349, Svart: 349, Ek: 369, Valnöt: 369 },
-  "21x30": { Ingen: 179, Vit: 399, Svart: 399, Ek: 429, Valnöt: 429, "Hängare Vit": 339, "Hängare Svart": 339, "Hängare Ek": 349, "Hängare Valnöt": 349 },
-  "30x40": { Ingen: 189, Vit: 559, Svart: 559, Ek: 589, Valnöt: 589, "Hängare Vit": 439, "Hängare Svart": 439, "Hängare Ek": 449, "Hängare Valnöt": 449 },
-  "40x50": { Ingen: 209, Vit: 749, Svart: 749, Ek: 789, Valnöt: 789, "Hängare Vit": 489, "Hängare Svart": 489, "Hängare Ek": 499, "Hängare Valnöt": 499 },
-  "50x70": { Ingen: 239, Vit: 919, Svart: 919, Ek: 969, Valnöt: 969, "Hängare Vit": 589, "Hängare Svart": 589, "Hängare Ek": 599, "Hängare Valnöt": 599 },
-  "70x100": { Ingen: 319, Vit: 1249, Svart: 1249, Ek: 1299, Valnöt: 1299, "Hängare Vit": 729, "Hängare Svart": 729, "Hängare Ek": 749, "Hängare Valnöt": 749 },
+  "13x18": { Ingen: 149, Vit: 399, Svart: 399, Ek: 419, Valnöt: 419 },
+  "21x30": { Ingen: 179, Vit: 449, Svart: 449, Ek: 479, Valnöt: 479, "Hängare Vit": 339, "Hängare Svart": 339, "Hängare Ek": 349, "Hängare Valnöt": 349 },
+  "30x40": { Ingen: 189, Vit: 649, Svart: 649, Ek: 679, Valnöt: 679, "Hängare Vit": 439, "Hängare Svart": 439, "Hängare Ek": 449, "Hängare Valnöt": 449 },
+  "40x50": { Ingen: 209, Vit: 849, Svart: 849, Ek: 889, Valnöt: 889, "Hängare Vit": 489, "Hängare Svart": 489, "Hängare Ek": 499, "Hängare Valnöt": 499 },
+  "50x70": { Ingen: 239, Vit: 1049, Svart: 1049, Ek: 1099, Valnöt: 1099, "Hängare Vit": 589, "Hängare Svart": 589, "Hängare Ek": 599, "Hängare Valnöt": 599 },
+  "70x100": { Ingen: 319, Vit: 1599, Svart: 1599, Ek: 1699, Valnöt: 1699, "Hängare Vit": 729, "Hängare Svart": 729, "Hängare Ek": 749, "Hängare Valnöt": 749 },
 };
 
 export const CANVAS_SIZES = ["20x25", "20x30", "30x40", "40x50", "40x60", "50x70", "60x80", "70x100"] as const;
 export const CANVAS_DEPTHS = ["2cm", "4cm"] as const;
 
 export const CANVAS_PRICES: Record<string, Record<string, number>> = {
-  "20x25": { "2cm": 219, "4cm": 239 },
-  "20x30": { "2cm": 259, "4cm": 279 },
-  "30x40": { "2cm": 329, "4cm": 359 },
-  "40x50": { "2cm": 449, "4cm": 479 },
-  "40x60": { "2cm": 519, "4cm": 569 },
-  "50x70": { "2cm": 599, "4cm": 649 },
-  "60x80": { "2cm": 749, "4cm": 819 },
-  "70x100": { "2cm": 969, "4cm": 1049 },
+  "20x25": { "2cm": 259, "4cm": 269 },
+  "20x30": { "2cm": 299, "4cm": 319 },
+  "30x40": { "2cm": 379, "4cm": 419 },
+  "40x50": { "2cm": 509, "4cm": 549 },
+  "40x60": { "2cm": 599, "4cm": 649 },
+  "50x70": { "2cm": 679, "4cm": 739 },
+  "60x80": { "2cm": 849, "4cm": 929 },
+  "70x100": { "2cm": 1099, "4cm": 1189 },
 };
 
 // Aluminium (vanlig — ej brushed). Använder pseudo-variantnamn "Standard"

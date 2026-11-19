@@ -10,6 +10,7 @@ import { resolveTemplate } from "@/lib/template-migrate";
 import type { Template } from "@/lib/template-schema";
 import CreateTemplateDialog from "@/components/admin/CreateTemplateDialog";
 import TemplateThumbnail from "@/components/admin/TemplateThumbnail";
+import PricePlanPanel from "@/components/admin/PricePlanPanel";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -164,6 +165,8 @@ export default function AdminConfigs() {
               {installStatus?.installed ? "Installera om" : "Installera Shopify-app"}
             </Button>
           </div>
+
+          <PricePlanPanel />
         </div>
       </header>
 
