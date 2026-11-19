@@ -193,6 +193,9 @@ export interface PhotoLayerSource {
   originalUrl: string | null;
 }
 
+/** Storlek som förväljs när en mall laddas, om mallen har den. */
+const PREFERRED_DEFAULT_SIZE = "30x40";
+
 export interface EditorState {
   config: ProductConfig | null;
   template: Template | null;
@@ -782,7 +785,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       (s) => allowedSizesForType.length === 0 || allowedSizesForType.includes(s.size),
     );
     const sizeStillValid = prevSize && allowedFiltered.find((s) => s.size === prevSize);
-    const nextSize = sizeStillValid ? prevSize : allowedFiltered[0]?.size ?? effectiveSizes[0]?.size ?? null;
+    // Förvald storlek: 30x40 när mallen erbjuder den (beslut 19 nov 2026 för
+    // att höja ordervärdet; tidigare blev minsta storleken 13x18 förvald).
+    const preferredDefault = allowedFiltered.find(
+      (s) => s.size.toLowerCase().replace(/\s|cm/g, "") === PREFERRED_DEFAULT_SIZE,
+    );
+    const nextSize = sizeStillValid
+      ? prevSize
+      : preferredDefault?.size ?? allowedFiltered[0]?.size ?? effectiveSizes[0]?.size ?? null;
     const nextSizeDef = effectiveSizes.find((s) => s.size === nextSize);
 
     const allowedVariantsForType =
