@@ -67,7 +67,10 @@
     "finish": "Finish",
     "frameOrHanger": "Ram / Hängare",
     "orientation": "Orientering",
-    "depthValue": "{{cm}} cm"
+    "depthValue": "{{cm}} cm",
+    "popular": "Populärast",
+    "canvasUpsell": "Canvas för {{delta}} mer – levereras färdig att hänga",
+    "canvasUpsellCta": "Visa canvas"
   },
   "productKind": {
     "poster": "Poster",

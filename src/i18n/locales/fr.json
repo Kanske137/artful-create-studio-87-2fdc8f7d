@@ -65,7 +65,10 @@
     "finish": "Finition",
     "frameOrHanger": "Cadre / Suspension",
     "orientation": "Orientation",
-    "depthValue": "{{cm}} cm"
+    "depthValue": "{{cm}} cm",
+    "popular": "Le plus populaire",
+    "canvasUpsell": "Toile pour {{delta}} de plus – livrée prête à accrocher",
+    "canvasUpsellCta": "Voir la toile"
   },
   "productKind": {
     "poster": "Poster",

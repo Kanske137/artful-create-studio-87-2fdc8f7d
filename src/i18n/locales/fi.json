@@ -67,7 +67,10 @@
     "finish": "Pinta",
     "frameOrHanger": "Kehys / Ripustin",
     "orientation": "Suunta",
-    "depthValue": "{{cm}} cm"
+    "depthValue": "{{cm}} cm",
+    "popular": "Suosituin",
+    "canvasUpsell": "Kangastaulu {{delta}} lisähintaan – toimitetaan valmiina ripustettavaksi",
+    "canvasUpsellCta": "Näytä kangastaulu"
   },
   "productKind": {
     "poster": "Juliste",

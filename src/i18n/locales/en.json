@@ -67,7 +67,10 @@
     "finish": "Finish",
     "frameOrHanger": "Frame / Hanger",
     "orientation": "Orientation",
-    "depthValue": "{{cm}} cm"
+    "depthValue": "{{cm}} cm",
+    "popular": "Most popular",
+    "canvasUpsell": "Canvas for {{delta}} more – arrives ready to hang",
+    "canvasUpsellCta": "Show canvas"
   },
   "productKind": {
     "poster": "Poster",

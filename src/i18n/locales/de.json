@@ -65,7 +65,10 @@
     "finish": "Finish",
     "frameOrHanger": "Rahmen / Aufhänger",
     "orientation": "Ausrichtung",
-    "depthValue": "{{cm}} cm"
+    "depthValue": "{{cm}} cm",
+    "popular": "Am beliebtesten",
+    "canvasUpsell": "Leinwand für {{delta}} mehr – wird aufhängefertig geliefert",
+    "canvasUpsellCta": "Leinwand ansehen"
   },
   "productKind": {
     "poster": "Poster",

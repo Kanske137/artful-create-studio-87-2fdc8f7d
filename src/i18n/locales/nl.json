@@ -65,7 +65,10 @@
     "finish": "Afwerking",
     "frameOrHanger": "Lijst / Hanger",
     "orientation": "Oriëntatie",
-    "depthValue": "{{cm}} cm"
+    "depthValue": "{{cm}} cm",
+    "popular": "Populairst",
+    "canvasUpsell": "Canvas voor {{delta}} meer – wordt ophangklaar geleverd",
+    "canvasUpsellCta": "Bekijk canvas"
   },
   "productKind": {
     "poster": "Poster",

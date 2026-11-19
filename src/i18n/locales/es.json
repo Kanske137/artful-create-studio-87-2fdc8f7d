@@ -65,7 +65,10 @@
     "finish": "Acabado",
     "frameOrHanger": "Marco / Colgador",
     "orientation": "Orientación",
-    "depthValue": "{{cm}} cm"
+    "depthValue": "{{cm}} cm",
+    "popular": "Más popular",
+    "canvasUpsell": "Lienzo por {{delta}} más – llega listo para colgar",
+    "canvasUpsellCta": "Ver lienzo"
   },
   "productKind": {
     "poster": "Póster",

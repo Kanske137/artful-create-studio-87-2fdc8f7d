@@ -65,7 +65,10 @@
     "finish": "Finitura",
     "frameOrHanger": "Cornice / Appendino",
     "orientation": "Orientamento",
-    "depthValue": "{{cm}} cm"
+    "depthValue": "{{cm}} cm",
+    "popular": "Il più popolare",
+    "canvasUpsell": "Tela per {{delta}} in più – arriva pronta da appendere",
+    "canvasUpsellCta": "Vedi la tela"
   },
   "productKind": {
     "poster": "Poster",

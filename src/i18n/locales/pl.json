@@ -65,7 +65,10 @@
     "finish": "Wykończenie",
     "frameOrHanger": "Rama / Wieszak",
     "orientation": "Orientacja",
-    "depthValue": "{{cm}} cm"
+    "depthValue": "{{cm}} cm",
+    "popular": "Najpopularniejszy",
+    "canvasUpsell": "Płótno za {{delta}} więcej – dostarczane gotowe do powieszenia",
+    "canvasUpsellCta": "Zobacz płótno"
   },
   "productKind": {
     "poster": "Plakat",

@@ -67,7 +67,10 @@
     "finish": "Finish",
     "frameOrHanger": "Ramme / Hænger",
     "orientation": "Orientering",
-    "depthValue": "{{cm}} cm"
+    "depthValue": "{{cm}} cm",
+    "popular": "Mest populær",
+    "canvasUpsell": "Lærred for {{delta}} mere – leveres klar til ophængning",
+    "canvasUpsellCta": "Vis lærred"
   },
   "productKind": {
     "poster": "Plakat",

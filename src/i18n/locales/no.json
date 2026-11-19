@@ -65,7 +65,10 @@
     "finish": "Finish",
     "frameOrHanger": "Ramme / Henger",
     "orientation": "Orientering",
-    "depthValue": "{{cm}} cm"
+    "depthValue": "{{cm}} cm",
+    "popular": "Mest populær",
+    "canvasUpsell": "Lerret for {{delta}} mer – leveres klart til å henges opp",
+    "canvasUpsellCta": "Vis lerret"
   },
   "productKind": {
     "poster": "Plakat",

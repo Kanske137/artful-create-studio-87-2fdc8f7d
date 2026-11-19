@@ -16,6 +16,7 @@ import {
 import { deriveTemplateSlug, getEffectiveSizes, type ProductConfig, type ProductType } from "@/lib/product-config";
 import { getActiveLayoutBlock } from "@/lib/template-schema";
 import { FrameOption } from "./FrameOption";
+import { CanvasUpsell } from "./CanvasUpsell";
 import frameWhite from "@/assets/frames/frame-white.jpg";
 import frameOak from "@/assets/frames/frame-oak.jpg";
 import frameWalnut from "@/assets/frames/frame-walnut.jpg";
@@ -73,6 +74,9 @@ const DepthIcon = forwardRef<SVGSVGElement, { depth: string }>(({ depth }, ref) 
   );
 });
 DepthIcon.displayName = "DepthIcon";
+
+/** Mest sålda posterstorleken i ordrarna juni–nov 2026 (näst efter förvalda 30x40). */
+const POPULAR_POSTER_SIZE = "50x70";
 
 export function FormatSection({ configs, activeHandle, activeProductType, onProductChange }: Props) {
   const { t } = useTranslation();
@@ -197,6 +201,37 @@ export function FormatSection({ configs, activeHandle, activeProductType, onProd
     });
   }
 
+  // Canvas-uppgradering: visas när poster är vald och mallen har canvas i samma storlek.
+  const canvasEntry = toggleEntries.find((e) => e.kind === "canvas");
+  const canvasConfig = kindToConfig.get("canvas");
+  let canvasUpsell: {
+    handle: string;
+    productType: ProductType;
+    size: string;
+    depth: string;
+    posterLive: ReturnType<typeof priceFromMap> | null;
+    fallbackDelta: string | null;
+  } | null = null;
+  if (!isCanvas && !isAluminum && !isAcrylic && canvasEntry && canvasConfig && size) {
+    const canvasSizes = getEffectiveSizes(canvasConfig, productOptions);
+    const allowedCanvasSizes = productOptions?.canvas?.allowedSizes;
+    const canvasSize = canvasSizes.find(
+      (s) => s.size === size && (!allowedCanvasSizes || allowedCanvasSizes.length === 0 || allowedCanvasSizes.includes(s.size)),
+    );
+    const canvasVariant = canvasSize?.variants.find((v) => v.available !== false) ?? canvasSize?.variants[0];
+    if (canvasSize && canvasVariant) {
+      const posterSek = sizeDef?.variants.find((v) => v.name === (variant ?? ""))?.price ?? currentVariantPrice;
+      canvasUpsell = {
+        handle: canvasEntry.handle,
+        productType: canvasEntry.productType,
+        size,
+        depth: canvasVariant.name,
+        posterLive: priceFromMap(priceMap, size, variant ?? null) ?? null,
+        fallbackDelta: posterSek > 0 && canvasVariant.price > posterSek ? formatDiff(canvasVariant.price - posterSek) : null,
+      };
+    }
+  }
+
   // size price diffs use the current variant name (or first variant) for fair comparison
   const variantNameForCompare = variant ?? visibleVariants[0]?.name ?? sizeDef?.variants[0]?.name;
   const currentSizeBasePrice =
@@ -308,6 +343,18 @@ export function FormatSection({ configs, activeHandle, activeProductType, onProd
         </div>
       )}
 
+      {/* Canvas som uppgradering när en poster är vald och samma storlek finns som canvas. */}
+      {canvasUpsell && (
+        <CanvasUpsell
+          canvasHandle={canvasUpsell.handle}
+          size={canvasUpsell.size}
+          canvasDepth={canvasUpsell.depth}
+          posterLive={canvasUpsell.posterLive}
+          fallbackDelta={canvasUpsell.fallbackDelta}
+          onSwitch={() => onProductChange(canvasUpsell.handle, canvasUpsell.productType)}
+        />
+      )}
+
       {/* Storlek dropdown */}
       <div className="space-y-2">
         <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("format.size")}</Label>
@@ -325,7 +372,14 @@ export function FormatSection({ configs, activeHandle, activeProductType, onProd
               return (
                 <SelectItem key={s.size} value={s.size}>
                   <div className="flex items-center justify-between w-full gap-4">
-                    <span>{s.size} cm</span>
+                    <span className="flex items-center gap-2">
+                      {s.size} cm
+                      {!isCanvas && !isAluminum && !isAcrylic && s.size.toLowerCase().replace(/\s|cm/g, "") === POPULAR_POSTER_SIZE && (
+                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-900">
+                          {t("format.popular")}
+                        </span>
+                      )}
+                    </span>
                     {!isCurrent && (
                       <span className="text-xs text-muted-foreground">{live ?? formatDiff(diff)}</span>
                     )}
