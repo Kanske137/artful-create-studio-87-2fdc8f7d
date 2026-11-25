@@ -41,6 +41,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import {
   NANO_BANANA_MODEL,
+  NANO_BANANA_PRO_MODEL,
   runNanoBanana,
   fitForUpload,
   readImageSize,
@@ -94,6 +95,43 @@ const HYBRID_IDENTITY_PROMPT = [
   "The result must remain ONE coherent artwork in the exact art style of image #1 - no photo-collage look.",
   "Return ONE single edited image with the same aspect ratio AND the same framing as image #1.",
 ].join("\n");
+
+// ---------- Identitetstest: Nano Banana Pro i ett pass (2026-11-25) ----------
+// Problemet med cdingram + NB2: ansiktsformen, näsan och käklinjen kommer från
+// MÅLNINGENS ansikte (face-swap-modellen byter bara den inre ansiktsytan och
+// NB2-passet får inte ändra ansiktet). Alla kunder blir därför lika
+// förlagan. Här målar Nano Banana Pro om personen i ett enda pass med kundens
+// foto som identitetsreferens och målningen som scen/stil.
+// Endast admin (humanEngine: "nbpro" + admin-JWT) tills Akram godkänt.
+const IDENTITY_REPAINT_PROMPT = [
+  "Image #1 is a finished portrait painting (the scene). Image #2 is a photograph of a real person (the identity).",
+  "Task: repaint the person in image #1 so that they unmistakably ARE the person in image #2. A close friend must instantly recognise them.",
+  "The painted face in image #1 is only a placeholder. Do NOT keep its face shape, nose, eyes, mouth, jawline, age or hair. Take ALL of these from image #2 instead:",
+  "- overall face shape and width, jawline and chin, cheekbones, forehead and hairline;",
+  "- nose shape and size, eye shape, eye colour and eyelids, eyebrows, mouth and lips, ears;",
+  "- apparent age, wrinkles, skin tone, freckles and moles;",
+  "- facial hair exactly as in image #2 (style, length, colour) - clean-shaven if image #2 is clean-shaven;",
+  "- hair exactly as in image #2 (style, length, colour, texture) adapted naturally under any crown or headwear - bald if bald;",
+  "- glasses, earrings and piercings ONLY if clearly visible in image #2, otherwise none.",
+  "Expression: a natural, flattering version of the expression in image #2 (keep a smile if they smile).",
+  "Keep EVERYTHING ELSE from image #1 unchanged: crown or headwear, clothing and costume jewellery, pose, body, hands, props, background, lighting direction, colour palette, framing, crop and aspect ratio. Never zoom, crop, pan or re-centre.",
+  "Paint the new face and hair in exactly the same painting style, brushwork and lighting as image #1, so the result is ONE coherent painting - never a pasted photo.",
+  "Return one single image.",
+].join("\n");
+
+const ADMIN_EMAILS = ["akram@arthena.se"];
+
+async function isAdminRequest(req: Request): Promise<boolean> {
+  try {
+    const jwt = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+    if (!jwt) return false;
+    const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const { data } = await sb.auth.getUser(jwt);
+    return ADMIN_EMAILS.includes((data?.user?.email ?? "").toLowerCase());
+  } catch {
+    return false;
+  }
+}
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -260,6 +298,7 @@ async function callNanoBananaOnce(params: {
   imageUrls: string[];
   resolution?: "2K" | "4K";
   aspectRatio?: string | null;
+  model?: string;
 }): Promise<
   | { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string }
   | { ok: false; retriable: boolean; status: number; reason: string; userMessage: string }
@@ -269,6 +308,7 @@ async function callNanoBananaOnce(params: {
     imageUrls: params.imageUrls,
     resolution: params.resolution,
     aspectRatio: params.aspectRatio,
+    model: params.model,
   });
   if (r.ok) return r;
   console.error("[face-swap] replicate nano-banana error:", r.reason);
@@ -289,6 +329,7 @@ async function callNanoBanana(params: {
   imageUrls: string[];
   resolution?: "2K" | "4K";
   aspectRatio?: string | null;
+  model?: string;
 }): Promise<
   { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
 > {
@@ -304,6 +345,7 @@ async function callNanoBanana(params: {
       imageUrls: params.imageUrls,
       resolution: params.resolution,
       aspectRatio: params.aspectRatio,
+      model: params.model,
     });
 
     if (result.ok) {
@@ -336,6 +378,21 @@ async function callNanoBanana(params: {
       `${lastFail?.reason ?? "unknown"} (after ${MAX_ATTEMPTS} attempts)`,
     ),
   };
+}
+
+// ---------- Route 1b: Nano Banana Pro identitetsomålning (admin-test) ----------
+async function runHumanNbPro(params: { referenceImageUrl: string; faceImageUrl: string }) {
+  // Två inputbilder: lås formatet till målningens (bild #1), se nearestNanoAspect.
+  const refAspect = await probeImageAspect(params.referenceImageUrl);
+  const aspectRatio = refAspect ? nearestNanoAspect(refAspect) : null;
+  console.log(`[face-swap] nbpro aspect=${aspectRatio ?? "match_input_image"}`);
+  return await callNanoBanana({
+    promptText: IDENTITY_REPAINT_PROMPT,
+    imageUrls: [params.referenceImageUrl, params.faceImageUrl],
+    resolution: "4K",
+    aspectRatio,
+    model: NANO_BANANA_PRO_MODEL,
+  });
 }
 
 // ---------- Route 2: pet face/identity transfer (cats + dogs) ----------
@@ -1000,10 +1057,16 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "referenceImageUrl required for this subjectKind" }, 400);
     }
 
+    // Identitetstest: Nano Banana Pro för personporträtt, bara för admin.
+    const useNbPro =
+      subjectKind === "human" && body?.humanEngine === "nbpro" && (await isAdminRequest(req));
+
     // Fas 4: prenumerant-gate — EN gratis generering per enhet, därefter
     // e-postkrav. Kollas FÖRE modellanrop; 200-svar med code + userMessage
     // enligt funktionens fallback-konvention (gamla bundlar visar texten).
-    const gate = await checkGenerationGate(typeof body?.sessionKey === "string" ? body.sessionKey : null);
+    const gate = useNbPro
+      ? { allowed: true as const }
+      : await checkGenerationGate(typeof body?.sessionKey === "string" ? body.sessionKey : null);
     if (!gate.allowed) {
       return jsonResponse({
         error: "subscriber-gate",
@@ -1027,7 +1090,9 @@ Deno.serve(async (req) => {
     const willUseFlux = !willUseSimple && subjectKind === "removeBackground" && fluxEnabledHandler && hasFluxStyle;
     const route =
       subjectKind === "human"
-        ? hybridEnabled
+        ? useNbPro
+          ? "human-nbpro"
+          : hybridEnabled
           ? "human-cdingram+nb2"
           : "human-cdingram"
         : subjectKind === "pet"
@@ -1039,7 +1104,9 @@ Deno.serve(async (req) => {
               : "remove-bg-nano-banana";
     const modelUsed =
       subjectKind === "human"
-        ? hybridEnabled
+        ? useNbPro
+          ? NANO_BANANA_PRO_MODEL
+          : hybridEnabled
           ? `${FACE_SWAP_MODEL_NAME}+${NANO_BANANA_MODEL}`
           : FACE_SWAP_MODEL_NAME
         : willUseSimple || willUseFlux
@@ -1082,7 +1149,9 @@ Deno.serve(async (req) => {
       typeof body?.fluxStylePrompt === "string" && body.fluxStylePrompt.trim().length > 0 ? body.fluxStylePrompt : null;
 
     let result =
-      subjectKind === "human"
+      subjectKind === "human" && useNbPro
+        ? await runHumanNbPro({ referenceImageUrl: referenceImageUrl!, faceImageUrl })
+        : subjectKind === "human"
         ? await runReplicateFaceSwap({
             referenceImageUrl: referenceImageUrl!,
             faceImageUrl,
@@ -1134,7 +1203,7 @@ Deno.serve(async (req) => {
     // Hybrid identity pass för human: NB2 justerar frisyr/glasögon/smycken/
     // hudton mot kundens foto. Misslyckas passet behålls cdingram-resultatet
     // (graceful degradation) — genereringen felar aldrig på det här steget.
-    if (subjectKind === "human" && hybridEnabled) {
+    if (subjectKind === "human" && hybridEnabled && !useNbPro) {
       // Lås passets bildformat till KONSTVERKETS (cdingram-resultatet = bild
       // #1). Med "match_input_image" och två inputbilder följde outputen
       // kundens telefonfoto i stället — 9:16 i stället för 4:5 — och lagrets

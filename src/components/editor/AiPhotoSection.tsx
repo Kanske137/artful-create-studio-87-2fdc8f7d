@@ -52,6 +52,18 @@ const MAX_BYTES = 25 * 1024 * 1024;
 
 // Subject hints moved to i18n (aiPhoto.subjectHint*).
 
+/** Admin-test: ?aiEngine=nbpro i editorns adress kör personporträtt med Nano
+ *  Banana Pro (funktionen kräver admin-inloggning, annars ignoreras det).
+ *  Ingår i cache-nyckeln så att samma foto kan jämföras mellan motorerna. */
+const AI_ENGINE_OVERRIDE: string | null = (() => {
+  try {
+    const v = new URLSearchParams(window.location.search).get("aiEngine");
+    return v === "nbpro" ? v : null;
+  } catch {
+    return null;
+  }
+})();
+
 /** Cache slot used in place of the admin reference URL for removeBackground.
  *  Including the style id keeps each style pick cached separately. When
  *  simpleStyleMode is on we append a tag so simple-mode results don't collide
@@ -67,7 +79,8 @@ function refSlotFor(
     if (simpleMode) base += `::simple:1`;
     return base;
   }
-  return refUrl ?? "";
+  const slot = refUrl ?? "";
+  return subjectKind === "human" && AI_ENGINE_OVERRIDE ? `${slot}::engine:${AI_ENGINE_OVERRIDE}` : slot;
 }
 
 async function blobToDataUrl(blob: Blob): Promise<string> {
@@ -346,6 +359,7 @@ export function AiPhotoSection({ layer, heading, aiStylePresets }: Props) {
         fluxStylePrompt: layer.defaults.fluxStylePrompt ?? null,
         simpleStyleMode,
         styleInstruction: selectedPreset?.styleInstruction ?? null,
+        humanEngine: subjectKind === "human" ? AI_ENGINE_OVERRIDE : null,
       });
       if (res.handled) return;
       const { data, error } = res;

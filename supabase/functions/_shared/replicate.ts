@@ -264,10 +264,15 @@ export async function probeImageAspect(url: string): Promise<number | null> {
  *  tryckfilen. Skicka därför ALLTID `aspectRatio` (via nearestNanoAspect på
  *  ankarbilden = bild #1) när anropet har mer än en input-bild. */
 export const NANO_BANANA_MODEL = "google/nano-banana-2";
+/** Gemini 3 Pro Image. Starkare identitetsbevarande än NB2; testas för
+ *  personporträtt (kung, drottning m.fl.) sedan 2026-11-25. */
+export const NANO_BANANA_PRO_MODEL = "google/nano-banana-pro";
 
 export function runNanoBanana(params: {
   promptText: string;
   imageUrls: string[];
+  /** Modell; default NB2. NANO_BANANA_PRO_MODEL för identitetstestet. */
+  model?: string;
   /** "2K" (default) eller "4K". 4K (~3700×4600 px) används för slutbilder
    *  sedan 2026-08-09 — tryckkvalitet för stora format + digitalförsäljning.
    *  Kostnad: ~$0.10 (2K) vs ~$0.15 (4K) per bild; 4K tar ~15 s längre.
@@ -281,7 +286,7 @@ export function runNanoBanana(params: {
 }): Promise<ReplicateResult> {
   const resolution = params.resolution ?? "2K";
   return runReplicateModel({
-    model: NANO_BANANA_MODEL,
+    model: params.model ?? NANO_BANANA_MODEL,
     input: {
       prompt: params.promptText,
       image_input: params.imageUrls,
