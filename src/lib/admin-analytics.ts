@@ -4,6 +4,7 @@
 // alla andra. Tabellerna finns ännu inte i den genererade Database-typen,
 // därav den otypade vyn av klienten.
 import { supabase } from "@/integrations/supabase/client";
+import { PORTRAIT_TEST_SESSION_KEY } from "@/lib/portrait-engine";
 
 export interface SessionRow {
   id: string;
@@ -76,9 +77,24 @@ export async function fetchEvents(limit = 5000): Promise<EventRow[]> {
   return (data ?? []) as EventRow[];
 }
 
+/** Adminens motortester (/admin/portratt-test) är inga kundgenereringar. */
+const NOT_PORTRAIT_TEST = `session_key.is.null,session_key.neq.${PORTRAIT_TEST_SESSION_KEY}`;
+
 export async function fetchGenerations(limit = 1000): Promise<GenerationRow[]> {
   const { data, error } = await anyFrom("generations")
     .select("*")
+    .or(NOT_PORTRAIT_TEST)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as GenerationRow[];
+}
+
+/** Adminens motortester för personporträtt, nyast först. */
+export async function fetchPortraitTestGenerations(limit = 500): Promise<GenerationRow[]> {
+  const { data, error } = await anyFrom("generations")
+    .select("*")
+    .eq("session_key", PORTRAIT_TEST_SESSION_KEY)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw new Error(error.message);
@@ -134,12 +150,16 @@ export async function fetchSummaryCounts(sinceIso: string): Promise<SummaryCount
           .or(`last_seen_at.gte.${sinceIso},created_at.gte.${sinceIso}`),
       ),
       countOf(() =>
-        anyFrom("generations").select("*", { count: "exact", head: true }).gte("created_at", sinceIso),
+        anyFrom("generations")
+          .select("*", { count: "exact", head: true })
+          .or(NOT_PORTRAIT_TEST)
+          .gte("created_at", sinceIso),
       ),
       countOf(() =>
         anyFrom("generations")
           .select("*", { count: "exact", head: true })
           .eq("status", "succeeded")
+          .or(NOT_PORTRAIT_TEST)
           .gte("created_at", sinceIso),
       ),
       countOf(() =>

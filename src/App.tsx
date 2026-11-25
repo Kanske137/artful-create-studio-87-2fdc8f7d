@@ -9,6 +9,7 @@ import EditorPage from "./pages/EditorPage.tsx";
 import AdminConfigs from "./pages/AdminConfigs.tsx";
 import DesignerPage from "./pages/admin/DesignerPage.tsx";
 import AnalyticsPage from "./pages/admin/AnalyticsPage.tsx";
+import PortraitTestPage from "./pages/admin/PortraitTestPage.tsx";
 import { RequireAdmin } from "./components/admin/RequireAdmin.tsx";
 
 import { useCartSync } from "./hooks/useCartSync";
@@ -29,6 +30,7 @@ const AppRoutes = () => {
       <Route path="/admin/configs" element={<RequireAdmin><AdminConfigs /></RequireAdmin>} />
       <Route path="/admin/designer/:handle" element={<RequireAdmin><DesignerPage /></RequireAdmin>} />
       <Route path="/admin/analytics" element={<RequireAdmin><AnalyticsPage /></RequireAdmin>} />
+      <Route path="/admin/portratt-test" element={<RequireAdmin><PortraitTestPage /></RequireAdmin>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -41,7 +41,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import {
   NANO_BANANA_MODEL,
-  NANO_BANANA_PRO_MODEL,
   runNanoBanana,
   fitForUpload,
   readImageSize,
@@ -49,6 +48,14 @@ import {
   probeImageAspect,
 } from "../_shared/replicate.ts";
 import { checkGenerationGate } from "../_shared/subscriber-gate.ts";
+import {
+  IDENTITY_REPAINT_PROMPT,
+  SINGLE_PASS_PROVIDER,
+  isAdminRequest,
+  parsePortraitTestEngine,
+  runIdentityRepaint,
+  type SinglePassEngine,
+} from "../_shared/portrait-engines.ts";
 // Deploy-markör 2026-07-21: analytics-loggning (generations-tabellen) aktiv.
 
 const corsHeaders = {
@@ -96,42 +103,8 @@ const HYBRID_IDENTITY_PROMPT = [
   "Return ONE single edited image with the same aspect ratio AND the same framing as image #1.",
 ].join("\n");
 
-// ---------- Identitetstest: Nano Banana Pro i ett pass (2026-11-25) ----------
-// Problemet med cdingram + NB2: ansiktsformen, näsan och käklinjen kommer från
-// MÅLNINGENS ansikte (face-swap-modellen byter bara den inre ansiktsytan och
-// NB2-passet får inte ändra ansiktet). Alla kunder blir därför lika
-// förlagan. Här målar Nano Banana Pro om personen i ett enda pass med kundens
-// foto som identitetsreferens och målningen som scen/stil.
-// Endast admin (humanEngine: "nbpro" + admin-JWT) tills Akram godkänt.
-const IDENTITY_REPAINT_PROMPT = [
-  "Image #1 is a finished portrait painting (the scene). Image #2 is a photograph of a real person (the identity).",
-  "Task: repaint the person in image #1 so that they unmistakably ARE the person in image #2. A close friend must instantly recognise them.",
-  "The painted face in image #1 is only a placeholder. Do NOT keep its face shape, nose, eyes, mouth, jawline, age or hair. Take ALL of these from image #2 instead:",
-  "- overall face shape and width, jawline and chin, cheekbones, forehead and hairline;",
-  "- nose shape and size, eye shape, eye colour and eyelids, eyebrows, mouth and lips, ears;",
-  "- apparent age, wrinkles, skin tone, freckles and moles;",
-  "- facial hair exactly as in image #2 (style, length, colour) - clean-shaven if image #2 is clean-shaven;",
-  "- hair exactly as in image #2 (style, length, colour, texture) adapted naturally under any crown or headwear - bald if bald;",
-  "- glasses, earrings and piercings ONLY if clearly visible in image #2, otherwise none.",
-  "Expression: a natural, flattering version of the expression in image #2 (keep a smile if they smile).",
-  "Keep EVERYTHING ELSE from image #1 unchanged: crown or headwear, clothing and costume jewellery, pose, body, hands, props, background, lighting direction, colour palette, framing, crop and aspect ratio. Never zoom, crop, pan or re-centre.",
-  "Paint the new face and hair in exactly the same painting style, brushwork and lighting as image #1, so the result is ONE coherent painting - never a pasted photo.",
-  "Return one single image.",
-].join("\n");
-
-const ADMIN_EMAILS = ["akram@arthena.se"];
-
-async function isAdminRequest(req: Request): Promise<boolean> {
-  try {
-    const jwt = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
-    if (!jwt) return false;
-    const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const { data } = await sb.auth.getUser(jwt);
-    return ADMIN_EMAILS.includes((data?.user?.email ?? "").toLowerCase());
-  } catch {
-    return false;
-  }
-}
+// Identitetstestet (motorerna nbpro/nb2/seedream i ett steg, endast admin)
+// ligger i _shared/portrait-engines.ts.
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -380,19 +353,25 @@ async function callNanoBanana(params: {
   };
 }
 
-// ---------- Route 1b: Nano Banana Pro identitetsomålning (admin-test) ----------
-async function runHumanNbPro(params: { referenceImageUrl: string; faceImageUrl: string }) {
-  // Två inputbilder: lås formatet till målningens (bild #1), se nearestNanoAspect.
-  const refAspect = await probeImageAspect(params.referenceImageUrl);
-  const aspectRatio = refAspect ? nearestNanoAspect(refAspect) : null;
-  console.log(`[face-swap] nbpro aspect=${aspectRatio ?? "match_input_image"}`);
-  return await callNanoBanana({
+// ---------- Route 1b: identitetsomålning i ett steg (admin-test) ----------
+async function runHumanSinglePass(params: {
+  engine: SinglePassEngine;
+  referenceImageUrl: string;
+  faceImageUrl: string;
+}): Promise<
+  { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
+> {
+  const r = await runIdentityRepaint({
+    engine: params.engine,
     promptText: IDENTITY_REPAINT_PROMPT,
-    imageUrls: [params.referenceImageUrl, params.faceImageUrl],
-    resolution: "4K",
-    aspectRatio,
-    model: NANO_BANANA_PRO_MODEL,
+    referenceImageUrl: params.referenceImageUrl,
+    photoUrls: [params.faceImageUrl],
   });
+  if (r.ok) return r;
+  return {
+    ok: false,
+    response: fallbackResponse("Vi kunde inte skapa bilden just nu. Försök igen om en stund.", r.reason),
+  };
 }
 
 // ---------- Route 2: pet face/identity transfer (cats + dogs) ----------
@@ -1057,14 +1036,18 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "referenceImageUrl required for this subjectKind" }, 400);
     }
 
-    // Identitetstest: Nano Banana Pro för personporträtt, bara för admin.
-    const useNbPro =
-      subjectKind === "human" && body?.humanEngine === "nbpro" && (await isAdminRequest(req));
+    // Motortest för personporträtt (se _shared/portrait-engines.ts), bara för
+    // admin. "current" = dagens kedja; övriga målar om i ett steg.
+    const requestedEngine = subjectKind === "human" ? parsePortraitTestEngine(body?.humanEngine) : null;
+    const testEngine = requestedEngine && (await isAdminRequest(req)) ? requestedEngine : null;
+    const singlePassEngine: SinglePassEngine | null =
+      testEngine && testEngine !== "current" ? testEngine : null;
 
     // Fas 4: prenumerant-gate — EN gratis generering per enhet, därefter
     // e-postkrav. Kollas FÖRE modellanrop; 200-svar med code + userMessage
     // enligt funktionens fallback-konvention (gamla bundlar visar texten).
-    const gate = useNbPro
+    // Adminens motortest räknas inte mot gaten.
+    const gate = testEngine
       ? { allowed: true as const }
       : await checkGenerationGate(typeof body?.sessionKey === "string" ? body.sessionKey : null);
     if (!gate.allowed) {
@@ -1090,8 +1073,8 @@ Deno.serve(async (req) => {
     const willUseFlux = !willUseSimple && subjectKind === "removeBackground" && fluxEnabledHandler && hasFluxStyle;
     const route =
       subjectKind === "human"
-        ? useNbPro
-          ? "human-nbpro"
+        ? singlePassEngine
+          ? `human-${singlePassEngine}`
           : hybridEnabled
           ? "human-cdingram+nb2"
           : "human-cdingram"
@@ -1104,8 +1087,8 @@ Deno.serve(async (req) => {
               : "remove-bg-nano-banana";
     const modelUsed =
       subjectKind === "human"
-        ? useNbPro
-          ? NANO_BANANA_PRO_MODEL
+        ? singlePassEngine
+          ? SINGLE_PASS_PROVIDER[singlePassEngine]
           : hybridEnabled
           ? `${FACE_SWAP_MODEL_NAME}+${NANO_BANANA_MODEL}`
           : FACE_SWAP_MODEL_NAME
@@ -1149,8 +1132,8 @@ Deno.serve(async (req) => {
       typeof body?.fluxStylePrompt === "string" && body.fluxStylePrompt.trim().length > 0 ? body.fluxStylePrompt : null;
 
     let result =
-      subjectKind === "human" && useNbPro
-        ? await runHumanNbPro({ referenceImageUrl: referenceImageUrl!, faceImageUrl })
+      subjectKind === "human" && singlePassEngine
+        ? await runHumanSinglePass({ engine: singlePassEngine, referenceImageUrl: referenceImageUrl!, faceImageUrl })
         : subjectKind === "human"
         ? await runReplicateFaceSwap({
             referenceImageUrl: referenceImageUrl!,
@@ -1203,7 +1186,7 @@ Deno.serve(async (req) => {
     // Hybrid identity pass för human: NB2 justerar frisyr/glasögon/smycken/
     // hudton mot kundens foto. Misslyckas passet behålls cdingram-resultatet
     // (graceful degradation) — genereringen felar aldrig på det här steget.
-    if (subjectKind === "human" && hybridEnabled && !useNbPro) {
+    if (subjectKind === "human" && hybridEnabled && !singlePassEngine) {
       // Lås passets bildformat till KONSTVERKETS (cdingram-resultatet = bild
       // #1). Med "match_input_image" och två inputbilder följde outputen
       // kundens telefonfoto i stället — 9:16 i stället för 4:5 — och lagrets

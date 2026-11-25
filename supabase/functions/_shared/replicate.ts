@@ -220,6 +220,42 @@ const NANO_ASPECT_RATIOS: Array<{ label: string; value: number }> = [
   { label: "8:1", value: 8 },
 ];
 
+/** Bildformat som bytedance/seedream-4.5 accepterar (Replicates schema,
+ *  läst 2026-11-25). */
+const SEEDREAM_ASPECT_RATIOS: Array<{ label: string; value: number }> = [
+  { label: "9:21", value: 9 / 21 },
+  { label: "9:16", value: 9 / 16 },
+  { label: "2:3", value: 2 / 3 },
+  { label: "3:4", value: 3 / 4 },
+  { label: "4:5", value: 4 / 5 },
+  { label: "1:1", value: 1 },
+  { label: "5:4", value: 5 / 4 },
+  { label: "4:3", value: 4 / 3 },
+  { label: "3:2", value: 3 / 2 },
+  { label: "16:9", value: 16 / 9 },
+  { label: "21:9", value: 21 / 9 },
+];
+
+function nearestAspect(ratio: number, options: Array<{ label: string; value: number }>): string | null {
+  if (!isFinite(ratio) || ratio <= 0) return null;
+  let best = options[0];
+  let bestDiff = Infinity;
+  for (const c of options) {
+    // Jämför i log-rymden så avvikelsen mäts relativt, inte absolut.
+    const d = Math.abs(Math.log(ratio / c.value));
+    if (d < bestDiff) {
+      best = c;
+      bestDiff = d;
+    }
+  }
+  return best.label;
+}
+
+/** Närmaste tillåtna seedream-format för ett givet bredd/höjd-förhållande. */
+export function nearestSeedreamAspect(ratio: number): string | null {
+  return nearestAspect(ratio, SEEDREAM_ASPECT_RATIOS);
+}
+
 /** Närmaste tillåtna nano-banana-format för ett givet bredd/höjd-förhållande. */
 export function nearestNanoAspect(ratio: number): string | null {
   if (!isFinite(ratio) || ratio <= 0) return null;
@@ -293,6 +329,32 @@ export function runNanoBanana(params: {
       resolution,
       aspect_ratio: params.aspectRatio ?? "match_input_image",
       output_format: resolution === "4K" ? "jpg" : "png",
+    },
+    timeoutMs: 180_000,
+  });
+}
+
+/** ByteDance Seedream 4.5. $0.04 per bild oavsett 2K/4K, upp till 14
+ *  referensbilder. Testas för personporträtt sedan 2026-11-25 (admin). */
+export const SEEDREAM_MODEL = "bytedance/seedream-4.5";
+
+export function runSeedream(params: {
+  promptText: string;
+  imageUrls: string[];
+  /** Explicit format (se nearestSeedreamAspect). Samma formatfälla som för
+   *  nano-banana: skicka alltid formatet när det finns flera inputbilder. */
+  aspectRatio?: string | null;
+  size?: "2K" | "4K";
+}): Promise<ReplicateResult> {
+  return runReplicateModel({
+    model: SEEDREAM_MODEL,
+    input: {
+      prompt: params.promptText,
+      image_input: params.imageUrls,
+      size: params.size ?? "2K",
+      aspect_ratio: params.aspectRatio ?? "match_input_image",
+      sequential_image_generation: "disabled",
+      max_images: 1,
     },
     timeoutMs: 180_000,
   });

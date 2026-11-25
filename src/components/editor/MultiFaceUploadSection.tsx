@@ -33,6 +33,7 @@ import {
   type MultiFaceCacheEntry,
 } from "@/lib/multi-face-cache";
 import type { TemplateLayer } from "@/lib/template-schema";
+import { AI_ENGINE_OVERRIDE } from "@/lib/portrait-engine";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -122,7 +123,7 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
       .map((s) => ({ slotId: s.id, hash: layerPortraits[s.id]?.hash ?? "" }))
       .filter((e) => e.hash);
     if (hashEntries.length !== slots.length) return;
-    const key = makeMultiFaceKey(layer.id, refUrl, hashEntries);
+    const key = makeMultiFaceKey(layer.id, AI_ENGINE_OVERRIDE ? `${refUrl}::engine:${AI_ENGINE_OVERRIDE}` : refUrl, hashEntries);
     const cached = cacheRef.current[key];
     if (cached?.url) {
       if (result !== cached.url) setAiPhotoResult(layer.id, cached.url);
@@ -223,7 +224,7 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
         if (!h) throw new Error("hash failed");
         hashEntries.push({ slotId: s.id, hash: h });
       }
-      const key = makeMultiFaceKey(layer.id, refUrl, hashEntries);
+      const key = makeMultiFaceKey(layer.id, AI_ENGINE_OVERRIDE ? `${refUrl}::engine:${AI_ENGINE_OVERRIDE}` : refUrl, hashEntries);
       if (!opts.force) {
         const cached = cacheRef.current[key];
         if (cached?.url) {
@@ -267,6 +268,8 @@ export function MultiFaceUploadSection({ layer, heading }: Props) {
         portraits: portraitsByID,
         designId,
         sessionKey: getSessionKey(),
+        // Admin-motortest (?aiEngine=…); funktionen ignorerar det för andra.
+        humanEngine: AI_ENGINE_OVERRIDE,
       });
       if (res.handled) return;
       const { data, error } = res;

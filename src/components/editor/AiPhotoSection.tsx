@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AiProgress } from "./AiProgress";
 import { invalidatePreviousResults, PreviousResults, PreviousUploads } from "./PreviousResults";
+import { AI_ENGINE_OVERRIDE } from "@/lib/portrait-engine";
 
 type AiPhotoLayer = Extract<TemplateLayer, { type: "aiPhoto" }>;
 
@@ -52,17 +53,8 @@ const MAX_BYTES = 25 * 1024 * 1024;
 
 // Subject hints moved to i18n (aiPhoto.subjectHint*).
 
-/** Admin-test: ?aiEngine=nbpro i editorns adress kör personporträtt med Nano
- *  Banana Pro (funktionen kräver admin-inloggning, annars ignoreras det).
- *  Ingår i cache-nyckeln så att samma foto kan jämföras mellan motorerna. */
-const AI_ENGINE_OVERRIDE: string | null = (() => {
-  try {
-    const v = new URLSearchParams(window.location.search).get("aiEngine");
-    return v === "nbpro" ? v : null;
-  } catch {
-    return null;
-  }
-})();
+// Admin-test: ?aiEngine=nbpro|nb2|seedream|current (se lib/portrait-engine).
+// Motorn ingår i cache-nyckeln så att samma foto kan jämföras mellan motorerna.
 
 /** Cache slot used in place of the admin reference URL for removeBackground.
  *  Including the style id keeps each style pick cached separately. When

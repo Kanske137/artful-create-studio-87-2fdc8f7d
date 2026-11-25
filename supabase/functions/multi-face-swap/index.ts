@@ -37,6 +37,14 @@ import {
   probeImageAspect,
 } from "../_shared/replicate.ts";
 import { checkGenerationGate } from "../_shared/subscriber-gate.ts";
+import {
+  SINGLE_PASS_PROVIDER,
+  identityRepaintGroupPrompt,
+  isAdminRequest,
+  parsePortraitTestEngine,
+  runIdentityRepaint,
+  type SinglePassEngine,
+} from "../_shared/portrait-engines.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -384,6 +392,28 @@ async function runCdingramTwoFaceSwap(params: {
   return { ok: true, bytes: outBytes, contentType: "image/jpeg", outputUrl: "(composited from 2 swaps)" };
 }
 
+// ---------- Admin-test: alla ansikten i ett steg (2026-11-25) ----------
+async function runGroupSinglePass(params: {
+  engine: SinglePassEngine;
+  referenceImageUrl: string;
+  portraitUrls: string[];
+  positions: string[];
+}): Promise<
+  { ok: true; bytes: Uint8Array; contentType: string; outputUrl: string } | { ok: false; response: Response }
+> {
+  const r = await runIdentityRepaint({
+    engine: params.engine,
+    promptText: identityRepaintGroupPrompt(params.positions),
+    referenceImageUrl: params.referenceImageUrl,
+    photoUrls: params.portraitUrls,
+  });
+  if (r.ok) return r;
+  return {
+    ok: false,
+    response: fallbackResponse("Vi kunde inte skapa bilden just nu. Försök igen om en stund.", r.reason),
+  };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -434,10 +464,20 @@ Deno.serve(async (req) => {
       portraitUrls.push(url);
     }
 
+    // Motortest för personporträtt (se _shared/portrait-engines.ts), bara för
+    // admin. "current" = dagens kedja; övriga målar om alla ansikten i ett steg.
+    const requestedEngine = parsePortraitTestEngine(body?.humanEngine);
+    const testEngine = requestedEngine && (await isAdminRequest(req)) ? requestedEngine : null;
+    const singlePassEngine: SinglePassEngine | null =
+      testEngine && testEngine !== "current" ? testEngine : null;
+
     // Fas 4: prenumerant-gate — EN gratis generering per enhet, därefter
     // e-postkrav. Kollas FÖRE modellanrop; 200-svar med code + userMessage
     // enligt funktionens fallback-konvention (gamla bundlar visar texten).
-    const gate = await checkGenerationGate(typeof body?.sessionKey === "string" ? body.sessionKey : null);
+    // Adminens motortest räknas inte mot gaten.
+    const gate = testEngine
+      ? { allowed: true as const }
+      : await checkGenerationGate(typeof body?.sessionKey === "string" ? body.sessionKey : null);
     if (!gate.allowed) {
       return jsonResponse({
         error: "subscriber-gate",
@@ -467,14 +507,16 @@ Deno.serve(async (req) => {
       );
     }
 
-    const useHybrid = engine === "cdingram" && hybridEnabled;
-    const provider = engine === "cdingram"
+    const useHybrid = !singlePassEngine && engine === "cdingram" && hybridEnabled;
+    const provider = singlePassEngine
+      ? SINGLE_PASS_PROVIDER[singlePassEngine]
+      : engine === "cdingram"
       ? useHybrid
         ? `${CDINGRAM_PROVIDER}+${NANO_BANANA_MODEL}`
         : CDINGRAM_PROVIDER
       : NANO_BANANA_MODEL;
     console.log(
-      `[multi-face-swap] start engine=${engine} layerId=${layerId} designId=${designId} ` +
+      `[multi-face-swap] start engine=${singlePassEngine ?? engine} layerId=${layerId} designId=${designId} ` +
       `slots=${normalisedSlots.length} referenceImage=${referenceImageUrl} ` +
       `portraits=${portraitUrls.join(",")}`,
     );
@@ -502,8 +544,14 @@ Deno.serve(async (req) => {
         `aspectRatio=${refAspectRatio ?? "match_input_image"}`,
     );
 
-    let result =
-      engine === "cdingram"
+    let result = singlePassEngine
+      ? await runGroupSinglePass({
+          engine: singlePassEngine,
+          referenceImageUrl,
+          portraitUrls,
+          positions: normalisedSlots.map((s) => s.position),
+        })
+      : engine === "cdingram"
         ? await runCdingramTwoFaceSwap({ referenceImageUrl, portraitUrls, designId })
         : await callNanoBanana({
             promptText,
@@ -607,7 +655,7 @@ Deno.serve(async (req) => {
       previewUrl: printFileUrl,
       output: printFileUrl,
       modelUsed: provider,
-      engine,
+      engine: singlePassEngine ?? engine,
       usedReferenceImageUrl: referenceImageUrl,
       usedPortraitUrls: portraitUrls,
     });
