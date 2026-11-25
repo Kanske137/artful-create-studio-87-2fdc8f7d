@@ -1,5 +1,6 @@
-// Motortest för personporträtt (kung, drottning, kungligt parporträtt m.fl.),
-// 2026-11-25. ENDAST admin.
+// Motorer för personporträtt (kung, drottning, kungligt parporträtt m.fl.),
+// 2026-11-25. Testmotorerna är ENDAST för admin; Nano Banana Pro körs i
+// produktion för mallarna i NBPRO_PRODUCTION_HANDLES (se nedan).
 //
 // Problemet med dagens kedja (cdingram + NB2-retusch): ansiktsbytesmodellen
 // byter bara den inre ansiktsytan, så ansiktsform, näsa och käke kommer från
@@ -47,6 +48,64 @@ export type SinglePassEngine = Exclude<PortraitTestEngine, "current">;
 
 export function parsePortraitTestEngine(v: unknown): PortraitTestEngine | null {
   return v === "current" || v === "nbpro" || v === "nb2" || v === "seedream" ? v : null;
+}
+
+// ---------- Produktion (Akram 2026-11-25) ----------
+// Efter jämförelsen på /admin/portratt-test körs dessa mallar med Nano Banana
+// Pro 2K i ett steg för alla kunder. Funktionerna avgör det på serversidan
+// utifrån referensbilden (målningen), så ingen editor-publicering behövs.
+// Misslyckas Nano Banana Pro (fel eller vägran, t.ex. barn på fotot) körs
+// dagens kedja som reserv. Nödbroms utan omdeploy: secret
+// PORTRAIT_NBPRO_DISABLED=true.
+export const NBPRO_PRODUCTION_HANDLES = ["kungtavla", "drottningtavla", "kungligt-parportratt"];
+
+const REF_CACHE_MS = 10 * 60_000;
+let nbproRefCache: { at: number; urls: Set<string> } | null = null;
+
+/** Samla alla referensbilder (målningar) i mallens personlager. */
+function collectReferenceUrls(node: unknown, out: Set<string>): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    for (const n of node) collectReferenceUrls(n, out);
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+  const defaults = obj.defaults as Record<string, unknown> | undefined;
+  if (obj.type === "aiPhoto" && defaults) {
+    if (typeof defaults.referenceImageUrl === "string") out.add(defaults.referenceImageUrl);
+    if (Array.isArray(defaults.referenceImages)) {
+      for (const r of defaults.referenceImages as Array<{ url?: unknown }>) {
+        if (typeof r?.url === "string") out.add(r.url);
+      }
+    }
+  }
+  for (const v of Object.values(obj)) collectReferenceUrls(v, out);
+}
+
+/** Produktionsmotorn för en målning: "nbpro" för mallarna ovan, annars null
+ *  (= dagens kedja). Läser mallarna med service role och cachar 10 min.
+ *  Fel = null, så kunden alltid får dagens kedja hellre än ett fel. */
+export async function productionEngineFor(referenceImageUrl: string | null | undefined): Promise<SinglePassEngine | null> {
+  if (!referenceImageUrl) return null;
+  if (Deno.env.get("PORTRAIT_NBPRO_DISABLED") === "true") return null;
+  try {
+    if (!nbproRefCache || Date.now() - nbproRefCache.at > REF_CACHE_MS) {
+      const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      const { data, error } = await sb
+        .from("product_configs")
+        .select("shopify_handle,template")
+        .in("shopify_handle", NBPRO_PRODUCTION_HANDLES);
+      if (error) throw new Error(error.message);
+      const urls = new Set<string>();
+      for (const row of (data ?? []) as Array<{ template: unknown }>) collectReferenceUrls(row.template, urls);
+      nbproRefCache = { at: Date.now(), urls };
+      console.log(`[portrait-engines] nbpro i produktion: ${urls.size} målningar i ${data?.length ?? 0} mallar`);
+    }
+    return nbproRefCache.urls.has(referenceImageUrl) ? "nbpro" : null;
+  } catch (e) {
+    console.warn("[portrait-engines] kunde inte läsa mallarna — dagens kedja används:", e instanceof Error ? e.message : e);
+    return null;
+  }
 }
 
 /** Värdet som loggas i generations.provider. */

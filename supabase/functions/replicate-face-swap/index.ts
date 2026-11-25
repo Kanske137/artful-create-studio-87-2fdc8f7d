@@ -53,6 +53,7 @@ import {
   SINGLE_PASS_PROVIDER,
   isAdminRequest,
   parsePortraitTestEngine,
+  productionEngineFor,
   runIdentityRepaint,
   type SinglePassEngine,
 } from "../_shared/portrait-engines.ts";
@@ -1040,8 +1041,15 @@ Deno.serve(async (req) => {
     // admin. "current" = dagens kedja; övriga målar om i ett steg.
     const requestedEngine = subjectKind === "human" ? parsePortraitTestEngine(body?.humanEngine) : null;
     const testEngine = requestedEngine && (await isAdminRequest(req)) ? requestedEngine : null;
-    const singlePassEngine: SinglePassEngine | null =
-      testEngine && testEngine !== "current" ? testEngine : null;
+    // Produktion: Nano Banana Pro för kung, drottning och parporträtt (avgörs
+    // av målningen). Adminens test-val går före.
+    const productionEngine =
+      !testEngine && subjectKind === "human" ? await productionEngineFor(referenceImageUrl) : null;
+    const singlePassEngine: SinglePassEngine | null = testEngine
+      ? testEngine !== "current"
+        ? testEngine
+        : null
+      : productionEngine;
 
     // Fas 4: prenumerant-gate — EN gratis generering per enhet, därefter
     // e-postkrav. Kollas FÖRE modellanrop; 200-svar med code + userMessage
@@ -1131,9 +1139,27 @@ Deno.serve(async (req) => {
     const fluxStylePrompt: string | null =
       typeof body?.fluxStylePrompt === "string" && body.fluxStylePrompt.trim().length > 0 ? body.fluxStylePrompt : null;
 
+    // Ett steg (Nano Banana Pro m.fl.). Misslyckas produktionsmotorn körs
+    // dagens kedja som reserv — kunden ska hellre få dagens bild än ett fel.
+    let usedSinglePass = false;
+    let fellBackFrom: SinglePassEngine | null = null;
+    let singlePass: Awaited<ReturnType<typeof runHumanSinglePass>> | null = null;
+    if (subjectKind === "human" && singlePassEngine) {
+      singlePass = await runHumanSinglePass({
+        engine: singlePassEngine,
+        referenceImageUrl: referenceImageUrl!,
+        faceImageUrl,
+      });
+      usedSinglePass = singlePass.ok;
+      if (!singlePass.ok && productionEngine) {
+        fellBackFrom = singlePassEngine;
+        console.warn(`[face-swap] ${singlePassEngine} misslyckades designId=${designId} — reserv: dagens kedja`);
+      }
+    }
+
     let result =
-      subjectKind === "human" && singlePassEngine
-        ? await runHumanSinglePass({ engine: singlePassEngine, referenceImageUrl: referenceImageUrl!, faceImageUrl })
+      singlePass && (singlePass.ok || !fellBackFrom)
+        ? singlePass
         : subjectKind === "human"
         ? await runReplicateFaceSwap({
             referenceImageUrl: referenceImageUrl!,
@@ -1186,7 +1212,7 @@ Deno.serve(async (req) => {
     // Hybrid identity pass för human: NB2 justerar frisyr/glasögon/smycken/
     // hudton mot kundens foto. Misslyckas passet behålls cdingram-resultatet
     // (graceful degradation) — genereringen felar aldrig på det här steget.
-    if (subjectKind === "human" && hybridEnabled && !singlePassEngine) {
+    if (subjectKind === "human" && hybridEnabled && !usedSinglePass) {
       // Lås passets bildformat till KONSTVERKETS (cdingram-resultatet = bild
       // #1). Med "match_input_image" och två inputbilder följde outputen
       // kundens telefonfoto i stället — 9:16 i stället för 4:5 — och lagrets
@@ -1285,10 +1311,14 @@ Deno.serve(async (req) => {
     const printFileUrl = pub.publicUrl;
     console.log(`[face-swap] done route=${route} → printFileUrl=${printFileUrl} ` + `aiOutputUrl=${result.outputUrl}`);
 
+    const finalModel = fellBackFrom
+      ? `${FACE_SWAP_MODEL_NAME}+${NANO_BANANA_MODEL} (reserv efter ${fellBackFrom})`
+      : modelUsed;
     await genLogEnd(genId, {
       status: "succeeded",
       duration_ms: Date.now() - genT0,
       output_image_url: printFileUrl,
+      ...(fellBackFrom ? { provider: finalModel } : {}),
     });
 
     return jsonResponse({
@@ -1298,8 +1328,8 @@ Deno.serve(async (req) => {
       replicateOutputUrl: result.outputUrl,
       usedReferenceImageUrl: referenceImageUrl,
       usedFaceImageUrl: faceImageUrl,
-      modelUsed,
-      route,
+      modelUsed: finalModel,
+      route: fellBackFrom ? `human-cdingram+nb2 (reserv efter ${fellBackFrom})` : route,
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";

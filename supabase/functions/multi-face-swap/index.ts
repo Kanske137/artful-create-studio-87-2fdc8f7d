@@ -42,6 +42,7 @@ import {
   identityRepaintGroupPrompt,
   isAdminRequest,
   parsePortraitTestEngine,
+  productionEngineFor,
   runIdentityRepaint,
   type SinglePassEngine,
 } from "../_shared/portrait-engines.ts";
@@ -468,8 +469,14 @@ Deno.serve(async (req) => {
     // admin. "current" = dagens kedja; övriga målar om alla ansikten i ett steg.
     const requestedEngine = parsePortraitTestEngine(body?.humanEngine);
     const testEngine = requestedEngine && (await isAdminRequest(req)) ? requestedEngine : null;
-    const singlePassEngine: SinglePassEngine | null =
-      testEngine && testEngine !== "current" ? testEngine : null;
+    // Produktion: Nano Banana Pro för kungligt parporträtt (avgörs av
+    // målningen). Adminens test-val går före.
+    const productionEngine = !testEngine ? await productionEngineFor(referenceImageUrl) : null;
+    const singlePassEngine: SinglePassEngine | null = testEngine
+      ? testEngine !== "current"
+        ? testEngine
+        : null
+      : productionEngine;
 
     // Fas 4: prenumerant-gate — EN gratis generering per enhet, därefter
     // e-postkrav. Kollas FÖRE modellanrop; 200-svar med code + userMessage
@@ -507,7 +514,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const useHybrid = !singlePassEngine && engine === "cdingram" && hybridEnabled;
+    let useHybrid = !singlePassEngine && engine === "cdingram" && hybridEnabled;
     const provider = singlePassEngine
       ? SINGLE_PASS_PROVIDER[singlePassEngine]
       : engine === "cdingram"
@@ -544,13 +551,26 @@ Deno.serve(async (req) => {
         `aspectRatio=${refAspectRatio ?? "match_input_image"}`,
     );
 
-    let result = singlePassEngine
-      ? await runGroupSinglePass({
-          engine: singlePassEngine,
-          referenceImageUrl,
-          portraitUrls,
-          positions: normalisedSlots.map((s) => s.position),
-        })
+    // Ett steg (Nano Banana Pro m.fl.). Misslyckas produktionsmotorn körs
+    // dagens kedja som reserv — kunden ska hellre få dagens bild än ett fel.
+    let fellBackFrom: SinglePassEngine | null = null;
+    let singlePass: Awaited<ReturnType<typeof runGroupSinglePass>> | null = null;
+    if (singlePassEngine) {
+      singlePass = await runGroupSinglePass({
+        engine: singlePassEngine,
+        referenceImageUrl,
+        portraitUrls,
+        positions: normalisedSlots.map((s) => s.position),
+      });
+      if (!singlePass.ok && productionEngine) {
+        fellBackFrom = singlePassEngine;
+        useHybrid = engine === "cdingram" && hybridEnabled;
+        console.warn(`[multi-face-swap] ${singlePassEngine} misslyckades designId=${designId} — reserv: dagens kedja`);
+      }
+    }
+
+    let result = singlePass && (singlePass.ok || !fellBackFrom)
+      ? singlePass
       : engine === "cdingram"
         ? await runCdingramTwoFaceSwap({ referenceImageUrl, portraitUrls, designId })
         : await callNanoBanana({
@@ -644,18 +664,22 @@ Deno.serve(async (req) => {
     const printFileUrl = pub.publicUrl;
     console.log(`[multi-face-swap] done → printFileUrl=${printFileUrl}`);
 
+    const finalProvider = fellBackFrom
+      ? `${useHybrid ? `${CDINGRAM_PROVIDER}+${NANO_BANANA_MODEL}` : engine === "cdingram" ? CDINGRAM_PROVIDER : NANO_BANANA_MODEL} (reserv efter ${fellBackFrom})`
+      : provider;
     await genLogEnd(genId, {
       status: "succeeded",
       duration_ms: Date.now() - genT0,
       output_image_url: printFileUrl,
+      ...(fellBackFrom ? { provider: finalProvider } : {}),
     });
 
     return jsonResponse({
       printFileUrl,
       previewUrl: printFileUrl,
       output: printFileUrl,
-      modelUsed: provider,
-      engine: singlePassEngine ?? engine,
+      modelUsed: finalProvider,
+      engine: fellBackFrom ? engine : singlePassEngine ?? engine,
       usedReferenceImageUrl: referenceImageUrl,
       usedPortraitUrls: portraitUrls,
     });
