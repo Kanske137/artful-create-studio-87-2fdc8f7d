@@ -392,3 +392,117 @@ export function substituteTokens(
   const tokens = resolveLinkedTokens(d as TextDefaults);
   return buildLinkedText(raw, tokens, safePlace);
 }
+
+// ---------- versaler, krympning till bredd och tidssummor ----------
+
+/** Texten som den visas: versaler när lagret har `uppercase`. Svensk
+ *  versalisering (å/ä/ö). Spans behåller sina index (versalisering ändrar
+ *  inte längden för de tecken mallarna använder). */
+export function displayText(d: Pick<TextDefaults, "uppercase">, text: string): string {
+  return d.uppercase ? text.toLocaleUpperCase("sv-SE") : text;
+}
+
+/** Andel av lagrets bredd som en krympt rad får uppta (samma i editorn och
+ *  tryckfilen; marginalen täcker editorns inre utfyllnad). */
+export const FIT_WIDTH_RATIO = 0.94;
+/** Minsta skala vid krympning till bredd. */
+export const FIT_MIN_SCALE = 0.4;
+
+export interface MeasurePiece {
+  text: string;
+  px: number;
+  font: string;
+  bold: boolean;
+  italic: boolean;
+}
+
+/** CSS/canvas-teckensnitt för en textbit (samma sträng i båda renderarna). */
+export function cssFontFor(p: Pick<MeasurePiece, "px" | "font" | "bold" | "italic">): string {
+  return `${p.italic ? "italic " : ""}${p.bold ? 700 : 400} ${Math.round(p.px * 100) / 100}px "${p.font}", Inter, sans-serif`;
+}
+
+/** Skala (≤ 1) som får den bredaste raden att rymmas i `maxWidthPx`.
+ *  `measure` mäter en textbit UTAN teckenspärrning; spärrningen läggs till
+ *  här (letterSpacingEm × basstorlek per tecken, som CSS och canvas). */
+export function fitWidthScale(
+  lines: MeasurePiece[][],
+  basePx: number,
+  letterSpacingEm: number,
+  maxWidthPx: number,
+  measure: (text: string, cssFont: string) => number,
+): number {
+  if (maxWidthPx <= 0) return 1;
+  const letterPx = letterSpacingEm * basePx;
+  let widest = 0;
+  for (const pieces of lines) {
+    let w = 0;
+    for (const p of pieces) {
+      w += measure(p.text, cssFontFor(p)) + letterPx * [...p.text].length;
+    }
+    widest = Math.max(widest, w);
+  }
+  const target = maxWidthPx * FIT_WIDTH_RATIO;
+  if (widest <= target || widest <= 0) return 1;
+  return Math.max(FIT_MIN_SCALE, target / widest);
+}
+
+/** Dela upp spans-segment i rader (\n) som mätbitar. */
+export function piecesByLine(
+  segments: ResolvedSpan[],
+  basePx: number,
+  canvasShortPx: number,
+  defaultFont: string,
+): MeasurePiece[][] {
+  const lines: MeasurePiece[][] = [[]];
+  for (const s of segments) {
+    const px = s.fontSizePt ? resolveFontPx({ fontSizePt: s.fontSizePt }, canvasShortPx) : basePx;
+    s.text.split("\n").forEach((part, i) => {
+      if (i > 0) lines.push([]);
+      if (part.length > 0) {
+        lines[lines.length - 1].push({ text: part, px, font: s.font || defaultFont, bold: !!s.bold, italic: !!s.italic });
+      }
+    });
+  }
+  return lines;
+}
+
+/** Tolka en tid: "h:mm:ss" (eller h.mm.ss) eller "m:ss". Tom text = 0.
+ *  Returnerar sekunder, eller null om texten inte är en tid. */
+export function parseDuration(raw: string): number | null {
+  const s = raw.trim();
+  if (s === "") return 0;
+  const m = /^(\d{1,3})[:.](\d{1,2})(?:[:.](\d{1,2}))?$/.exec(s);
+  if (!m) return null;
+  const a = Number(m[1]);
+  const b = Number(m[2]);
+  if (m[3] === undefined) {
+    if (b >= 60) return null;
+    return a * 60 + b;
+  }
+  const c = Number(m[3]);
+  if (b >= 60 || c >= 60) return null;
+  return a * 3600 + b * 60 + c;
+}
+
+/** Sekunder som "h:mm:ss". */
+export function formatDuration(totalSeconds: number): string {
+  const t = Math.max(0, Math.round(totalSeconds));
+  const h = Math.floor(t / 3600);
+  const m = Math.floor((t % 3600) / 60);
+  const s = t % 60;
+  return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+/** Summan av tiderna som "h:mm:ss", eller null om någon inte är en tid
+ *  eller alla är tomma. */
+export function sumDurations(parts: string[]): string | null {
+  let total = 0;
+  let any = false;
+  for (const p of parts) {
+    const v = parseDuration(p);
+    if (v === null) return null;
+    if (p.trim() !== "") any = true;
+    total += v;
+  }
+  return any ? formatDuration(total) : null;
+}

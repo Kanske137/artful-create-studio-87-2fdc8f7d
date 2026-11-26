@@ -1,0 +1,2832 @@
+{
+ "orientations": [
+  "portrait"
+ ],
+ "defaultOrientation": "portrait",
+ "defaultLayoutName": "Vinteraffisch",
+ "defaultLayout": {
+  "portrait": {
+   "aspect": "3:4",
+   "background": {
+    "color": "#F7F9FB"
+   },
+   "layers": [
+    {
+     "id": "vas-scene",
+     "name": "Landskap",
+     "type": "image",
+     "xPct": 0.0,
+     "yPct": 0.0,
+     "wPct": 100.0,
+     "hPct": 75.0,
+     "rotation": 0,
+     "zIndex": 1,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "url": "https://artful-create-studio-87.lovable.app/sport/vas-a-scene.svg?v=1",
+      "fit": "cover",
+      "shape": "rect"
+     }
+    },
+    {
+     "id": "vas-skier",
+     "name": "Åkare",
+     "type": "image",
+     "xPct": 10.3333,
+     "yPct": 36.5,
+     "wPct": 32.6667,
+     "hPct": 24.5,
+     "rotation": 0,
+     "zIndex": 2,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "url": "https://artful-create-studio-87.lovable.app/sport/vas-skier.svg?v=1",
+      "fit": "contain",
+      "shape": "rect"
+     }
+    },
+    {
+     "id": "vas-timeline",
+     "name": "Kontroller",
+     "type": "image",
+     "xPct": 8.0,
+     "yPct": 80.0,
+     "wPct": 84.0,
+     "hPct": 12.0,
+     "rotation": 0,
+     "zIndex": 3,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "url": "https://artful-create-studio-87.lovable.app/sport/vas-a-timeline.svg?v=1",
+      "fit": "contain",
+      "shape": "rect"
+     }
+    },
+    {
+     "id": "vas-name",
+     "name": "Namn",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 63.75,
+     "wPct": 84.0,
+     "hPct": 6.25,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "Linnea Berg",
+      "font": "Barlow Condensed",
+      "fontSizePt": 45.64,
+      "align": "left",
+      "valign": "middle",
+      "color": "#14243F",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.0,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "uppercase": true,
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "vas-date",
+     "name": "Datum",
+     "type": "text",
+     "xPct": 53.3333,
+     "yPct": 71.0,
+     "wPct": 38.6667,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "7 mars 2027",
+      "font": "Barlow",
+      "fontSizePt": 13.89,
+      "align": "right",
+      "valign": "middle",
+      "color": "#14243F",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "vas-bib",
+     "name": "Startnummer",
+     "type": "text",
+     "xPct": 53.3333,
+     "yPct": 73.5,
+     "wPct": 38.6667,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": false,
+      "style": true
+     },
+     "defaults": {
+      "text": "Startnummer 12345",
+      "font": "Barlow",
+      "fontSizePt": 13.89,
+      "align": "right",
+      "valign": "middle",
+      "color": "#14243F",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "vas-group",
+     "name": "Startled",
+     "type": "text",
+     "xPct": 53.3333,
+     "yPct": 76.0,
+     "wPct": 38.6667,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": false,
+      "style": true
+     },
+     "defaults": {
+      "text": "Startled 5",
+      "font": "Barlow",
+      "fontSizePt": 13.89,
+      "align": "right",
+      "valign": "middle",
+      "color": "#14243F",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "vas-custom",
+     "name": "Egen rad",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 22.25,
+     "wPct": 84.0,
+     "hPct": 3.0,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": false,
+      "style": true
+     },
+     "defaults": {
+      "text": "Mitt tredje Vasalopp",
+      "font": "Barlow",
+      "fontSizePt": 16.87,
+      "align": "left",
+      "valign": "middle",
+      "color": "#DCE7F1",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "italic": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "vas-time",
+     "name": "Sluttid",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 70.5,
+     "wPct": 45.0,
+     "hPct": 7.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "6:42:18",
+      "font": "Barlow Condensed",
+      "fontSizePt": 57.54,
+      "align": "left",
+      "valign": "middle",
+      "color": "#B3261E",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.0,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Tider"
+     }
+    },
+    {
+     "id": "vas-title",
+     "name": "Loppets namn",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 11.0,
+     "wPct": 84.0,
+     "hPct": 10.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "Vasaloppet",
+      "font": "Barlow Condensed",
+      "fontSizePt": 85.32,
+      "align": "left",
+      "valign": "middle",
+      "color": "#FFFFFF",
+      "letterSpacingEm": 0.01,
+      "lineHeight": 0.95,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "uppercase": true,
+      "fitWidth": true,
+      "formGroup": "Lopp"
+     }
+    },
+    {
+     "id": "vas-kicker",
+     "name": "Sträcka",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 8.0,
+     "wPct": 84.0,
+     "hPct": 2.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "Sälen – Mora · 90 km",
+      "font": "Barlow Condensed",
+      "fontSizePt": 14.88,
+      "align": "left",
+      "valign": "middle",
+      "color": "#DCE7F1",
+      "letterSpacingEm": 0.3,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "uppercase": true,
+      "fitWidth": true,
+      "formGroup": "Lopp"
+     }
+    }
+   ]
+  },
+  "landscape": {
+   "aspect": "4:3",
+   "background": {
+    "color": "#F7F9FB"
+   },
+   "layers": []
+  }
+ },
+ "extraLayouts": [
+  {
+   "id": "vas-b",
+   "name": "90 och kontrollerna",
+   "defaultLayout": {
+    "portrait": {
+     "aspect": "3:4",
+     "background": {
+      "color": "#F4F1EA"
+     },
+     "layers": [
+      {
+       "id": "vas-skier",
+       "name": "Åkare",
+       "type": "image",
+       "xPct": 31.0,
+       "yPct": 12.5,
+       "wPct": 19.6667,
+       "hPct": 14.75,
+       "rotation": 0,
+       "zIndex": 2,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/vas-skier.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "vas-rule-head",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 61.3333,
+       "yPct": 18.25,
+       "wPct": 30.6667,
+       "hPct": 0.25,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.6667,
+        "color": "#14243F"
+       }
+      },
+      {
+       "id": "vas-rule-1",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 61.3333,
+       "yPct": 22.875,
+       "wPct": 30.6667,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#B9C2CF"
+       }
+      },
+      {
+       "id": "vas-rule-2",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 61.3333,
+       "yPct": 27.125,
+       "wPct": 30.6667,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#B9C2CF"
+       }
+      },
+      {
+       "id": "vas-rule-3",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 61.3333,
+       "yPct": 31.375,
+       "wPct": 30.6667,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#B9C2CF"
+       }
+      },
+      {
+       "id": "vas-rule-4",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 61.3333,
+       "yPct": 35.625,
+       "wPct": 30.6667,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#B9C2CF"
+       }
+      },
+      {
+       "id": "vas-rule-5",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 61.3333,
+       "yPct": 39.875,
+       "wPct": 30.6667,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#B9C2CF"
+       }
+      },
+      {
+       "id": "vas-rule-6",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 61.3333,
+       "yPct": 44.125,
+       "wPct": 30.6667,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#B9C2CF"
+       }
+      },
+      {
+       "id": "vas-rule-7",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 61.3333,
+       "yPct": 48.375,
+       "wPct": 30.6667,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#B9C2CF"
+       }
+      },
+      {
+       "id": "vas-rule-foot",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 70.0,
+       "wPct": 84.0,
+       "hPct": 0.25,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.6667,
+        "color": "#14243F"
+       }
+      },
+      {
+       "id": "vas-name",
+       "name": "Namn",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 71.75,
+       "wPct": 84.0,
+       "hPct": 7.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Linnea Berg",
+        "font": "Barlow Condensed",
+        "fontSizePt": 55.56,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-date",
+       "name": "Datum",
+       "type": "text",
+       "xPct": 58.6667,
+       "yPct": 80.0,
+       "wPct": 33.3333,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "7 mars 2027",
+        "font": "Barlow",
+        "fontSizePt": 13.89,
+        "align": "right",
+        "valign": "middle",
+        "color": "#3D4A5E",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-bib",
+       "name": "Startnummer",
+       "type": "text",
+       "xPct": 58.6667,
+       "yPct": 82.5,
+       "wPct": 33.3333,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Startnummer 12345",
+        "font": "Barlow",
+        "fontSizePt": 13.89,
+        "align": "right",
+        "valign": "middle",
+        "color": "#3D4A5E",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-group",
+       "name": "Startled",
+       "type": "text",
+       "xPct": 58.6667,
+       "yPct": 85.0,
+       "wPct": 33.3333,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Startled 5",
+        "font": "Barlow",
+        "fontSizePt": 13.89,
+        "align": "right",
+        "valign": "middle",
+        "color": "#3D4A5E",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-custom",
+       "name": "Egen rad",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 80.0,
+       "wPct": 50.0,
+       "hPct": 3.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Mitt tredje Vasalopp",
+        "font": "Barlow",
+        "fontSizePt": 16.87,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "italic": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-time",
+       "name": "Sluttid",
+       "type": "text",
+       "xPct": 75.3333,
+       "yPct": 48.75,
+       "wPct": 16.6667,
+       "hPct": 5.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "6:42:18",
+        "font": "Barlow Condensed",
+        "fontSizePt": 33.73,
+        "align": "right",
+        "valign": "middle",
+        "color": "#B3261E",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider"
+       }
+      },
+      {
+       "id": "vas-cp1",
+       "name": "Smågan",
+       "type": "text",
+       "xPct": 81.6667,
+       "yPct": 18.75,
+       "wPct": 10.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "0:52",
+        "font": "Barlow Condensed",
+        "fontSizePt": 17.86,
+        "align": "right",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "vas-cp2",
+       "name": "Mångsbodarna",
+       "type": "text",
+       "xPct": 81.6667,
+       "yPct": 23.0,
+       "wPct": 10.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "1:49",
+        "font": "Barlow Condensed",
+        "fontSizePt": 17.86,
+        "align": "right",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "vas-cp3",
+       "name": "Risberg",
+       "type": "text",
+       "xPct": 81.6667,
+       "yPct": 27.25,
+       "wPct": 10.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "2:35",
+        "font": "Barlow Condensed",
+        "fontSizePt": 17.86,
+        "align": "right",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "vas-cp4",
+       "name": "Evertsberg",
+       "type": "text",
+       "xPct": 81.6667,
+       "yPct": 31.5,
+       "wPct": 10.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "3:28",
+        "font": "Barlow Condensed",
+        "fontSizePt": 17.86,
+        "align": "right",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "vas-cp5",
+       "name": "Oxberg",
+       "type": "text",
+       "xPct": 81.6667,
+       "yPct": 35.75,
+       "wPct": 10.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "4:33",
+        "font": "Barlow Condensed",
+        "fontSizePt": 17.86,
+        "align": "right",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "vas-cp6",
+       "name": "Hökberg",
+       "type": "text",
+       "xPct": 81.6667,
+       "yPct": 40.0,
+       "wPct": 10.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "5:10",
+        "font": "Barlow Condensed",
+        "fontSizePt": 17.86,
+        "align": "right",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "vas-cp7",
+       "name": "Eldris",
+       "type": "text",
+       "xPct": 81.6667,
+       "yPct": 44.25,
+       "wPct": 10.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "5:52",
+        "font": "Barlow Condensed",
+        "fontSizePt": 17.86,
+        "align": "right",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "vas-title",
+       "name": "Loppets namn",
+       "type": "text",
+       "xPct": 58.6667,
+       "yPct": 8.0,
+       "wPct": 33.3333,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Vasaloppet",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "right",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.3,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Lopp"
+       }
+      },
+      {
+       "id": "vas-kicker",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 8.0,
+       "wPct": 50.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Sälen – Mora · 90 km",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.3,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Lopp"
+       }
+      },
+      {
+       "id": "vas-l-90",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 25.75,
+       "wPct": 50.3333,
+       "hPct": 30.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "90",
+        "font": "Barlow Condensed",
+        "fontSizePt": 282.76,
+        "align": "left",
+        "valign": "middle",
+        "color": "#B3261E",
+        "letterSpacingEm": -0.03,
+        "lineHeight": 0.82,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-classic",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 56.5,
+       "wPct": 50.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "KILOMETER · KLASSISK STIL",
+        "font": "Barlow Condensed",
+        "fontSizePt": 15.87,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.3,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-cp",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 61.3333,
+       "yPct": 15.5,
+       "wPct": 20.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "KONTROLL",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-time",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 78.3333,
+       "yPct": 15.5,
+       "wPct": 13.6667,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "TID",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-cp1",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 61.3333,
+       "yPct": 18.75,
+       "wPct": 20.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Smågan 11 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 7,
+          "end": 12,
+          "fontSizePt": 11.91,
+          "color": "#5A6577"
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-cp2",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 61.3333,
+       "yPct": 23.0,
+       "wPct": 20.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Mångsbodarna 24 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 13,
+          "end": 18,
+          "fontSizePt": 11.91,
+          "color": "#5A6577"
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-cp3",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 61.3333,
+       "yPct": 27.25,
+       "wPct": 20.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Risberg 35 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 8,
+          "end": 13,
+          "fontSizePt": 11.91,
+          "color": "#5A6577"
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-cp4",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 61.3333,
+       "yPct": 31.5,
+       "wPct": 20.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Evertsberg 47 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 11,
+          "end": 16,
+          "fontSizePt": 11.91,
+          "color": "#5A6577"
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-cp5",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 61.3333,
+       "yPct": 35.75,
+       "wPct": 20.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Oxberg 62 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 7,
+          "end": 12,
+          "fontSizePt": 11.91,
+          "color": "#5A6577"
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-cp6",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 61.3333,
+       "yPct": 40.0,
+       "wPct": 20.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Hökberg 71 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 8,
+          "end": 13,
+          "fontSizePt": 11.91,
+          "color": "#5A6577"
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-cp7",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 61.3333,
+       "yPct": 44.25,
+       "wPct": 20.3333,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Eldris 81 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 7,
+          "end": 12,
+          "fontSizePt": 11.91,
+          "color": "#5A6577"
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-mora",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 61.3333,
+       "yPct": 49.0,
+       "wPct": 16.6667,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Mora 90 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 4,
+          "bold": true
+         },
+         {
+          "start": 5,
+          "end": 10,
+          "fontSizePt": 11.91,
+          "color": "#5A6577"
+         }
+        ],
+        "fitWidth": true
+       }
+      }
+     ]
+    },
+    "landscape": {
+     "aspect": "4:3",
+     "background": {
+      "color": "#F4F1EA"
+     },
+     "layers": []
+    }
+   }
+  },
+  {
+   "id": "vas-c",
+   "name": "Höjdprofilen",
+   "defaultLayout": {
+    "portrait": {
+     "aspect": "3:4",
+     "background": {
+      "color": "#F4F1EA"
+     },
+     "layers": [
+      {
+       "id": "vas-profile",
+       "name": "Höjdprofil",
+       "type": "image",
+       "xPct": 0.0,
+       "yPct": 40.0,
+       "wPct": 100.0,
+       "hPct": 60.0,
+       "rotation": 0,
+       "zIndex": 1,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/vas-c-profile.svg?v=1",
+        "fit": "cover",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "vas-name",
+       "name": "Namn",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 11.25,
+       "wPct": 84.0,
+       "hPct": 8.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Linnea Berg",
+        "font": "Barlow Condensed",
+        "fontSizePt": 63.5,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-date",
+       "name": "Datum",
+       "type": "text",
+       "xPct": 50.0,
+       "yPct": 21.25,
+       "wPct": 42.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "7 mars 2027",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-bib",
+       "name": "Startnummer",
+       "type": "text",
+       "xPct": 50.0,
+       "yPct": 23.75,
+       "wPct": 42.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Startnummer 12345",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-group",
+       "name": "Startled",
+       "type": "text",
+       "xPct": 50.0,
+       "yPct": 26.25,
+       "wPct": 42.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Startled 5",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-custom",
+       "name": "Egen rad",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 30.5,
+       "wPct": 84.0,
+       "hPct": 3.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Mitt tredje Vasalopp",
+        "font": "Barlow",
+        "fontSizePt": 15.87,
+        "align": "left",
+        "valign": "middle",
+        "color": "#14243F",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "italic": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-time",
+       "name": "Sluttid",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 20.0,
+       "wPct": 41.6667,
+       "hPct": 9.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "6:42:18",
+        "font": "Barlow Condensed",
+        "fontSizePt": 71.43,
+        "align": "left",
+        "valign": "middle",
+        "color": "#B3261E",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider"
+       }
+      },
+      {
+       "id": "vas-title",
+       "name": "Loppets namn",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 8.0,
+       "wPct": 84.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Vasaloppet",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#B3261E",
+        "letterSpacingEm": 0.3,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Lopp"
+       }
+      },
+      {
+       "id": "vas-l-start",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 88.0,
+       "wPct": 33.3333,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SÄLEN",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.14,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-finish-km",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 58.6667,
+       "yPct": 88.0,
+       "wPct": 33.3333,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "MORA · 90 KM",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "right",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.14,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      }
+     ]
+    },
+    "landscape": {
+     "aspect": "4:3",
+     "background": {
+      "color": "#F4F1EA"
+     },
+     "layers": []
+    }
+   }
+  },
+  {
+   "id": "vas-d",
+   "name": "Minnestavlan",
+   "defaultLayout": {
+    "portrait": {
+     "aspect": "3:4",
+     "background": {
+      "color": "#F6EFDF"
+     },
+     "layers": [
+      {
+       "id": "vas-frame-outer",
+       "name": "Ram",
+       "type": "shape",
+       "xPct": 6.0,
+       "yPct": 4.5,
+       "wPct": 88.0,
+       "hPct": 91.0,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "frame-rect",
+        "strokeMm": 0.6667,
+        "color": "#9A7A34"
+       }
+      },
+      {
+       "id": "vas-frame-inner",
+       "name": "Ram",
+       "type": "shape",
+       "xPct": 7.6667,
+       "yPct": 5.75,
+       "wPct": 84.6667,
+       "hPct": 88.5,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "frame-rect",
+        "strokeMm": 0.3333,
+        "color": "#9A7A34"
+       }
+      },
+      {
+       "id": "vas-medal",
+       "name": "Medaljong",
+       "type": "image",
+       "xPct": 40.6667,
+       "yPct": 10.25,
+       "wPct": 18.6667,
+       "hPct": 14.0,
+       "rotation": 0,
+       "zIndex": 2,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/vas-d-medal.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "vas-rule-gold",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 40.0,
+       "yPct": 53.5,
+       "wPct": 20.0,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#9A7A34"
+       }
+      },
+      {
+       "id": "vas-name",
+       "name": "Namn",
+       "type": "text",
+       "xPct": 12.0,
+       "yPct": 30.0,
+       "wPct": 76.0,
+       "hPct": 9.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Linnea Berg",
+        "font": "Cormorant Garamond",
+        "fontSizePt": 65.48,
+        "align": "center",
+        "valign": "middle",
+        "color": "#2A2419",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true,
+          "italic": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-date",
+       "name": "Datum",
+       "type": "text",
+       "xPct": 12.0,
+       "yPct": 68.75,
+       "wPct": 76.0,
+       "hPct": 3.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "7 mars 2027",
+        "font": "Cormorant Garamond",
+        "fontSizePt": 20.83,
+        "align": "center",
+        "valign": "middle",
+        "color": "#2A2419",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-bib",
+       "name": "Startnummer",
+       "type": "text",
+       "xPct": 12.0,
+       "yPct": 86.25,
+       "wPct": 25.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Startnummer 12345",
+        "font": "Barlow",
+        "fontSizePt": 12.9,
+        "align": "left",
+        "valign": "middle",
+        "color": "#5A4E3A",
+        "letterSpacingEm": 0.08,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-group",
+       "name": "Startled",
+       "type": "text",
+       "xPct": 63.0,
+       "yPct": 86.25,
+       "wPct": 25.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Startled 5",
+        "font": "Barlow",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#5A4E3A",
+        "letterSpacingEm": 0.08,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-custom",
+       "name": "Egen rad",
+       "type": "text",
+       "xPct": 33.3333,
+       "yPct": 86.25,
+       "wPct": 33.3333,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Mitt tredje Vasalopp",
+        "font": "Barlow",
+        "fontSizePt": 12.9,
+        "align": "center",
+        "valign": "middle",
+        "color": "#5A4E3A",
+        "letterSpacingEm": 0.08,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "vas-time",
+       "name": "Sluttid",
+       "type": "text",
+       "xPct": 12.0,
+       "yPct": 58.5,
+       "wPct": 76.0,
+       "hPct": 9.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "6:42:18",
+        "font": "Cormorant Garamond",
+        "fontSizePt": 71.43,
+        "align": "center",
+        "valign": "middle",
+        "color": "#2A2419",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.05,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider"
+       }
+      },
+      {
+       "id": "vas-verb",
+       "name": "Hyllningsrad",
+       "type": "text",
+       "xPct": 12.0,
+       "yPct": 40.25,
+       "wPct": 76.0,
+       "hPct": 3.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "som åkte Vasaloppet",
+        "font": "Cormorant Garamond",
+        "fontSizePt": 21.83,
+        "align": "center",
+        "valign": "middle",
+        "color": "#2A2419",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "italic": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Lopp"
+       }
+      },
+      {
+       "id": "vas-l-memory",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 12.0,
+       "yPct": 26.75,
+       "wPct": 76.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "TILL MINNE AV",
+        "font": "Cormorant Garamond",
+        "fontSizePt": 16.87,
+        "align": "center",
+        "valign": "middle",
+        "color": "#2A2419",
+        "letterSpacingEm": 0.4,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-route",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 12.0,
+       "yPct": 44.25,
+       "wPct": 76.0,
+       "hPct": 6.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "från Sälen till Mora,\n90 kilometer i klassisk stil",
+        "font": "Cormorant Garamond",
+        "fontSizePt": 19.84,
+        "align": "center",
+        "valign": "middle",
+        "color": "#2A2419",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "vas-l-finish",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 12.0,
+       "yPct": 55.75,
+       "wPct": 76.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SLUTTID",
+        "font": "Cormorant Garamond",
+        "fontSizePt": 14.88,
+        "align": "center",
+        "valign": "middle",
+        "color": "#2A2419",
+        "letterSpacingEm": 0.35,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      }
+     ]
+    },
+    "landscape": {
+     "aspect": "4:3",
+     "background": {
+      "color": "#F6EFDF"
+     },
+     "layers": []
+    }
+   }
+  }
+ ],
+ "contentVariants": [
+  {
+   "id": "vasaloppet",
+   "name": "Vasaloppet",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/vas-v-vasaloppet.svg?v=1",
+   "overrides": {
+    "vas-title": {
+     "text": "Vasaloppet"
+    },
+    "vas-verb": {
+     "text": "som åkte Vasaloppet"
+    }
+   }
+  },
+  {
+   "id": "oppet-spar",
+   "name": "Öppet Spår",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/vas-v-oppet-spar.svg?v=1",
+   "overrides": {
+    "vas-title": {
+     "text": "Öppet Spår"
+    },
+    "vas-verb": {
+     "text": "som åkte Öppet Spår"
+    }
+   }
+  },
+  {
+   "id": "nattvasan",
+   "name": "Nattvasan",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/vas-v-nattvasan.svg?v=1",
+   "overrides": {
+    "vas-title": {
+     "text": "Nattvasan"
+    },
+    "vas-verb": {
+     "text": "som åkte Nattvasan"
+    }
+   }
+  }
+ ],
+ "contentVariantLabel": "Lopp",
+ "defaultContentVariantId": "vasaloppet",
+ "i18n": {
+  "en": {
+   "Vinteraffisch": "Winter poster",
+   "90 och kontrollerna": "90 and the checkpoints",
+   "Höjdprofilen": "The elevation profile",
+   "Minnestavlan": "The keepsake",
+   "Lopp": "Race",
+   "Om dig": "About you",
+   "Tider": "Times",
+   "Namn": "Name",
+   "Datum": "Date",
+   "Startnummer": "Bib number",
+   "Startled": "Start group",
+   "Egen rad": "Your own line",
+   "Sluttid": "Finish time",
+   "Loppets namn": "Race name",
+   "Sträcka": "Course",
+   "Hyllningsrad": "Dedication line",
+   "KONTROLL": "CHECKPOINT",
+   "TID": "TIME",
+   "KILOMETER · KLASSISK STIL": "KILOMETRES · CLASSIC STYLE",
+   "TILL MINNE AV": "IN HONOUR OF",
+   "SLUTTID": "FINISH TIME",
+   "från Sälen till Mora,\n90 kilometer i klassisk stil": "from Sälen to Mora,\n90 kilometres in classic style",
+   "7 mars 2027": "7 March 2027",
+   "Startnummer 12345": "Bib 12345",
+   "Startled 5": "Start group 5",
+   "Mitt tredje Vasalopp": "My third Vasaloppet",
+   "som åkte Vasaloppet": "who skied Vasaloppet",
+   "som åkte Öppet Spår": "who skied Öppet Spår",
+   "som åkte Nattvasan": "who skied Nattvasan",
+   "Vasaloppet": "Vasaloppet",
+   "Öppet Spår": "Öppet Spår",
+   "Nattvasan": "Nattvasan",
+   "SÄLEN": "SÄLEN",
+   "MORA · 90 KM": "MORA · 90 KM",
+   "Mora 90 km": "Mora 90 km",
+   "Sälen – Mora · 90 km": "Sälen – Mora · 90 km",
+   "Smågan": "Smågan",
+   "Mångsbodarna": "Mångsbodarna",
+   "Risberg": "Risberg",
+   "Evertsberg": "Evertsberg",
+   "Oxberg": "Oxberg",
+   "Hökberg": "Hökberg",
+   "Eldris": "Eldris",
+   "Smågan 11 km": "Smågan 11 km",
+   "Mångsbodarna 24 km": "Mångsbodarna 24 km",
+   "Risberg 35 km": "Risberg 35 km",
+   "Evertsberg 47 km": "Evertsberg 47 km",
+   "Oxberg 62 km": "Oxberg 62 km",
+   "Hökberg 71 km": "Hökberg 71 km",
+   "Eldris 81 km": "Eldris 81 km"
+  },
+  "da": {
+   "Vinteraffisch": "Vinterplakat",
+   "90 och kontrollerna": "90 og kontrollerne",
+   "Höjdprofilen": "Højdeprofilen",
+   "Minnestavlan": "Mindetavlen",
+   "Lopp": "Løb",
+   "Om dig": "Om dig",
+   "Tider": "Tider",
+   "Namn": "Navn",
+   "Datum": "Dato",
+   "Startnummer": "Startnummer",
+   "Startled": "Startgruppe",
+   "Egen rad": "Egen linje",
+   "Sluttid": "Sluttid",
+   "Loppets namn": "Løbets navn",
+   "Sträcka": "Rute",
+   "Hyllningsrad": "Hyldestlinje",
+   "KONTROLL": "KONTROL",
+   "TID": "TID",
+   "KILOMETER · KLASSISK STIL": "KILOMETER · KLASSISK STIL",
+   "TILL MINNE AV": "TIL ÆRE FOR",
+   "SLUTTID": "SLUTTID",
+   "från Sälen till Mora,\n90 kilometer i klassisk stil": "fra Sälen til Mora,\n90 kilometer i klassisk stil",
+   "7 mars 2027": "7. marts 2027",
+   "Startnummer 12345": "Startnummer 12345",
+   "Startled 5": "Startgruppe 5",
+   "Mitt tredje Vasalopp": "Mit tredje Vasaløb",
+   "som åkte Vasaloppet": "som gennemførte Vasaloppet",
+   "som åkte Öppet Spår": "som gennemførte Öppet Spår",
+   "som åkte Nattvasan": "som gennemførte Nattvasan",
+   "Vasaloppet": "Vasaloppet",
+   "Öppet Spår": "Öppet Spår",
+   "Nattvasan": "Nattvasan",
+   "SÄLEN": "SÄLEN",
+   "MORA · 90 KM": "MORA · 90 KM",
+   "Mora 90 km": "Mora 90 km",
+   "Sälen – Mora · 90 km": "Sälen – Mora · 90 km",
+   "Smågan": "Smågan",
+   "Mångsbodarna": "Mångsbodarna",
+   "Risberg": "Risberg",
+   "Evertsberg": "Evertsberg",
+   "Oxberg": "Oxberg",
+   "Hökberg": "Hökberg",
+   "Eldris": "Eldris",
+   "Smågan 11 km": "Smågan 11 km",
+   "Mångsbodarna 24 km": "Mångsbodarna 24 km",
+   "Risberg 35 km": "Risberg 35 km",
+   "Evertsberg 47 km": "Evertsberg 47 km",
+   "Oxberg 62 km": "Oxberg 62 km",
+   "Hökberg 71 km": "Hökberg 71 km",
+   "Eldris 81 km": "Eldris 81 km"
+  },
+  "fi": {
+   "Vinteraffisch": "Talvijuliste",
+   "90 och kontrollerna": "90 ja tarkastuspisteet",
+   "Höjdprofilen": "Korkeusprofiili",
+   "Minnestavlan": "Muistotaulu",
+   "Lopp": "Kilpailu",
+   "Om dig": "Sinusta",
+   "Tider": "Ajat",
+   "Namn": "Nimi",
+   "Datum": "Päivämäärä",
+   "Startnummer": "Kilpailunumero",
+   "Startled": "Lähtöryhmä",
+   "Egen rad": "Oma rivi",
+   "Sluttid": "Loppuaika",
+   "Loppets namn": "Kilpailun nimi",
+   "Sträcka": "Reitti",
+   "Hyllningsrad": "Omistusrivi",
+   "KONTROLL": "TARKASTUSPISTE",
+   "TID": "AIKA",
+   "KILOMETER · KLASSISK STIL": "KILOMETRIÄ · PERINTEINEN TYYLI",
+   "TILL MINNE AV": "KUNNIAKIRJA",
+   "SLUTTID": "LOPPUAIKA",
+   "från Sälen till Mora,\n90 kilometer i klassisk stil": "Sälenistä Moraan,\n90 kilometriä perinteisellä tyylillä",
+   "7 mars 2027": "7. maaliskuuta 2027",
+   "Startnummer 12345": "Numero 12345",
+   "Startled 5": "Lähtöryhmä 5",
+   "Mitt tredje Vasalopp": "Kolmas Vasaloppetini",
+   "som åkte Vasaloppet": "joka hiihti Vasaloppetin",
+   "som åkte Öppet Spår": "joka hiihti Öppet Spårin",
+   "som åkte Nattvasan": "joka hiihti Nattvasanin",
+   "Vasaloppet": "Vasaloppet",
+   "Öppet Spår": "Öppet Spår",
+   "Nattvasan": "Nattvasan",
+   "SÄLEN": "SÄLEN",
+   "MORA · 90 KM": "MORA · 90 KM",
+   "Mora 90 km": "Mora 90 km",
+   "Sälen – Mora · 90 km": "Sälen – Mora · 90 km",
+   "Smågan": "Smågan",
+   "Mångsbodarna": "Mångsbodarna",
+   "Risberg": "Risberg",
+   "Evertsberg": "Evertsberg",
+   "Oxberg": "Oxberg",
+   "Hökberg": "Hökberg",
+   "Eldris": "Eldris",
+   "Smågan 11 km": "Smågan 11 km",
+   "Mångsbodarna 24 km": "Mångsbodarna 24 km",
+   "Risberg 35 km": "Risberg 35 km",
+   "Evertsberg 47 km": "Evertsberg 47 km",
+   "Oxberg 62 km": "Oxberg 62 km",
+   "Hökberg 71 km": "Hökberg 71 km",
+   "Eldris 81 km": "Eldris 81 km"
+  }
+ }
+}

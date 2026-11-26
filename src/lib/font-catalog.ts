@@ -36,10 +36,12 @@ export const FONT_CATALOG: FontDef[] = [
   { family: "Manrope", category: "sans", googleSpec: `Manrope:${W}` },
   { family: "Raleway", category: "sans", googleSpec: `Raleway:${W}` },
   { family: "Questrial", category: "sans", googleSpec: `Questrial` },
+  // Barlow: sporttavlornas brödtext (med äkta kursiv).
+  { family: "Barlow", category: "sans", googleSpec: `Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700` },
 
   // Serif
   { family: "Playfair Display", category: "serif", googleSpec: `Playfair+Display:${W}` },
-  { family: "Cormorant Garamond", category: "serif", googleSpec: `Cormorant+Garamond:${W}` },
+  { family: "Cormorant Garamond", category: "serif", googleSpec: `Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700` },
   { family: "Lora", category: "serif", googleSpec: `Lora:${W}` },
   { family: "Merriweather", category: "serif", googleSpec: `Merriweather:wght@400;700` },
   { family: "EB Garamond", category: "serif", googleSpec: `EB+Garamond:${W}` },
@@ -50,6 +52,8 @@ export const FONT_CATALOG: FontDef[] = [
   // Display
   { family: "Bebas Neue", category: "display", googleSpec: `Bebas+Neue` },
   { family: "Oswald", category: "display", googleSpec: `Oswald:${W}` },
+  // Barlow Condensed: sporttavlornas rubriker och tider.
+  { family: "Barlow Condensed", category: "display", googleSpec: `Barlow+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700` },
   { family: "Abril Fatface", category: "display", googleSpec: `Abril+Fatface` },
   { family: "Archivo Black", category: "display", googleSpec: `Archivo+Black` },
   { family: "Anton", category: "display", googleSpec: `Anton` },

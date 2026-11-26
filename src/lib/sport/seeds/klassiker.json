@@ -1,0 +1,4302 @@
+{
+ "orientations": [
+  "portrait"
+ ],
+ "defaultOrientation": "portrait",
+ "defaultLayoutName": "Året runt",
+ "defaultLayout": {
+  "portrait": {
+   "aspect": "3:4",
+   "background": {
+    "color": "#1F2A3A"
+   },
+   "layers": [
+    {
+     "id": "ksk-ring",
+     "name": "Året",
+     "type": "image",
+     "xPct": 13.3333,
+     "yPct": 12.0,
+     "wPct": 73.3333,
+     "hPct": 55.0,
+     "rotation": 0,
+     "zIndex": 2,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "url": "https://artful-create-studio-87.lovable.app/sport/ksk-b-ring.svg?v=1",
+      "fit": "contain",
+      "shape": "rect"
+     }
+    },
+    {
+     "id": "ksk-rule",
+     "name": "Linje",
+     "type": "shape",
+     "xPct": 8.0,
+     "yPct": 81.0,
+     "wPct": 84.0,
+     "hPct": 0.125,
+     "rotation": 0,
+     "zIndex": 6,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "kind": "line-horizontal",
+      "strokeMm": 0.3333,
+      "color": "#6B7486"
+     }
+    },
+    {
+     "id": "ksk-name",
+     "name": "Namn",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 69.0,
+     "wPct": 84.0,
+     "hPct": 7.25,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "Johan Ek",
+      "font": "Barlow Condensed",
+      "fontSizePt": 53.57,
+      "align": "center",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.0,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "uppercase": true,
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "ksk-kicker",
+     "name": "Rubrik",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 8.0,
+     "wPct": 84.0,
+     "hPct": 2.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "En svensk klassiker · 2026",
+      "font": "Barlow Condensed",
+      "fontSizePt": 14.88,
+      "align": "center",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.32,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "uppercase": true,
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "ksk-custom",
+     "name": "Egen rad",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 76.5,
+     "wPct": 84.0,
+     "hPct": 2.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": false,
+      "style": true
+     },
+     "defaults": {
+      "text": "Fyra lopp, fyra årstider",
+      "font": "Barlow",
+      "fontSizePt": 15.87,
+      "align": "center",
+      "valign": "middle",
+      "color": "#C9C2B6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "italic": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "ksk-ski-time",
+     "name": "Tid",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 87.25,
+     "wPct": 19.6667,
+     "hPct": 3.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "7:15:40",
+      "font": "Barlow Condensed",
+      "fontSizePt": 23.81,
+      "align": "left",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Skidor",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-ski-race",
+     "name": "Lopp",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 82.5,
+     "wPct": 19.6667,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "Vasaloppet",
+      "font": "Barlow",
+      "fontSizePt": 13.89,
+      "align": "left",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Skidor",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-ski-dist",
+     "name": "Sträcka",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 85.0,
+     "wPct": 19.6667,
+     "hPct": 2.25,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "90 km",
+      "font": "Barlow",
+      "fontSizePt": 12.9,
+      "align": "left",
+      "valign": "middle",
+      "color": "#C9C2B6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Skidor",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-bike-time",
+     "name": "Tid",
+     "type": "text",
+     "xPct": 29.0,
+     "yPct": 87.25,
+     "wPct": 19.6667,
+     "hPct": 3.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "10:48:00",
+      "font": "Barlow Condensed",
+      "fontSizePt": 23.81,
+      "align": "left",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Cykel",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-bike-race",
+     "name": "Lopp",
+     "type": "text",
+     "xPct": 29.0,
+     "yPct": 82.5,
+     "wPct": 19.6667,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "Vätternrundan",
+      "font": "Barlow",
+      "fontSizePt": 13.89,
+      "align": "left",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Cykel",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-bike-dist",
+     "name": "Sträcka",
+     "type": "text",
+     "xPct": 29.0,
+     "yPct": 85.0,
+     "wPct": 19.6667,
+     "hPct": 2.25,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "315 km",
+      "font": "Barlow",
+      "fontSizePt": 12.9,
+      "align": "left",
+      "valign": "middle",
+      "color": "#C9C2B6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Cykel",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-swim-time",
+     "name": "Tid",
+     "type": "text",
+     "xPct": 50.0,
+     "yPct": 87.25,
+     "wPct": 19.6667,
+     "hPct": 3.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "0:58:31",
+      "font": "Barlow Condensed",
+      "fontSizePt": 23.81,
+      "align": "left",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Simning",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-swim-race",
+     "name": "Lopp",
+     "type": "text",
+     "xPct": 50.0,
+     "yPct": 82.5,
+     "wPct": 19.6667,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "Vansbrosimningen",
+      "font": "Barlow",
+      "fontSizePt": 13.89,
+      "align": "left",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Simning",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-swim-dist",
+     "name": "Sträcka",
+     "type": "text",
+     "xPct": 50.0,
+     "yPct": 85.0,
+     "wPct": 19.6667,
+     "hPct": 2.25,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "3 km",
+      "font": "Barlow",
+      "fontSizePt": 12.9,
+      "align": "left",
+      "valign": "middle",
+      "color": "#C9C2B6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Simning",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-run-time",
+     "name": "Tid",
+     "type": "text",
+     "xPct": 71.0,
+     "yPct": 87.25,
+     "wPct": 19.6667,
+     "hPct": 3.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "2:41:09",
+      "font": "Barlow Condensed",
+      "fontSizePt": 23.81,
+      "align": "left",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Löpning",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-run-race",
+     "name": "Lopp",
+     "type": "text",
+     "xPct": 71.0,
+     "yPct": 82.5,
+     "wPct": 19.6667,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "Lidingöloppet",
+      "font": "Barlow",
+      "fontSizePt": 13.89,
+      "align": "left",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Löpning",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-run-dist",
+     "name": "Sträcka",
+     "type": "text",
+     "xPct": 71.0,
+     "yPct": 85.0,
+     "wPct": 19.6667,
+     "hPct": 2.25,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "30 km",
+      "font": "Barlow",
+      "fontSizePt": 12.9,
+      "align": "left",
+      "valign": "middle",
+      "color": "#C9C2B6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Löpning",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-totaldist",
+     "name": "Total sträcka (km)",
+     "type": "text",
+     "xPct": 25.0,
+     "yPct": 34.25,
+     "wPct": 50.0,
+     "hPct": 10.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "438",
+      "font": "Barlow Condensed",
+      "fontSizePt": 91.28,
+      "align": "center",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 0.95,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Totalt",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "ksk-l-four",
+     "name": "Etikett",
+     "type": "text",
+     "xPct": 25.0,
+     "yPct": 31.75,
+     "wPct": 50.0,
+     "hPct": 2.25,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "FYRA LOPP",
+      "font": "Barlow Condensed",
+      "fontSizePt": 12.9,
+      "align": "center",
+      "valign": "middle",
+      "color": "#C9C2B6",
+      "letterSpacingEm": 0.3,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true
+     }
+    },
+    {
+     "id": "ksk-l-km",
+     "name": "Etikett",
+     "type": "text",
+     "xPct": 25.0,
+     "yPct": 45.0,
+     "wPct": 50.0,
+     "hPct": 2.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "KILOMETER",
+      "font": "Barlow Condensed",
+      "fontSizePt": 17.86,
+      "align": "center",
+      "valign": "middle",
+      "color": "#F3EEE6",
+      "letterSpacingEm": 0.3,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true
+     }
+    }
+   ]
+  },
+  "landscape": {
+   "aspect": "4:3",
+   "background": {
+    "color": "#1F2A3A"
+   },
+   "layers": []
+  }
+ },
+ "extraLayouts": [
+  {
+   "id": "ksk-a",
+   "name": "Fyra lopp",
+   "defaultLayout": {
+    "portrait": {
+     "aspect": "3:4",
+     "background": {
+      "color": "#F6F3EC"
+     },
+     "layers": [
+      {
+       "id": "ksk-bg-ski",
+       "name": "Ruta",
+       "type": "image",
+       "xPct": 8.0,
+       "yPct": 24.0,
+       "wPct": 41.5,
+       "hPct": 24.75,
+       "rotation": 0,
+       "zIndex": 1,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/ksk-a-ski-bg.svg?v=1",
+        "fit": "cover",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "ksk-pic-ski",
+       "name": "Piktogram",
+       "type": "image",
+       "xPct": 10.6667,
+       "yPct": 25.75,
+       "wPct": 10.6667,
+       "hPct": 8.0,
+       "rotation": 0,
+       "zIndex": 2,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/ksk-ski-ink.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "ksk-bg-bike",
+       "name": "Ruta",
+       "type": "image",
+       "xPct": 50.5,
+       "yPct": 24.0,
+       "wPct": 41.5,
+       "hPct": 24.75,
+       "rotation": 0,
+       "zIndex": 1,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/ksk-a-bike-bg.svg?v=1",
+        "fit": "cover",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "ksk-pic-bike",
+       "name": "Piktogram",
+       "type": "image",
+       "xPct": 53.1667,
+       "yPct": 25.75,
+       "wPct": 10.6667,
+       "hPct": 8.0,
+       "rotation": 0,
+       "zIndex": 2,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/ksk-bike-ink.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "ksk-bg-swim",
+       "name": "Ruta",
+       "type": "image",
+       "xPct": 8.0,
+       "yPct": 49.5,
+       "wPct": 41.5,
+       "hPct": 24.75,
+       "rotation": 0,
+       "zIndex": 1,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/ksk-a-swim-bg.svg?v=1",
+        "fit": "cover",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "ksk-pic-swim",
+       "name": "Piktogram",
+       "type": "image",
+       "xPct": 10.6667,
+       "yPct": 51.25,
+       "wPct": 10.6667,
+       "hPct": 8.0,
+       "rotation": 0,
+       "zIndex": 2,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/ksk-swim-ink.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "ksk-bg-run",
+       "name": "Ruta",
+       "type": "image",
+       "xPct": 50.5,
+       "yPct": 49.5,
+       "wPct": 41.5,
+       "hPct": 24.75,
+       "rotation": 0,
+       "zIndex": 1,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/ksk-a-run-bg.svg?v=1",
+        "fit": "cover",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "ksk-pic-run",
+       "name": "Piktogram",
+       "type": "image",
+       "xPct": 53.1667,
+       "yPct": 51.25,
+       "wPct": 10.6667,
+       "hPct": 8.0,
+       "rotation": 0,
+       "zIndex": 2,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/ksk-run-ink.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "ksk-rule",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 77.0,
+       "wPct": 84.0,
+       "hPct": 0.25,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.6667,
+        "color": "#1B1F27"
+       }
+      },
+      {
+       "id": "ksk-name",
+       "name": "Namn",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 11.0,
+       "wPct": 84.0,
+       "hPct": 7.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Johan Ek",
+        "font": "Barlow Condensed",
+        "fontSizePt": 57.54,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "ksk-kicker",
+       "name": "Rubrik",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 8.0,
+       "wPct": 84.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "En svensk klassiker · 2026",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#9C3B1B",
+        "letterSpacingEm": 0.3,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "ksk-custom",
+       "name": "Egen rad",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 19.0,
+       "wPct": 84.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Fyra lopp, fyra årstider",
+        "font": "Barlow",
+        "fontSizePt": 15.87,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "ksk-ski-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 24.0,
+       "yPct": 43.0,
+       "wPct": 22.1667,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "7:15:40",
+        "font": "Barlow Condensed",
+        "fontSizePt": 33.73,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.05,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Skidor",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-ski-when",
+       "name": "Månad",
+       "type": "text",
+       "xPct": 28.0,
+       "yPct": 37.0,
+       "wPct": 18.1667,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "mars 2026",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.1,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Skidor",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-ski-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 11.3333,
+       "yPct": 39.5,
+       "wPct": 34.8333,
+       "hPct": 4.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Vasaloppet",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.1,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Skidor",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-ski-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 11.3333,
+       "yPct": 43.75,
+       "wPct": 16.6667,
+       "hPct": 4.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "90 km",
+        "font": "Barlow",
+        "fontSizePt": 15.87,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Skidor",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-bike-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 66.5,
+       "yPct": 43.0,
+       "wPct": 22.1667,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "10:48:00",
+        "font": "Barlow Condensed",
+        "fontSizePt": 33.73,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.05,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Cykel",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-bike-when",
+       "name": "Månad",
+       "type": "text",
+       "xPct": 70.5,
+       "yPct": 37.0,
+       "wPct": 18.1667,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "juni 2026",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.1,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Cykel",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-bike-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 53.8333,
+       "yPct": 39.5,
+       "wPct": 34.8333,
+       "hPct": 4.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Vätternrundan",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.1,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Cykel",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-bike-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 53.8333,
+       "yPct": 43.75,
+       "wPct": 16.6667,
+       "hPct": 4.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "315 km",
+        "font": "Barlow",
+        "fontSizePt": 15.87,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Cykel",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-swim-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 24.0,
+       "yPct": 68.5,
+       "wPct": 22.1667,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "0:58:31",
+        "font": "Barlow Condensed",
+        "fontSizePt": 33.73,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.05,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Simning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-swim-when",
+       "name": "Månad",
+       "type": "text",
+       "xPct": 28.0,
+       "yPct": 62.5,
+       "wPct": 18.1667,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "juli 2026",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.1,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Simning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-swim-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 11.3333,
+       "yPct": 65.0,
+       "wPct": 34.8333,
+       "hPct": 4.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Vansbrosimningen",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.1,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Simning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-swim-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 11.3333,
+       "yPct": 69.25,
+       "wPct": 16.6667,
+       "hPct": 4.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "3 km",
+        "font": "Barlow",
+        "fontSizePt": 15.87,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Simning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-run-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 66.5,
+       "yPct": 68.5,
+       "wPct": 22.1667,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "2:41:09",
+        "font": "Barlow Condensed",
+        "fontSizePt": 33.73,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.05,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Löpning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-run-when",
+       "name": "Månad",
+       "type": "text",
+       "xPct": 70.5,
+       "yPct": 62.5,
+       "wPct": 18.1667,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "september 2026",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.1,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Löpning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-run-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 53.8333,
+       "yPct": 65.0,
+       "wPct": 34.8333,
+       "hPct": 4.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Lidingöloppet",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.1,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Löpning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-run-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 53.8333,
+       "yPct": 69.25,
+       "wPct": 16.6667,
+       "hPct": 4.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "30 km",
+        "font": "Barlow",
+        "fontSizePt": 15.87,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Löpning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-total",
+       "name": "Sammanlagd tid",
+       "type": "text",
+       "xPct": 46.6667,
+       "yPct": 81.0,
+       "wPct": 45.3333,
+       "hPct": 7.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "21:43:20",
+        "font": "Barlow Condensed",
+        "fontSizePt": 49.61,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Totalt",
+        "formHalf": true,
+        "sumTimesOf": [
+         "ksk-ski-time",
+         "ksk-bike-time",
+         "ksk-swim-time",
+         "ksk-run-time"
+        ]
+       }
+      },
+      {
+       "id": "ksk-totaldist",
+       "name": "Total sträcka (km)",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 81.0,
+       "wPct": 40.0,
+       "hPct": 7.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "438",
+        "font": "Barlow Condensed",
+        "fontSizePt": 49.61,
+        "align": "left",
+        "valign": "middle",
+        "color": "#9C3B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Totalt",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-l-ski",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 11.3333,
+       "yPct": 37.0,
+       "wPct": 18.3333,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SKIDOR",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.22,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "ksk-l-bike",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 53.8333,
+       "yPct": 37.0,
+       "wPct": 18.3333,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "CYKEL",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.22,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "ksk-l-swim",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 11.3333,
+       "yPct": 62.5,
+       "wPct": 18.3333,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SIMNING",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.22,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "ksk-l-run",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 53.8333,
+       "yPct": 62.5,
+       "wPct": 18.3333,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "LÖPNING",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.22,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "ksk-l-km",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 78.75,
+       "wPct": 36.6667,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "KILOMETER",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.3,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "ksk-l-sum",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 50.0,
+       "yPct": 78.75,
+       "wPct": 42.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SAMMANLAGD TID",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.3,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      }
+     ]
+    },
+    "landscape": {
+     "aspect": "4:3",
+     "background": {
+      "color": "#F6F3EC"
+     },
+     "layers": []
+    }
+   }
+  },
+  {
+   "id": "ksk-c",
+   "name": "Fyra medaljer",
+   "defaultLayout": {
+    "portrait": {
+     "aspect": "3:4",
+     "background": {
+      "color": "#1F2A3A"
+     },
+     "layers": [
+      {
+       "id": "ksk-medals",
+       "name": "Medaljer",
+       "type": "image",
+       "xPct": 8.0,
+       "yPct": 0.0,
+       "wPct": 84.0,
+       "hPct": 53.0,
+       "rotation": 0,
+       "zIndex": 2,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/ksk-c-medals.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "ksk-name",
+       "name": "Namn",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 75.5,
+       "wPct": 84.0,
+       "hPct": 8.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Johan Ek",
+        "font": "Barlow Condensed",
+        "fontSizePt": 63.5,
+        "align": "center",
+        "valign": "middle",
+        "color": "#F3EEE6",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "ksk-kicker",
+       "name": "Rubrik",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 72.5,
+       "wPct": 84.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "En svensk klassiker · 2026",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "center",
+        "valign": "middle",
+        "color": "#D9B45A",
+        "letterSpacingEm": 0.32,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "ksk-ski-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 8.6667,
+       "yPct": 58.5,
+       "wPct": 20.0,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "7:15:40",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "center",
+        "valign": "middle",
+        "color": "#F3EEE6",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Skidor",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-ski-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 8.6667,
+       "yPct": 53.75,
+       "wPct": 20.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Vasaloppet",
+        "font": "Barlow",
+        "fontSizePt": 13.89,
+        "align": "center",
+        "valign": "middle",
+        "color": "#F3EEE6",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Skidor",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-ski-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 8.6667,
+       "yPct": 56.25,
+       "wPct": 20.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "90 km",
+        "font": "Barlow",
+        "fontSizePt": 12.9,
+        "align": "center",
+        "valign": "middle",
+        "color": "#CFC8BB",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Skidor",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-bike-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 29.6667,
+       "yPct": 58.5,
+       "wPct": 20.0,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "10:48:00",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "center",
+        "valign": "middle",
+        "color": "#F3EEE6",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Cykel",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-bike-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 29.6667,
+       "yPct": 53.75,
+       "wPct": 20.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Vätternrundan",
+        "font": "Barlow",
+        "fontSizePt": 13.89,
+        "align": "center",
+        "valign": "middle",
+        "color": "#F3EEE6",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Cykel",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-bike-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 29.6667,
+       "yPct": 56.25,
+       "wPct": 20.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "315 km",
+        "font": "Barlow",
+        "fontSizePt": 12.9,
+        "align": "center",
+        "valign": "middle",
+        "color": "#CFC8BB",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Cykel",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-swim-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 50.6667,
+       "yPct": 58.5,
+       "wPct": 20.0,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "0:58:31",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "center",
+        "valign": "middle",
+        "color": "#F3EEE6",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Simning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-swim-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 50.6667,
+       "yPct": 53.75,
+       "wPct": 20.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Vansbrosimningen",
+        "font": "Barlow",
+        "fontSizePt": 13.89,
+        "align": "center",
+        "valign": "middle",
+        "color": "#F3EEE6",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Simning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-swim-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 50.6667,
+       "yPct": 56.25,
+       "wPct": 20.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "3 km",
+        "font": "Barlow",
+        "fontSizePt": 12.9,
+        "align": "center",
+        "valign": "middle",
+        "color": "#CFC8BB",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Simning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-run-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 71.6667,
+       "yPct": 58.5,
+       "wPct": 20.0,
+       "hPct": 4.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "2:41:09",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "center",
+        "valign": "middle",
+        "color": "#F3EEE6",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Löpning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-run-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 71.6667,
+       "yPct": 53.75,
+       "wPct": 20.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Lidingöloppet",
+        "font": "Barlow",
+        "fontSizePt": 13.89,
+        "align": "center",
+        "valign": "middle",
+        "color": "#F3EEE6",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Löpning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-run-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 71.6667,
+       "yPct": 56.25,
+       "wPct": 20.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "30 km",
+        "font": "Barlow",
+        "fontSizePt": 12.9,
+        "align": "center",
+        "valign": "middle",
+        "color": "#CFC8BB",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Löpning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-total",
+       "name": "Sammanlagd tid",
+       "type": "text",
+       "xPct": 50.0,
+       "yPct": 87.0,
+       "wPct": 26.6667,
+       "hPct": 4.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "21:43:20",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "center",
+        "valign": "middle",
+        "color": "#F3EEE6",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Totalt",
+        "formHalf": true,
+        "sumTimesOf": [
+         "ksk-ski-time",
+         "ksk-bike-time",
+         "ksk-swim-time",
+         "ksk-run-time"
+        ]
+       }
+      },
+      {
+       "id": "ksk-totaldist",
+       "name": "Total sträcka (km)",
+       "type": "text",
+       "xPct": 23.3333,
+       "yPct": 87.0,
+       "wPct": 26.6667,
+       "hPct": 4.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "438",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "center",
+        "valign": "middle",
+        "color": "#F3EEE6",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Totalt",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-l-km",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 23.3333,
+       "yPct": 85.0,
+       "wPct": 26.6667,
+       "hPct": 2.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "KILOMETER",
+        "font": "Barlow Condensed",
+        "fontSizePt": 11.91,
+        "align": "center",
+        "valign": "middle",
+        "color": "#CFC8BB",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "ksk-l-sum",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 50.0,
+       "yPct": 85.0,
+       "wPct": 26.6667,
+       "hPct": 2.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SAMMANLAGD TID",
+        "font": "Barlow Condensed",
+        "fontSizePt": 11.91,
+        "align": "center",
+        "valign": "middle",
+        "color": "#CFC8BB",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      }
+     ]
+    },
+    "landscape": {
+     "aspect": "4:3",
+     "background": {
+      "color": "#1F2A3A"
+     },
+     "layers": []
+    }
+   }
+  },
+  {
+   "id": "ksk-d",
+   "name": "Fyra ord",
+   "defaultLayout": {
+    "portrait": {
+     "aspect": "3:4",
+     "background": {
+      "color": "#F2EFE8"
+     },
+     "layers": [
+      {
+       "id": "ksk-rule-top",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 23.25,
+       "wPct": 84.0,
+       "hPct": 0.25,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.6667,
+        "color": "#1B1F27"
+       }
+      },
+      {
+       "id": "ksk-rule-ski",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 36.75,
+       "wPct": 84.0,
+       "hPct": 0.25,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.6667,
+        "color": "#1B1F27"
+       }
+      },
+      {
+       "id": "ksk-rule-bike",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 50.25,
+       "wPct": 84.0,
+       "hPct": 0.25,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.6667,
+        "color": "#1B1F27"
+       }
+      },
+      {
+       "id": "ksk-rule-swim",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 63.75,
+       "wPct": 84.0,
+       "hPct": 0.25,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.6667,
+        "color": "#1B1F27"
+       }
+      },
+      {
+       "id": "ksk-rule-run",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 77.25,
+       "wPct": 84.0,
+       "hPct": 0.25,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.6667,
+        "color": "#1B1F27"
+       }
+      },
+      {
+       "id": "ksk-name",
+       "name": "Namn",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 11.0,
+       "wPct": 84.0,
+       "hPct": 7.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Johan Ek",
+        "font": "Barlow Condensed",
+        "fontSizePt": 53.57,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "ksk-kicker",
+       "name": "Rubrik",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 8.0,
+       "wPct": 84.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "En svensk klassiker · 2026",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.3,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "ksk-custom",
+       "name": "Egen rad",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 18.75,
+       "wPct": 84.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Fyra lopp, fyra årstider",
+        "font": "Barlow",
+        "fontSizePt": 15.87,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "italic": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "ksk-ski-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 28.0,
+       "wPct": 37.0,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "7:15:40",
+        "font": "Barlow Condensed",
+        "fontSizePt": 31.75,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.1,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Skidor",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-ski-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 25.5,
+       "wPct": 37.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Vasaloppet",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Skidor",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-ski-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 33.0,
+       "wPct": 37.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "90 km",
+        "font": "Barlow",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#4A4F58",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Skidor",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-bike-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 41.5,
+       "wPct": 37.0,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "10:48:00",
+        "font": "Barlow Condensed",
+        "fontSizePt": 31.75,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.1,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Cykel",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-bike-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 39.0,
+       "wPct": 37.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Vätternrundan",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Cykel",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-bike-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 46.5,
+       "wPct": 37.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "315 km",
+        "font": "Barlow",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#4A4F58",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Cykel",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-swim-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 55.0,
+       "wPct": 37.0,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "0:58:31",
+        "font": "Barlow Condensed",
+        "fontSizePt": 31.75,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.1,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Simning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-swim-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 52.5,
+       "wPct": 37.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Vansbrosimningen",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Simning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-swim-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 60.0,
+       "wPct": 37.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "3 km",
+        "font": "Barlow",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#4A4F58",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Simning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-run-time",
+       "name": "Tid",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 68.5,
+       "wPct": 37.0,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "2:41:09",
+        "font": "Barlow Condensed",
+        "fontSizePt": 31.75,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.1,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Löpning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-run-race",
+       "name": "Lopp",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 66.0,
+       "wPct": 37.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Lidingöloppet",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Löpning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-run-dist",
+       "name": "Sträcka",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 73.5,
+       "wPct": 37.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "30 km",
+        "font": "Barlow",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#4A4F58",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Löpning",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-total",
+       "name": "Sammanlagd tid",
+       "type": "text",
+       "xPct": 43.3333,
+       "yPct": 82.25,
+       "wPct": 48.6667,
+       "hPct": 6.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "21:43:20",
+        "font": "Barlow Condensed",
+        "fontSizePt": 45.64,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Totalt",
+        "formHalf": true,
+        "sumTimesOf": [
+         "ksk-ski-time",
+         "ksk-bike-time",
+         "ksk-swim-time",
+         "ksk-run-time"
+        ]
+       }
+      },
+      {
+       "id": "ksk-totaldist",
+       "name": "Total sträcka (km)",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 82.25,
+       "wPct": 40.0,
+       "hPct": 6.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "438",
+        "font": "Barlow Condensed",
+        "fontSizePt": 45.64,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Totalt",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "ksk-w-ski",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 23.75,
+       "wPct": 49.3333,
+       "hPct": 13.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SKIDOR",
+        "font": "Barlow Condensed",
+        "fontSizePt": 103.18,
+        "align": "left",
+        "valign": "middle",
+        "color": "#2F5E8C",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "ksk-w-bike",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 37.25,
+       "wPct": 49.3333,
+       "hPct": 13.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "CYKEL",
+        "font": "Barlow Condensed",
+        "fontSizePt": 103.18,
+        "align": "left",
+        "valign": "middle",
+        "color": "#B8860B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "ksk-w-swim",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 50.75,
+       "wPct": 49.3333,
+       "hPct": 13.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SIM",
+        "font": "Barlow Condensed",
+        "fontSizePt": 103.18,
+        "align": "left",
+        "valign": "middle",
+        "color": "#2B7A78",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "ksk-w-run",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 64.25,
+       "wPct": 49.3333,
+       "hPct": 13.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "LÖP",
+        "font": "Barlow Condensed",
+        "fontSizePt": 103.18,
+        "align": "left",
+        "valign": "middle",
+        "color": "#A8452A",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "ksk-l-km",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 80.0,
+       "wPct": 36.6667,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "KILOMETER",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.3,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "ksk-l-sum",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 50.0,
+       "yPct": 80.0,
+       "wPct": 42.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SAMMANLAGD TID",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "right",
+        "valign": "middle",
+        "color": "#1B1F27",
+        "letterSpacingEm": 0.3,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      }
+     ]
+    },
+    "landscape": {
+     "aspect": "4:3",
+     "background": {
+      "color": "#F2EFE8"
+     },
+     "layers": []
+    }
+   }
+  }
+ ],
+ "contentVariants": [
+  {
+   "id": "klassiker",
+   "name": "En svensk klassiker",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/ksk-v-klassiker.svg?v=1",
+   "overrides": {
+    "ksk-kicker": {
+     "text": "En svensk klassiker · 2026"
+    },
+    "ksk-totaldist": {
+     "text": "438"
+    },
+    "ksk-ski-race": {
+     "text": "Vasaloppet"
+    },
+    "ksk-ski-dist": {
+     "text": "90 km"
+    },
+    "ksk-bike-race": {
+     "text": "Vätternrundan"
+    },
+    "ksk-bike-dist": {
+     "text": "315 km"
+    },
+    "ksk-swim-race": {
+     "text": "Vansbrosimningen"
+    },
+    "ksk-swim-dist": {
+     "text": "3 km"
+    },
+    "ksk-run-race": {
+     "text": "Lidingöloppet"
+    },
+    "ksk-run-dist": {
+     "text": "30 km"
+    }
+   }
+  },
+  {
+   "id": "engelbrekt",
+   "name": "Med Engelbrektsloppet",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/ksk-v-engelbrekt.svg?v=1",
+   "overrides": {
+    "ksk-kicker": {
+     "text": "En svensk klassiker · 2026"
+    },
+    "ksk-totaldist": {
+     "text": "408"
+    },
+    "ksk-ski-race": {
+     "text": "Engelbrektsloppet"
+    },
+    "ksk-ski-dist": {
+     "text": "60 km"
+    },
+    "ksk-bike-race": {
+     "text": "Vätternrundan"
+    },
+    "ksk-bike-dist": {
+     "text": "315 km"
+    },
+    "ksk-swim-race": {
+     "text": "Vansbrosimningen"
+    },
+    "ksk-swim-dist": {
+     "text": "3 km"
+    },
+    "ksk-run-race": {
+     "text": "Lidingöloppet"
+    },
+    "ksk-run-dist": {
+     "text": "30 km"
+    }
+   }
+  },
+  {
+   "id": "halva",
+   "name": "Halva",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/ksk-v-halva.svg?v=1",
+   "overrides": {
+    "ksk-kicker": {
+     "text": "En svensk klassiker Halva · 2026"
+    },
+    "ksk-totaldist": {
+     "text": "211,5"
+    },
+    "ksk-ski-race": {
+     "text": "Vasaloppet 45"
+    },
+    "ksk-ski-dist": {
+     "text": "45 km"
+    },
+    "ksk-bike-race": {
+     "text": "Halvvättern"
+    },
+    "ksk-bike-dist": {
+     "text": "150 km"
+    },
+    "ksk-swim-race": {
+     "text": "Vansbro Halvsim"
+    },
+    "ksk-swim-dist": {
+     "text": "1,5 km"
+    },
+    "ksk-run-race": {
+     "text": "Lidingöloppet 15"
+    },
+    "ksk-run-dist": {
+     "text": "15 km"
+    }
+   }
+  },
+  {
+   "id": "tjej",
+   "name": "Tjej",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/ksk-v-tjej.svg?v=1",
+   "overrides": {
+    "ksk-kicker": {
+     "text": "En svensk klassiker Tjej · 2026"
+    },
+    "ksk-totaldist": {
+     "text": "141"
+    },
+    "ksk-ski-race": {
+     "text": "Tjejvasan"
+    },
+    "ksk-ski-dist": {
+     "text": "30 km"
+    },
+    "ksk-bike-race": {
+     "text": "Tjejvättern"
+    },
+    "ksk-bike-dist": {
+     "text": "100 km"
+    },
+    "ksk-swim-race": {
+     "text": "Vansbro Tjejsim"
+    },
+    "ksk-swim-dist": {
+     "text": "1 km"
+    },
+    "ksk-run-race": {
+     "text": "Rosa Bandet-loppet"
+    },
+    "ksk-run-dist": {
+     "text": "10 km"
+    }
+   }
+  },
+  {
+   "id": "korta",
+   "name": "Korta",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/ksk-v-korta.svg?v=1",
+   "overrides": {
+    "ksk-kicker": {
+     "text": "En svensk klassiker Korta · 2026"
+    },
+    "ksk-totaldist": {
+     "text": "141"
+    },
+    "ksk-ski-race": {
+     "text": "Vasaloppet 30"
+    },
+    "ksk-ski-dist": {
+     "text": "30 km"
+    },
+    "ksk-bike-race": {
+     "text": "Vätternrundan 100"
+    },
+    "ksk-bike-dist": {
+     "text": "100 km"
+    },
+    "ksk-swim-race": {
+     "text": "Vansbro Kortsim"
+    },
+    "ksk-swim-dist": {
+     "text": "1 km"
+    },
+    "ksk-run-race": {
+     "text": "Rosa Bandet-loppet"
+    },
+    "ksk-run-dist": {
+     "text": "10 km"
+    }
+   }
+  }
+ ],
+ "contentVariantLabel": "Klassiker",
+ "defaultContentVariantId": "klassiker",
+ "i18n": {
+  "en": {
+   "Året runt": "All year round",
+   "Fyra lopp": "Four races",
+   "Fyra medaljer": "Four medals",
+   "Fyra ord": "Four words",
+   "Klassiker": "Classic",
+   "En svensk klassiker": "A Swedish Classic",
+   "Med Engelbrektsloppet": "With Engelbrektsloppet",
+   "Halva": "Half",
+   "Tjej": "Women's",
+   "Korta": "Short",
+   "Om dig": "About you",
+   "Skidor": "Skiing",
+   "Cykel": "Cycling",
+   "Simning": "Swimming",
+   "Löpning": "Running",
+   "Totalt": "Total",
+   "Namn": "Name",
+   "Rubrik": "Heading",
+   "Egen rad": "Your own line",
+   "Tid": "Time",
+   "Månad": "Month",
+   "Lopp": "Race",
+   "Sträcka": "Distance",
+   "Sammanlagd tid": "Combined time",
+   "Total sträcka (km)": "Total distance (km)",
+   "SKIDOR": "SKIING",
+   "CYKEL": "CYCLING",
+   "SIMNING": "SWIMMING",
+   "LÖPNING": "RUNNING",
+   "SIM": "SWIM",
+   "LÖP": "RUN",
+   "KILOMETER": "KILOMETRES",
+   "SAMMANLAGD TID": "COMBINED TIME",
+   "FYRA LOPP": "FOUR RACES",
+   "En svensk klassiker · 2026": "A Swedish Classic · 2026",
+   "En svensk klassiker Halva · 2026": "A Swedish Classic Half · 2026",
+   "En svensk klassiker Tjej · 2026": "A Swedish Classic Women's · 2026",
+   "En svensk klassiker Korta · 2026": "A Swedish Classic Short · 2026",
+   "mars 2026": "March 2026",
+   "juni 2026": "June 2026",
+   "juli 2026": "July 2026",
+   "september 2026": "September 2026",
+   "Fyra lopp, fyra årstider": "Four races, four seasons",
+   "1,5 km": "1.5 km",
+   "Vasaloppet": "Vasaloppet",
+   "Vätternrundan": "Vätternrundan",
+   "Vansbrosimningen": "Vansbrosimningen",
+   "Lidingöloppet": "Lidingöloppet",
+   "Engelbrektsloppet": "Engelbrektsloppet",
+   "Vasaloppet 45": "Vasaloppet 45",
+   "Halvvättern": "Halvvättern",
+   "Vansbro Halvsim": "Vansbro Halvsim",
+   "Lidingöloppet 15": "Lidingöloppet 15",
+   "Tjejvasan": "Tjejvasan",
+   "Tjejvättern": "Tjejvättern",
+   "Vansbro Tjejsim": "Vansbro Tjejsim",
+   "Rosa Bandet-loppet": "Rosa Bandet-loppet",
+   "Vasaloppet 30": "Vasaloppet 30",
+   "Vätternrundan 100": "Vätternrundan 100",
+   "Vansbro Kortsim": "Vansbro Kortsim"
+  },
+  "da": {
+   "Året runt": "Året rundt",
+   "Fyra lopp": "Fire løb",
+   "Fyra medaljer": "Fire medaljer",
+   "Fyra ord": "Fire ord",
+   "Klassiker": "Klassiker",
+   "En svensk klassiker": "En svensk klassiker",
+   "Med Engelbrektsloppet": "Med Engelbrektsloppet",
+   "Halva": "Halv",
+   "Tjej": "Kvinder",
+   "Korta": "Korte",
+   "Om dig": "Om dig",
+   "Skidor": "Skiløb",
+   "Cykel": "Cykling",
+   "Simning": "Svømning",
+   "Löpning": "Løb",
+   "Totalt": "I alt",
+   "Namn": "Navn",
+   "Rubrik": "Overskrift",
+   "Egen rad": "Egen linje",
+   "Tid": "Tid",
+   "Månad": "Måned",
+   "Lopp": "Løb",
+   "Sträcka": "Distance",
+   "Sammanlagd tid": "Samlet tid",
+   "Total sträcka (km)": "Samlet distance (km)",
+   "SKIDOR": "SKILØB",
+   "CYKEL": "CYKLING",
+   "SIMNING": "SVØMNING",
+   "LÖPNING": "LØB",
+   "SIM": "SVØM",
+   "LÖP": "LØB",
+   "KILOMETER": "KILOMETER",
+   "SAMMANLAGD TID": "SAMLET TID",
+   "FYRA LOPP": "FIRE LØB",
+   "En svensk klassiker · 2026": "En svensk klassiker · 2026",
+   "En svensk klassiker Halva · 2026": "En svensk klassiker Halva · 2026",
+   "En svensk klassiker Tjej · 2026": "En svensk klassiker Tjej · 2026",
+   "En svensk klassiker Korta · 2026": "En svensk klassiker Korta · 2026",
+   "mars 2026": "marts 2026",
+   "juni 2026": "juni 2026",
+   "juli 2026": "juli 2026",
+   "september 2026": "september 2026",
+   "Fyra lopp, fyra årstider": "Fire løb, fire årstider",
+   "1,5 km": "1,5 km",
+   "Vasaloppet": "Vasaloppet",
+   "Vätternrundan": "Vätternrundan",
+   "Vansbrosimningen": "Vansbrosimningen",
+   "Lidingöloppet": "Lidingöloppet",
+   "Engelbrektsloppet": "Engelbrektsloppet",
+   "Vasaloppet 45": "Vasaloppet 45",
+   "Halvvättern": "Halvvättern",
+   "Vansbro Halvsim": "Vansbro Halvsim",
+   "Lidingöloppet 15": "Lidingöloppet 15",
+   "Tjejvasan": "Tjejvasan",
+   "Tjejvättern": "Tjejvättern",
+   "Vansbro Tjejsim": "Vansbro Tjejsim",
+   "Rosa Bandet-loppet": "Rosa Bandet-loppet",
+   "Vasaloppet 30": "Vasaloppet 30",
+   "Vätternrundan 100": "Vätternrundan 100",
+   "Vansbro Kortsim": "Vansbro Kortsim"
+  },
+  "fi": {
+   "Året runt": "Ympäri vuoden",
+   "Fyra lopp": "Neljä kilpailua",
+   "Fyra medaljer": "Neljä mitalia",
+   "Fyra ord": "Neljä sanaa",
+   "Klassiker": "Klassikko",
+   "En svensk klassiker": "En svensk klassiker",
+   "Med Engelbrektsloppet": "Engelbrektsloppet",
+   "Halva": "Puolikas",
+   "Tjej": "Naiset",
+   "Korta": "Lyhyt",
+   "Om dig": "Sinusta",
+   "Skidor": "Hiihto",
+   "Cykel": "Pyöräily",
+   "Simning": "Uinti",
+   "Löpning": "Juoksu",
+   "Totalt": "Yhteensä",
+   "Namn": "Nimi",
+   "Rubrik": "Otsikko",
+   "Egen rad": "Oma rivi",
+   "Tid": "Aika",
+   "Månad": "Kuukausi",
+   "Lopp": "Kilpailu",
+   "Sträcka": "Matka",
+   "Sammanlagd tid": "Yhteisaika",
+   "Total sträcka (km)": "Kokonaismatka (km)",
+   "SKIDOR": "HIIHTO",
+   "CYKEL": "PYÖRÄILY",
+   "SIMNING": "UINTI",
+   "LÖPNING": "JUOKSU",
+   "SIM": "UINTI",
+   "LÖP": "JUOKSU",
+   "KILOMETER": "KILOMETRIÄ",
+   "SAMMANLAGD TID": "YHTEISAIKA",
+   "FYRA LOPP": "NELJÄ KILPAILUA",
+   "En svensk klassiker · 2026": "En svensk klassiker · 2026",
+   "En svensk klassiker Halva · 2026": "En svensk klassiker Halva · 2026",
+   "En svensk klassiker Tjej · 2026": "En svensk klassiker Tjej · 2026",
+   "En svensk klassiker Korta · 2026": "En svensk klassiker Korta · 2026",
+   "mars 2026": "maaliskuu 2026",
+   "juni 2026": "kesäkuu 2026",
+   "juli 2026": "heinäkuu 2026",
+   "september 2026": "syyskuu 2026",
+   "Fyra lopp, fyra årstider": "Neljä kilpailua, neljä vuodenaikaa",
+   "1,5 km": "1,5 km",
+   "Vasaloppet": "Vasaloppet",
+   "Vätternrundan": "Vätternrundan",
+   "Vansbrosimningen": "Vansbrosimningen",
+   "Lidingöloppet": "Lidingöloppet",
+   "Engelbrektsloppet": "Engelbrektsloppet",
+   "Vasaloppet 45": "Vasaloppet 45",
+   "Halvvättern": "Halvvättern",
+   "Vansbro Halvsim": "Vansbro Halvsim",
+   "Lidingöloppet 15": "Lidingöloppet 15",
+   "Tjejvasan": "Tjejvasan",
+   "Tjejvättern": "Tjejvättern",
+   "Vansbro Tjejsim": "Vansbro Tjejsim",
+   "Rosa Bandet-loppet": "Rosa Bandet-loppet",
+   "Vasaloppet 30": "Vasaloppet 30",
+   "Vätternrundan 100": "Vätternrundan 100",
+   "Vansbro Kortsim": "Vansbro Kortsim"
+  }
+ }
+}

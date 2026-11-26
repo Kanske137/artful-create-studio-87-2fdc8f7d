@@ -24,6 +24,9 @@ import type { LayerValue, MapIcon } from "@/stores/editorStore";
 import { getActiveMarginInsetsPct, expandRectForRemovedMargin } from "./layer-utils";
 import {
   buildEffectiveTextWithSpans,
+  displayText,
+  fitWidthScale,
+  piecesByLine,
   resolveFontPx,
   resolveLineHeight,
   resolveLetterSpacingEm,
@@ -406,7 +409,7 @@ function drawTextLayer(
   // Caller resolverar effektiv text via buildEffectiveTextWithSpans, så
   // overrideText === "" (medvetet tomt) MÅSTE respekteras. Använd INTE
   // `liveText || d.text` här — det skulle falla tillbaka på placeholder.
-  const text = liveText;
+  const text = displayText(d, liveText);
   if (!text.trim()) return;
   // multiply-blend: underliggande tyg/skuggor lyser igenom (tröjnummer) —
   // speglar TextLayerView:s mix-blend-mode. Återställs i slutet av funktionen.
@@ -422,21 +425,43 @@ function drawTextLayer(
 
   // Basstorlek: kundoverride vinner, annars pt (A4-referens) via samma
   // helper som editorn — sedan legacy %-av-höjd.
-  const basePx =
+  const unscaledPx =
     typeof liveFontSizePt === "number" && liveFontSizePt > 0
       ? resolveFontPx({ fontSizePt: liveFontSizePt }, canvasShortPx)
       : resolveFontPx(d, canvasShortPx, rect.h);
   const lineMul = resolveLineHeight(d);
+
+  // Segmentera texten med spans (samma helper som editorn) och bryt i rader.
+  const segments = resolveSpans(text, liveSpans ?? d.spans);
+
+  // Krymp till bredd (fitWidth): samma beräkning som editorns TextLayerView.
+  let fit = 1;
+  if (d.fitWidth) {
+    const prevSpacing = (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing;
+    if ("letterSpacing" in ctx) (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = "0px";
+    fit = fitWidthScale(
+      piecesByLine(segments, unscaledPx, canvasShortPx, liveFont || d.font),
+      unscaledPx,
+      resolveLetterSpacingEm(d),
+      rect.w,
+      (str, cssFont) => {
+        ctx.font = cssFont;
+        return ctx.measureText(str).width;
+      },
+    );
+    if ("letterSpacing" in ctx && prevSpacing !== undefined) {
+      (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = prevSpacing;
+    }
+  }
+  const basePx = unscaledPx * fit;
   // Letter-spacing: samma semantik som DOM (em × CONTAINERNS fontstorlek,
   // ärvd som längd av alla segment).
   const letterPx = resolveLetterSpacingEm(d) * basePx;
 
-  // Segmentera texten med spans (samma helper som editorn) och bryt i rader.
-  const segments = resolveSpans(text, liveSpans ?? d.spans);
   type Piece = { text: string; px: number; font: string; color: string; bold: boolean; italic: boolean; underline: boolean };
   let lines: Piece[][] = [[]];
   for (const s of segments) {
-    const px = s.fontSizePt ? resolveFontPx({ fontSizePt: s.fontSizePt }, canvasShortPx) : basePx;
+    const px = s.fontSizePt ? resolveFontPx({ fontSizePt: s.fontSizePt }, canvasShortPx) * fit : basePx;
     const style: Omit<Piece, "text"> = {
       px,
       font: s.font || liveFont || d.font,
@@ -562,6 +587,23 @@ function drawTextLayer(
   });
   ctx.restore();
   ctx.globalCompositeOperation = prevComposite;
+}
+
+/** Se till att textlagrets typsnitt (inkl. fet/kursiv från spans) är laddat
+ *  innan det ritas i canvas — annars kan tryckfilen få reservtypsnitt. */
+async function ensureTextFonts(font: string, spans: TextSpan[] | undefined): Promise<void> {
+  if (typeof document === "undefined" || !document.fonts) return;
+  const variants = new Set<string>(["400 normal"]);
+  for (const s of spans ?? []) variants.add(`${s.bold ? 700 : 400} ${s.italic ? "italic" : "normal"}`);
+  const families = new Set<string>([font, ...(spans ?? []).map((s) => s.font).filter((f): f is string => !!f)]);
+  const loads: Promise<unknown>[] = [];
+  for (const fam of families) {
+    for (const v of variants) {
+      const [weight, style] = v.split(" ");
+      loads.push(document.fonts.load(`${style === "italic" ? "italic " : ""}${weight} 20px "${fam}"`).catch(() => undefined));
+    }
+  }
+  await Promise.all(loads);
 }
 
 async function drawImageLayer(
@@ -1075,6 +1117,7 @@ export async function renderTemplateSnapshot(input: TemplateSnapshotInput): Prom
         overrideText = v ? (layer.defaults.raceFieldUppercase ? v.toLocaleUpperCase("sv-SE") : v) : null;
       }
       const { text, spans } = buildEffectiveTextWithSpans(layer.defaults, place, overrideText);
+      await ensureTextFonts(font, spans ?? layer.defaults.spans);
       drawTextLayer(ctx, rect, layer, text, font, Math.min(frontPxW, frontPxH), tv?.fontSizePt ?? null, spans);
     } else if (layer.type === "image") {
       try {

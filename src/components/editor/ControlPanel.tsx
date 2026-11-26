@@ -374,10 +374,15 @@ export function ControlPanel({ configs, activeHandle, activeProductType, onProdu
           })}
         </div>
       );
-    case "text":
+    case "text": {
+      // Formulärfält (formGroup) visas kompakt i grupper; övriga lager som
+      // tidigare, en textruta per lager.
+      const formTexts = editableTexts.filter((l) => !!l.defaults.formGroup);
+      const freeTexts = editableTexts.filter((l) => !l.defaults.formGroup);
       return (
         <div className="space-y-6">
-          {editableTexts.map((l, idx) => {
+          {formTexts.length > 0 && <TextFormGroups config={config} layers={formTexts} layerValues={layerValues} />}
+          {freeTexts.map((l, idx) => {
             const linkedMapId = l.defaults.linkedMapLayerId;
             const linkedMap =
               linkedMapId
@@ -396,6 +401,7 @@ export function ControlPanel({ configs, activeHandle, activeProductType, onProdu
           })}
         </div>
       );
+    }
     case "format":
       return (
         <FormatSection
@@ -918,6 +924,102 @@ function MapStyleLayerSection({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+type TextLayer = Extract<TemplateLayer, { type: "text" }>;
+
+/** Kompakt formulär för textlager med `formGroup`: grupperade enradsfält
+ *  (lagrets namn som etikett), halva bredden för `formHalf`, av/på-knapp när
+ *  synligheten är upplåst och en ledtråd på summafält (sumTimesOf). */
+function TextFormGroups({
+  config,
+  layers,
+  layerValues,
+}: {
+  config: ProductConfig;
+  layers: TextLayer[];
+  layerValues: Record<string, unknown>;
+}) {
+  const groups: Array<{ name: string; layers: TextLayer[] }> = [];
+  for (const l of layers) {
+    const name = l.defaults.formGroup!;
+    const g = groups.find((x) => x.name === name);
+    if (g) g.layers.push(l);
+    else groups.push({ name, layers: [l] });
+  }
+  return (
+    <div className="space-y-6">
+      {groups.map((g) => (
+        <div key={g.name} className="space-y-3">
+          <h4 className="text-[11px] font-semibold uppercase tracking-wider text-foreground">{g.name}</h4>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-3">
+            {g.layers.map((l) => (
+              <FormTextField
+                key={l.id}
+                config={config}
+                layer={l}
+                value={(layerValues[l.id] as TextLayerValue | undefined) ?? null}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function FormTextField({
+  config,
+  layer,
+  value,
+}: {
+  config: ProductConfig;
+  layer: TextLayer;
+  value: TextLayerValue | null;
+}) {
+  const { t } = useTranslation();
+  const setLayerText = useEditorStore((s) => s.setLayerText);
+  const setLayerTextVisible = useEditorStore((s) => s.setLayerTextVisible);
+  const manualSum = useEditorStore((s) => !!s.manualSumIds[layer.id]);
+  const committed = value?.overrideText ?? layer.defaults.text;
+  // Lokal buffert medan fältet har fokus, så markören inte hoppar.
+  const [draft, setDraft] = useState<string | null>(null);
+  const visible = value?.visible ?? true;
+  const isSum = !!layer.defaults.sumTimesOf?.length;
+  const inputId = `form-${layer.id}`;
+  return (
+    <div className={cn("space-y-1.5 min-w-0", layer.defaults.formHalf ? "col-span-1" : "col-span-2")}>
+      <div className="flex items-center justify-between gap-2 min-h-5">
+        <Label htmlFor={inputId} className="text-[11px] text-muted-foreground truncate">
+          {layer.name}
+        </Label>
+        {!layer.locks.visibility && (
+          <Switch
+            checked={visible}
+            onCheckedChange={(v) => setLayerTextVisible(layer.id, v)}
+            aria-label={`${t("text.show")}: ${layer.name}`}
+            className="scale-75 origin-right"
+          />
+        )}
+      </div>
+      {!layer.locks.content && (
+        <Input
+          id={inputId}
+          value={draft !== null ? draft : committed}
+          onFocus={() => setDraft(committed)}
+          onChange={(e) => {
+            setDraft(e.target.value);
+            setLayerText(layer.id, e.target.value);
+          }}
+          onBlur={() => setDraft(null)}
+          maxLength={Math.max(config.text_config.maxChars, committed.length)}
+          disabled={!visible}
+          className="rounded-xl h-9"
+        />
+      )}
+      {isSum && !manualSum && <p className="text-[11px] text-muted-foreground px-1">{t("text.autoSum")}</p>}
     </div>
   );
 }

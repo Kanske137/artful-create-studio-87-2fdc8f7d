@@ -212,6 +212,14 @@ export interface EditorState {
   // Per-layer values keyed by layer id (covers map + text layers).
   layerValues: Record<string, LayerValue>;
 
+  /** Kundens texter och synlighetsval per textlager-id från tidigare stilar.
+   *  Låter ett fält som saknas i en mellanliggande stil (sporttavlorna delar
+   *  fält, men alla stilar visar inte alla fält) komma tillbaka med kundens
+   *  text när kunden byter till en stil som har fältet igen. */
+  textStash: Record<string, { overrideText: string | null; visible: boolean }>;
+  /** Summafält (sumTimesOf) där kunden skrivit en egen text — räknas inte om. */
+  manualSumIds: Record<string, true>;
+
   // Customer-driven rect overrides for layers (when locks.size or locks.move
   // are unlocked). All values in % of editor canvas. Missing fields fall
   // back to the template layer's xPct/yPct/wPct/hPct.
@@ -458,7 +466,7 @@ interface AutoTextFields {
   coordinates?: boolean;
 }
 
-import { buildLinkedText, resolveLinkedTokens, tokensFromLegacyFields } from "@/lib/text-typography";
+import { buildLinkedText, resolveLinkedTokens, sumDurations, tokensFromLegacyFields } from "@/lib/text-typography";
 import type { TextDefaults } from "@/lib/template-schema";
 
 function buildAutoText(args: ApplyPlaceArgs, fields?: AutoTextFields): string {
@@ -668,6 +676,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   template: null,
   productOptions: null,
   layerValues: {},
+  textStash: {},
+  manualSumIds: {},
   layerTransforms: {},
   layoutId: null,
   posterBgColor: "#EFE7D6",
@@ -933,11 +943,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       }
     }
 
+    // Ny mall (inte bara byte av material inom samma mall) ⇒ inga gamla
+    // texter eller egna summor följer med.
+    const sameTemplate =
+      !isFirstLoad && !!state.config?.template_slug && state.config.template_slug === config.template_slug;
+
     const next = {
       config,
       template,
       productOptions,
       orientation,
+      textStash: sameTemplate ? state.textStash : {},
+      manualSumIds: sameTemplate ? state.manualSumIds : {},
       hiddenLayerIds: nextHiddenLayerIds,
       contentVariantId: nextContentVariantId,
       layoutId: nextLayoutId,
@@ -1276,6 +1293,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const aiPhotoResults = remap(state.aiPhotoResults);
     const aiPhotoSelectedRefUrl = remap(state.aiPhotoSelectedRefUrl);
 
+    // Fält som saknades i förra stilen får tillbaka kundens text och
+    // synlighetsval från förrådet (stilen innan dess). Formulärfält
+    // (formGroup) behåller dessutom synlighetsvalet även vid samma id.
+    const textStash = stashTextValues(state.textStash, state.layerValues);
+    restoreFromStash(textStash, nextLayersById, prevLayersById, state.layerValues, layerValues);
+
     // Re-apply the active drink's variant text so title/labels/one-liner and
     // untouched recipe fields reflect the selected drink in the new layout —
     // not the layout's own (Aperol) defaults — after a stil-byte.
@@ -1285,6 +1308,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set({
       layoutId: nextLayoutId,
       layerValues,
+      textStash,
       layerTransforms,
       photoSources,
       photoAiResults,
@@ -1315,16 +1339,20 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     // layoutbyten och förblir fritt redigerbara i Text-fliken. Bild- och
     // färg-overrides löses vid rendering via applyContentVariant.
     const nextValues: Record<string, LayerValue> = { ...state.layerValues };
+    const textStash = { ...state.textStash };
     for (const [layerId, ov] of Object.entries(variant.overrides ?? {})) {
       if (ov.text === undefined) continue;
       const existing = nextValues[layerId];
       if (existing && existing.kind === "text") {
         nextValues[layerId] = { ...existing, text: ov.text, overrideText: ov.text };
       }
+      // Fält som inte syns i den här stilen: varianten gäller även där.
+      if (textStash[layerId]) textStash[layerId] = { ...textStash[layerId], overrideText: ov.text };
     }
     set({
       contentVariantId: variantId,
       layerValues: nextValues,
+      textStash,
       ...mirrorLegacy({ template, orientation: state.orientation, layerValues: nextValues, config, layoutId: state.layoutId }),
     });
   },
@@ -1671,7 +1699,21 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   setLayerText: (id, t) => {
     trackEditOnce("text_edited", id);
+    const state = get();
+    const layer = activeTextLayer(state, id);
+    if (layer?.defaults.sumTimesOf?.length) {
+      // Kunden skriver en egen summa ⇒ sluta räkna. Tomt fält ⇒ räkna igen.
+      const manualSumIds = { ...state.manualSumIds };
+      if (t.trim() === "") delete manualSumIds[id];
+      else manualSumIds[id] = true;
+      set({ manualSumIds });
+      if (t.trim() === "") {
+        recomputeTimeSums(set, get);
+        return;
+      }
+    }
     setLayerOverrideText(set, get, id, t);
+    recomputeTimeSums(set, get);
   },
   setLayerTextFont: (id, f) => updateText(set, get, id, { font: f }),
   setLayerTextFontSizePt: (id, pt) => updateText(set, get, id, { fontSizePt: pt }),
@@ -2073,6 +2115,100 @@ function updateText(set: SetFn, get: GetFn, id: string, patch: Partial<TextLayer
 /** Customer-facing text setter: stores raw override and recomputes the
  *  effective `text` mirror from the linked map's current place. Empty/null
  *  override means "follow auto". */
+function activeTextLayer(state: EditorState, id: string): Extract<TemplateLayer, { type: "text" }> | null {
+  if (!state.template) return null;
+  const layout = getActiveLayoutBlock(state.template, state.config?.product_type, state.layoutId)[state.orientation];
+  const l = layout?.layers.find((x) => x.id === id);
+  return l && l.type === "text" ? l : null;
+}
+
+/** Slå ihop förrådet med aktuella textvärden (aktuella vinner). */
+export function stashTextValues(
+  stash: EditorState["textStash"],
+  values: Record<string, LayerValue>,
+): EditorState["textStash"] {
+  const out = { ...stash };
+  for (const [id, v] of Object.entries(values)) {
+    if (v.kind === "text") out[id] = { overrideText: v.overrideText, visible: v.visible };
+  }
+  return out;
+}
+
+/** Lägg tillbaka kundens text/synlighet på den nya stilens fält: från
+ *  förrådet för fält som saknades i förra stilen, och synligheten för
+ *  formulärfält som fanns i båda. Muterar `next`. */
+export function restoreFromStash(
+  stash: EditorState["textStash"],
+  nextLayersById: Record<string, TemplateLayer>,
+  prevLayersById: Record<string, TemplateLayer>,
+  prevValues: Record<string, LayerValue>,
+  next: Record<string, LayerValue>,
+): void {
+  for (const [id, val] of Object.entries(next)) {
+    if (val.kind !== "text") continue;
+    const layer = nextLayersById[id];
+    if (!layer || layer.type !== "text") continue;
+    if (!prevLayersById[id]) {
+      const s = stash[id];
+      if (!s) continue;
+      let v = val;
+      if (!layer.locks.content && v.overrideText === null && s.overrideText !== null) {
+        v = { ...v, overrideText: s.overrideText, text: s.overrideText };
+      }
+      if (!layer.locks.visibility && !s.visible) v = { ...v, visible: false };
+      next[id] = v;
+    } else if (layer.defaults.formGroup && !layer.locks.visibility) {
+      const old = prevValues[id];
+      if (old && old.kind === "text" && !old.visible) next[id] = { ...val, visible: false };
+    }
+  }
+}
+
+/** Förvald text för ett textlager i någon av mallens stilar. */
+function templateTextDefault(template: Template, id: string): string | null {
+  for (const named of getAllLayouts(template)) {
+    for (const block of [named.defaultLayout, named.canvasLayout]) {
+      if (!block) continue;
+      for (const l of [...block.portrait.layers, ...block.landscape.layers]) {
+        if (l.id === id && l.type === "text") return l.defaults.text;
+      }
+    }
+  }
+  return null;
+}
+
+/** Räkna om summafälten (sumTimesOf) i aktiv stil från delfältens text —
+ *  även delfält som inte syns i stilen (förrådet, annars mallens text).
+ *  Kundens egna summor (manualSumIds) lämnas orörda. */
+function recomputeTimeSums(set: SetFn, get: GetFn): void {
+  const state = get();
+  if (!state.template) return;
+  const layout = getActiveLayoutBlock(state.template, state.config?.product_type, state.layoutId)[state.orientation];
+  if (!layout) return;
+  let layerValues: Record<string, LayerValue> | null = null;
+  for (const l of layout.layers) {
+    if (l.type !== "text" || !l.defaults.sumTimesOf?.length || l.locks.content) continue;
+    if (state.manualSumIds[l.id]) continue;
+    const parts = l.defaults.sumTimesOf.map((src) => {
+      const v = (layerValues ?? state.layerValues)[src];
+      if (v && v.kind === "text") return v.text;
+      const stashed = state.textStash[src]?.overrideText;
+      return stashed ?? templateTextDefault(state.template!, src) ?? "";
+    });
+    const total = sumDurations(parts);
+    const cur = (layerValues ?? state.layerValues)[l.id];
+    if (total === null || !cur || cur.kind !== "text" || cur.text === total) continue;
+    layerValues = layerValues ?? { ...state.layerValues };
+    layerValues[l.id] = { ...cur, text: total, overrideText: total === l.defaults.text ? null : total };
+  }
+  if (layerValues) {
+    set({
+      layerValues,
+      ...mirrorLegacy({ template: state.template, orientation: state.orientation, layerValues, config: state.config, layoutId: state.layoutId }),
+    });
+  }
+}
+
 function setLayerOverrideText(set: SetFn, get: GetFn, id: string, raw: string) {
   const state = get();
   const cur = state.layerValues[id];

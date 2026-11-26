@@ -1,0 +1,3722 @@
+{
+ "orientations": [
+  "portrait"
+ ],
+ "defaultOrientation": "portrait",
+ "defaultLayoutName": "Tre discipliner",
+ "defaultLayout": {
+  "portrait": {
+   "aspect": "3:4",
+   "background": {
+    "color": "#F3EEE6"
+   },
+   "layers": [
+    {
+     "id": "tri-art",
+     "name": "Grafik",
+     "type": "image",
+     "xPct": 8.0,
+     "yPct": 12.25,
+     "wPct": 84.0,
+     "hPct": 16.5,
+     "rotation": 0,
+     "zIndex": 2,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "url": "https://artful-create-studio-87.lovable.app/sport/tri-a-row.svg?v=1",
+      "fit": "contain",
+      "shape": "rect"
+     }
+    },
+    {
+     "id": "tri-rule-1",
+     "name": "Linje",
+     "type": "shape",
+     "xPct": 8.0,
+     "yPct": 48.75,
+     "wPct": 84.0,
+     "hPct": 0.25,
+     "rotation": 0,
+     "zIndex": 6,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "kind": "line-horizontal",
+      "strokeMm": 0.6667,
+      "color": "#1B1B1B"
+     }
+    },
+    {
+     "id": "tri-rule-2",
+     "name": "Linje",
+     "type": "shape",
+     "xPct": 8.0,
+     "yPct": 62.25,
+     "wPct": 84.0,
+     "hPct": 0.25,
+     "rotation": 0,
+     "zIndex": 6,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "kind": "line-horizontal",
+      "strokeMm": 0.6667,
+      "color": "#1B1B1B"
+     }
+    },
+    {
+     "id": "tri-div-1",
+     "name": "Linje",
+     "type": "shape",
+     "xPct": 36.0,
+     "yPct": 49.0,
+     "wPct": 0.1667,
+     "hPct": 13.25,
+     "rotation": 0,
+     "zIndex": 6,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "kind": "line-vertical",
+      "strokeMm": 0.3333,
+      "color": "#1B1B1B"
+     }
+    },
+    {
+     "id": "tri-div-2",
+     "name": "Linje",
+     "type": "shape",
+     "xPct": 64.0,
+     "yPct": 49.0,
+     "wPct": 0.1667,
+     "hPct": 13.25,
+     "rotation": 0,
+     "zIndex": 6,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "kind": "line-vertical",
+      "strokeMm": 0.3333,
+      "color": "#1B1B1B"
+     }
+    },
+    {
+     "id": "tri-name",
+     "name": "Namn",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 30.5,
+     "wPct": 84.0,
+     "hPct": 9.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "Anna Lindqvist",
+      "font": "Barlow Condensed",
+      "fontSizePt": 63.5,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.01,
+      "lineHeight": 1.0,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "uppercase": true,
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "tri-place",
+     "name": "Ort och datum",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 40.25,
+     "wPct": 84.0,
+     "hPct": 3.0,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "Kalmar · augusti 2026",
+      "font": "Barlow",
+      "fontSizePt": 16.87,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "tri-custom",
+     "name": "Egen rad",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 43.375,
+     "wPct": 84.0,
+     "hPct": 2.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": false,
+      "style": true
+     },
+     "defaults": {
+      "text": "Mitt första långdistanstriathlon",
+      "font": "Barlow",
+      "fontSizePt": 14.88,
+      "align": "center",
+      "valign": "middle",
+      "color": "#4A4A4A",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "italic": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "tri-bib",
+     "name": "Startnummer",
+     "type": "text",
+     "xPct": 50.0,
+     "yPct": 88.5,
+     "wPct": 20.0,
+     "hPct": 3.0,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": false,
+      "style": true
+     },
+     "defaults": {
+      "text": "1482",
+      "font": "Barlow",
+      "fontSizePt": 14.88,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Om dig"
+     }
+    },
+    {
+     "id": "tri-swim",
+     "name": "Simning",
+     "type": "text",
+     "xPct": 9.0,
+     "yPct": 55.75,
+     "wPct": 26.0,
+     "hPct": 5.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "1:12:45",
+      "font": "Barlow Condensed",
+      "fontSizePt": 33.73,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.05,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Tider",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "tri-t1",
+     "name": "Växling T1",
+     "type": "text",
+     "xPct": 30.0,
+     "yPct": 66.25,
+     "wPct": 20.0,
+     "hPct": 2.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "4:12",
+      "font": "Barlow",
+      "fontSizePt": 15.87,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Tider",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "tri-bike",
+     "name": "Cykel",
+     "type": "text",
+     "xPct": 37.0,
+     "yPct": 55.75,
+     "wPct": 26.0,
+     "hPct": 5.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "5:41:10",
+      "font": "Barlow Condensed",
+      "fontSizePt": 33.73,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.05,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Tider",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "tri-t2",
+     "name": "Växling T2",
+     "type": "text",
+     "xPct": 50.0,
+     "yPct": 66.25,
+     "wPct": 20.0,
+     "hPct": 2.75,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "2:48",
+      "font": "Barlow",
+      "fontSizePt": 15.87,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Tider",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "tri-run",
+     "name": "Löpning",
+     "type": "text",
+     "xPct": 65.0,
+     "yPct": 55.75,
+     "wPct": 26.0,
+     "hPct": 5.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "3:58:02",
+      "font": "Barlow Condensed",
+      "fontSizePt": 33.73,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.05,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Tider",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "tri-total",
+     "name": "Totaltid",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 75.5,
+     "wPct": 84.0,
+     "hPct": 10.25,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "10:58:57",
+      "font": "Barlow Condensed",
+      "fontSizePt": 75.4,
+      "align": "center",
+      "valign": "middle",
+      "color": "#B4441B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.0,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true,
+      "formGroup": "Tider",
+      "formHalf": true,
+      "sumTimesOf": [
+       "tri-swim",
+       "tri-t1",
+       "tri-bike",
+       "tri-t2",
+       "tri-run"
+      ]
+     }
+    },
+    {
+     "id": "tri-kicker",
+     "name": "Rubrik",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 8.0,
+     "wPct": 84.0,
+     "hPct": 3.0,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "Triathlon · Långdistans",
+      "font": "Barlow Condensed",
+      "fontSizePt": 14.88,
+      "align": "center",
+      "valign": "middle",
+      "color": "#B4441B",
+      "letterSpacingEm": 0.32,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "uppercase": true,
+      "fitWidth": true,
+      "formGroup": "Distans"
+     }
+    },
+    {
+     "id": "tri-swimdist",
+     "name": "Sträcka simning",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 53.125,
+     "wPct": 28.0,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "3,8 km",
+      "font": "Barlow",
+      "fontSizePt": 14.88,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Distans",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "tri-bikedist",
+     "name": "Sträcka cykel",
+     "type": "text",
+     "xPct": 36.0,
+     "yPct": 53.125,
+     "wPct": 28.0,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "180 km",
+      "font": "Barlow",
+      "fontSizePt": 14.88,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Distans",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "tri-rundist",
+     "name": "Sträcka löpning",
+     "type": "text",
+     "xPct": 64.0,
+     "yPct": 53.125,
+     "wPct": 28.0,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "42,2 km",
+      "font": "Barlow",
+      "fontSizePt": 14.88,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Distans",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "tri-totaldist",
+     "name": "Total sträcka",
+     "type": "text",
+     "xPct": 30.0,
+     "yPct": 88.5,
+     "wPct": 20.0,
+     "hPct": 3.0,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": false,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "226 km",
+      "font": "Barlow",
+      "fontSizePt": 14.88,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.0,
+      "lineHeight": 1.15,
+      "fitWidth": true,
+      "formGroup": "Distans",
+      "formHalf": true
+     }
+    },
+    {
+     "id": "tri-l-swim",
+     "name": "Etikett",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 50.5,
+     "wPct": 28.0,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "SIM",
+      "font": "Barlow Condensed",
+      "fontSizePt": 13.89,
+      "align": "center",
+      "valign": "middle",
+      "color": "#B4441B",
+      "letterSpacingEm": 0.2,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true
+     }
+    },
+    {
+     "id": "tri-l-bike",
+     "name": "Etikett",
+     "type": "text",
+     "xPct": 36.0,
+     "yPct": 50.5,
+     "wPct": 28.0,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "CYKEL",
+      "font": "Barlow Condensed",
+      "fontSizePt": 13.89,
+      "align": "center",
+      "valign": "middle",
+      "color": "#B4441B",
+      "letterSpacingEm": 0.2,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true
+     }
+    },
+    {
+     "id": "tri-l-run",
+     "name": "Etikett",
+     "type": "text",
+     "xPct": 64.0,
+     "yPct": 50.5,
+     "wPct": 28.0,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "LÖPNING",
+      "font": "Barlow Condensed",
+      "fontSizePt": 13.89,
+      "align": "center",
+      "valign": "middle",
+      "color": "#B4441B",
+      "letterSpacingEm": 0.2,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true
+     }
+    },
+    {
+     "id": "tri-l-t1",
+     "name": "Etikett",
+     "type": "text",
+     "xPct": 30.0,
+     "yPct": 64.0,
+     "wPct": 20.0,
+     "hPct": 2.25,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "VÄXLING T1",
+      "font": "Barlow Condensed",
+      "fontSizePt": 11.91,
+      "align": "center",
+      "valign": "middle",
+      "color": "#4A4A4A",
+      "letterSpacingEm": 0.2,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true
+     }
+    },
+    {
+     "id": "tri-l-t2",
+     "name": "Etikett",
+     "type": "text",
+     "xPct": 50.0,
+     "yPct": 64.0,
+     "wPct": 20.0,
+     "hPct": 2.25,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "VÄXLING T2",
+      "font": "Barlow Condensed",
+      "fontSizePt": 11.91,
+      "align": "center",
+      "valign": "middle",
+      "color": "#4A4A4A",
+      "letterSpacingEm": 0.2,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true
+     }
+    },
+    {
+     "id": "tri-l-total",
+     "name": "Etikett",
+     "type": "text",
+     "xPct": 8.0,
+     "yPct": 73.0,
+     "wPct": 84.0,
+     "hPct": 2.5,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "TOTALTID",
+      "font": "Barlow Condensed",
+      "fontSizePt": 13.89,
+      "align": "center",
+      "valign": "middle",
+      "color": "#1B1B1B",
+      "letterSpacingEm": 0.32,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true
+     }
+    },
+    {
+     "id": "tri-l-totaldist",
+     "name": "Etikett",
+     "type": "text",
+     "xPct": 30.0,
+     "yPct": 86.5,
+     "wPct": 20.0,
+     "hPct": 2.0,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "DISTANS",
+      "font": "Barlow Condensed",
+      "fontSizePt": 11.91,
+      "align": "center",
+      "valign": "middle",
+      "color": "#4A4A4A",
+      "letterSpacingEm": 0.2,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true
+     }
+    },
+    {
+     "id": "tri-l-bib",
+     "name": "Etikett",
+     "type": "text",
+     "xPct": 50.0,
+     "yPct": 86.5,
+     "wPct": 20.0,
+     "hPct": 2.0,
+     "rotation": 0,
+     "zIndex": 10,
+     "locks": {
+      "position": true,
+      "move": true,
+      "size": true,
+      "shape": true,
+      "font": true,
+      "content": true,
+      "visibility": true,
+      "style": true
+     },
+     "defaults": {
+      "text": "STARTNUMMER",
+      "font": "Barlow Condensed",
+      "fontSizePt": 11.91,
+      "align": "center",
+      "valign": "middle",
+      "color": "#4A4A4A",
+      "letterSpacingEm": 0.2,
+      "lineHeight": 1.15,
+      "spans": [
+       {
+        "start": 0,
+        "end": 200,
+        "bold": true
+       }
+      ],
+      "fitWidth": true
+     }
+    }
+   ]
+  },
+  "landscape": {
+   "aspect": "4:3",
+   "background": {
+    "color": "#F3EEE6"
+   },
+   "layers": []
+  }
+ },
+ "extraLayouts": [
+  {
+   "id": "tri-b",
+   "name": "Dagen i tre färger",
+   "defaultLayout": {
+    "portrait": {
+     "aspect": "3:4",
+     "background": {
+      "color": "#F3EEE6"
+     },
+     "layers": [
+      {
+       "id": "tri-bg-swim",
+       "name": "Färgblock",
+       "type": "image",
+       "xPct": 8.0,
+       "yPct": 24.5,
+       "wPct": 84.0,
+       "hPct": 13.0,
+       "rotation": 0,
+       "zIndex": 1,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-b-swim-bg.svg?v=1",
+        "fit": "cover",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-pic-swim",
+       "name": "Piktogram",
+       "type": "image",
+       "xPct": 11.6667,
+       "yPct": 25.75,
+       "wPct": 14.0,
+       "hPct": 10.5,
+       "rotation": 0,
+       "zIndex": 3,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-b-swim.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-bg-bike",
+       "name": "Färgblock",
+       "type": "image",
+       "xPct": 8.0,
+       "yPct": 41.5,
+       "wPct": 84.0,
+       "hPct": 17.0,
+       "rotation": 0,
+       "zIndex": 1,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-b-bike-bg.svg?v=1",
+        "fit": "cover",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-pic-bike",
+       "name": "Piktogram",
+       "type": "image",
+       "xPct": 11.6667,
+       "yPct": 43.75,
+       "wPct": 16.6667,
+       "hPct": 12.5,
+       "rotation": 0,
+       "zIndex": 3,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-b-bike.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-bg-run",
+       "name": "Färgblock",
+       "type": "image",
+       "xPct": 8.0,
+       "yPct": 62.5,
+       "wPct": 84.0,
+       "hPct": 14.5,
+       "rotation": 0,
+       "zIndex": 1,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-b-run-bg.svg?v=1",
+        "fit": "cover",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-pic-run",
+       "name": "Piktogram",
+       "type": "image",
+       "xPct": 11.6667,
+       "yPct": 64.0,
+       "wPct": 15.3333,
+       "hPct": 11.5,
+       "rotation": 0,
+       "zIndex": 3,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-b-run.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-rule-t1a",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 38.0,
+       "wPct": 84.0,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#8A8A8A"
+       }
+      },
+      {
+       "id": "tri-rule-t1b",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 41.0,
+       "wPct": 84.0,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#8A8A8A"
+       }
+      },
+      {
+       "id": "tri-rule-t2a",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 59.0,
+       "wPct": 84.0,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#8A8A8A"
+       }
+      },
+      {
+       "id": "tri-rule-t2b",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 62.0,
+       "wPct": 84.0,
+       "hPct": 0.125,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.3333,
+        "color": "#8A8A8A"
+       }
+      },
+      {
+       "id": "tri-name",
+       "name": "Namn",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 11.0,
+       "wPct": 84.0,
+       "hPct": 8.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Anna Lindqvist",
+        "font": "Barlow Condensed",
+        "fontSizePt": 59.53,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "tri-place",
+       "name": "Ort och datum",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 19.25,
+       "wPct": 84.0,
+       "hPct": 3.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Kalmar · augusti 2026",
+        "font": "Barlow",
+        "fontSizePt": 16.87,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "tri-bib",
+       "name": "Startnummer",
+       "type": "text",
+       "xPct": 58.6667,
+       "yPct": 86.5,
+       "wPct": 33.3333,
+       "hPct": 3.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "1482",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "right",
+        "valign": "middle",
+        "color": "#4A4A4A",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "tri-swim",
+       "name": "Simning",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 27.5,
+       "wPct": 33.0,
+       "hPct": 7.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "1:12:45",
+        "font": "Barlow Condensed",
+        "fontSizePt": 43.65,
+        "align": "right",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-t1",
+       "name": "Växling T1",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 38.375,
+       "wPct": 33.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "4:12",
+        "font": "Barlow",
+        "fontSizePt": 13.89,
+        "align": "right",
+        "valign": "middle",
+        "color": "#4A4A4A",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-bike",
+       "name": "Cykel",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 46.5,
+       "wPct": 33.0,
+       "hPct": 7.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "5:41:10",
+        "font": "Barlow Condensed",
+        "fontSizePt": 43.65,
+        "align": "right",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-t2",
+       "name": "Växling T2",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 59.375,
+       "wPct": 33.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "2:48",
+        "font": "Barlow",
+        "fontSizePt": 13.89,
+        "align": "right",
+        "valign": "middle",
+        "color": "#4A4A4A",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-run",
+       "name": "Löpning",
+       "type": "text",
+       "xPct": 55.0,
+       "yPct": 66.25,
+       "wPct": 33.0,
+       "hPct": 7.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "3:58:02",
+        "font": "Barlow Condensed",
+        "fontSizePt": 43.65,
+        "align": "right",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-total",
+       "name": "Totaltid",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 81.75,
+       "wPct": 50.0,
+       "hPct": 8.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "10:58:57",
+        "font": "Barlow Condensed",
+        "fontSizePt": 63.5,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true,
+        "sumTimesOf": [
+         "tri-swim",
+         "tri-t1",
+         "tri-bike",
+         "tri-t2",
+         "tri-run"
+        ]
+       }
+      },
+      {
+       "id": "tri-kicker",
+       "name": "Rubrik",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 8.0,
+       "wPct": 84.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Triathlon · Långdistans",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#4A4A4A",
+        "letterSpacingEm": 0.32,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Distans"
+       }
+      },
+      {
+       "id": "tri-swimdist",
+       "name": "Sträcka simning",
+       "type": "text",
+       "xPct": 28.3333,
+       "yPct": 31.25,
+       "wPct": 26.6667,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "3,8 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Distans",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-bikedist",
+       "name": "Sträcka cykel",
+       "type": "text",
+       "xPct": 31.0,
+       "yPct": 50.25,
+       "wPct": 26.6667,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "180 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Distans",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-rundist",
+       "name": "Sträcka löpning",
+       "type": "text",
+       "xPct": 29.6667,
+       "yPct": 70.0,
+       "wPct": 26.6667,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "42,2 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "left",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Distans",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-totaldist",
+       "name": "Total sträcka",
+       "type": "text",
+       "xPct": 58.6667,
+       "yPct": 81.25,
+       "wPct": 33.3333,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "226 km",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "right",
+        "valign": "middle",
+        "color": "#4A4A4A",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Distans",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-l-swim",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 28.3333,
+       "yPct": 27.5,
+       "wPct": 33.3333,
+       "hPct": 3.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SIM",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "left",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.08,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-bike",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 31.0,
+       "yPct": 46.5,
+       "wPct": 33.3333,
+       "hPct": 3.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "CYKEL",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "left",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.08,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-run",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 29.6667,
+       "yPct": 66.25,
+       "wPct": 33.3333,
+       "hPct": 3.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "LÖPNING",
+        "font": "Barlow Condensed",
+        "fontSizePt": 25.8,
+        "align": "left",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.08,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-t1",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 11.6667,
+       "yPct": 38.375,
+       "wPct": 43.3333,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "VÄXLING T1",
+        "font": "Barlow Condensed",
+        "fontSizePt": 11.91,
+        "align": "left",
+        "valign": "middle",
+        "color": "#4A4A4A",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-t2",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 11.6667,
+       "yPct": 59.375,
+       "wPct": 43.3333,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "VÄXLING T2",
+        "font": "Barlow Condensed",
+        "fontSizePt": 11.91,
+        "align": "left",
+        "valign": "middle",
+        "color": "#4A4A4A",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-total",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 79.5,
+       "wPct": 43.3333,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "TOTALTID",
+        "font": "Barlow Condensed",
+        "fontSizePt": 13.89,
+        "align": "left",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.32,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-bib",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 58.6667,
+       "yPct": 84.5,
+       "wPct": 33.3333,
+       "hPct": 2.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "STARTNUMMER",
+        "font": "Barlow Condensed",
+        "fontSizePt": 11.91,
+        "align": "right",
+        "valign": "middle",
+        "color": "#4A4A4A",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      }
+     ]
+    },
+    "landscape": {
+     "aspect": "4:3",
+     "background": {
+      "color": "#F3EEE6"
+     },
+     "layers": []
+    }
+   }
+  },
+  {
+   "id": "tri-c",
+   "name": "Medaljen",
+   "defaultLayout": {
+    "portrait": {
+     "aspect": "3:4",
+     "background": {
+      "color": "#F3EEE6"
+     },
+     "layers": [
+      {
+       "id": "tri-art",
+       "name": "Medalj",
+       "type": "image",
+       "xPct": 13.3333,
+       "yPct": 8.0,
+       "wPct": 73.3333,
+       "hPct": 55.0,
+       "rotation": 0,
+       "zIndex": 2,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-c-medal.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-rule-1",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 8.0,
+       "yPct": 80.75,
+       "wPct": 84.0,
+       "hPct": 0.25,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-horizontal",
+        "strokeMm": 0.6667,
+        "color": "#1B1B1B"
+       }
+      },
+      {
+       "id": "tri-name",
+       "name": "Namn",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 68.0,
+       "wPct": 84.0,
+       "hPct": 7.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Anna Lindqvist",
+        "font": "Barlow Condensed",
+        "fontSizePt": 55.56,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "tri-place",
+       "name": "Ort och datum",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 76.0,
+       "wPct": 84.0,
+       "hPct": 3.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Kalmar · augusti 2026",
+        "font": "Barlow",
+        "fontSizePt": 16.87,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "tri-swim",
+       "name": "Simning",
+       "type": "text",
+       "xPct": 9.0,
+       "yPct": 84.5,
+       "wPct": 26.0,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "1:12:45",
+        "font": "Barlow Condensed",
+        "fontSizePt": 29.76,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.05,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-bike",
+       "name": "Cykel",
+       "type": "text",
+       "xPct": 37.0,
+       "yPct": 84.5,
+       "wPct": 26.0,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "5:41:10",
+        "font": "Barlow Condensed",
+        "fontSizePt": 29.76,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.05,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-run",
+       "name": "Löpning",
+       "type": "text",
+       "xPct": 65.0,
+       "yPct": 84.5,
+       "wPct": 26.0,
+       "hPct": 5.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "3:58:02",
+        "font": "Barlow Condensed",
+        "fontSizePt": 29.76,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.05,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-total",
+       "name": "Totaltid",
+       "type": "text",
+       "xPct": 25.0,
+       "yPct": 36.5,
+       "wPct": 50.0,
+       "hPct": 8.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "10:58:57",
+        "font": "Barlow Condensed",
+        "fontSizePt": 63.5,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true,
+        "sumTimesOf": [
+         "tri-swim",
+         "tri-t1",
+         "tri-bike",
+         "tri-t2",
+         "tri-run"
+        ]
+       }
+      },
+      {
+       "id": "tri-kicker",
+       "name": "Rubrik",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 65.0,
+       "wPct": 84.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Triathlon · Långdistans",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1F5FA8",
+        "letterSpacingEm": 0.32,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Distans"
+       }
+      },
+      {
+       "id": "tri-totaldist",
+       "name": "Total sträcka",
+       "type": "text",
+       "xPct": 25.0,
+       "yPct": 45.25,
+       "wPct": 50.0,
+       "hPct": 3.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "226 km",
+        "font": "Barlow",
+        "fontSizePt": 15.87,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.18,
+        "lineHeight": 1.15,
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Distans",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-l-total",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 25.0,
+       "yPct": 33.25,
+       "wPct": 50.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "TOTALTID",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.3,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-swim",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 82.25,
+       "wPct": 28.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SIM",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-bike",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 36.0,
+       "yPct": 82.25,
+       "wPct": 28.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "CYKEL",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-run",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 64.0,
+       "yPct": 82.25,
+       "wPct": 28.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "LÖPNING",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      }
+     ]
+    },
+    "landscape": {
+     "aspect": "4:3",
+     "background": {
+      "color": "#F3EEE6"
+     },
+     "layers": []
+    }
+   }
+  },
+  {
+   "id": "tri-d",
+   "name": "Nummerlappen",
+   "defaultLayout": {
+    "portrait": {
+     "aspect": "3:4",
+     "background": {
+      "color": "#E7E3DB"
+     },
+     "layers": [
+      {
+       "id": "tri-card",
+       "name": "Nummerlapp",
+       "type": "image",
+       "xPct": 10.0,
+       "yPct": 8.0,
+       "wPct": 80.0,
+       "hPct": 62.0,
+       "rotation": 0,
+       "zIndex": 1,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-d-white.svg?v=1",
+        "fit": "cover",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-card-head",
+       "name": "Nummerlapp",
+       "type": "image",
+       "xPct": 10.0,
+       "yPct": 8.0,
+       "wPct": 80.0,
+       "hPct": 12.0,
+       "rotation": 0,
+       "zIndex": 2,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-d-head.svg?v=1",
+        "fit": "cover",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-card-strip",
+       "name": "Nummerlapp",
+       "type": "image",
+       "xPct": 10.0,
+       "yPct": 61.25,
+       "wPct": 80.0,
+       "hPct": 8.75,
+       "rotation": 0,
+       "zIndex": 2,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-d-strip.svg?v=1",
+        "fit": "cover",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-hole-0",
+       "name": "Hål",
+       "type": "image",
+       "xPct": 12.3333,
+       "yPct": 9.5,
+       "wPct": 2.6667,
+       "hPct": 2.0,
+       "rotation": 0,
+       "zIndex": 3,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-d-hole.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-hole-1",
+       "name": "Hål",
+       "type": "image",
+       "xPct": 85.0,
+       "yPct": 9.5,
+       "wPct": 2.6667,
+       "hPct": 2.0,
+       "rotation": 0,
+       "zIndex": 3,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-d-hole.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-hole-2",
+       "name": "Hål",
+       "type": "image",
+       "xPct": 12.3333,
+       "yPct": 58.0,
+       "wPct": 2.6667,
+       "hPct": 2.0,
+       "rotation": 0,
+       "zIndex": 3,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-d-hole.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-hole-3",
+       "name": "Hål",
+       "type": "image",
+       "xPct": 85.0,
+       "yPct": 58.0,
+       "wPct": 2.6667,
+       "hPct": 2.0,
+       "rotation": 0,
+       "zIndex": 3,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "url": "https://artful-create-studio-87.lovable.app/sport/tri-d-hole.svg?v=1",
+        "fit": "contain",
+        "shape": "rect"
+       }
+      },
+      {
+       "id": "tri-div-1",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 36.6667,
+       "yPct": 62.5,
+       "wPct": 0.1667,
+       "hPct": 6.25,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-vertical",
+        "strokeMm": 0.3333,
+        "color": "#555555"
+       }
+      },
+      {
+       "id": "tri-div-2",
+       "name": "Linje",
+       "type": "shape",
+       "xPct": 63.3333,
+       "yPct": 62.5,
+       "wPct": 0.1667,
+       "hPct": 6.25,
+       "rotation": 0,
+       "zIndex": 6,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "kind": "line-vertical",
+        "strokeMm": 0.3333,
+        "color": "#555555"
+       }
+      },
+      {
+       "id": "tri-name",
+       "name": "Namn",
+       "type": "text",
+       "xPct": 14.0,
+       "yPct": 44.25,
+       "wPct": 72.0,
+       "hPct": 5.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Anna Lindqvist",
+        "font": "Barlow Condensed",
+        "fontSizePt": 37.7,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.1,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "tri-place",
+       "name": "Ort och datum",
+       "type": "text",
+       "xPct": 16.0,
+       "yPct": 16.0,
+       "wPct": 68.0,
+       "hPct": 2.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "Kalmar · augusti 2026",
+        "font": "Barlow Condensed",
+        "fontSizePt": 14.88,
+        "align": "center",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "uppercase": true,
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "tri-custom",
+       "name": "Egen rad",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 86.25,
+       "wPct": 84.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "Mitt första långdistanstriathlon",
+        "font": "Barlow",
+        "fontSizePt": 14.88,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "italic": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "tri-bib",
+       "name": "Startnummer",
+       "type": "text",
+       "xPct": 14.0,
+       "yPct": 21.25,
+       "wPct": 72.0,
+       "hPct": 22.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": false,
+        "style": true
+       },
+       "defaults": {
+        "text": "1482",
+        "font": "Barlow Condensed",
+        "fontSizePt": 188.5,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": -0.02,
+        "lineHeight": 0.95,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Om dig"
+       }
+      },
+      {
+       "id": "tri-swim",
+       "name": "Simning",
+       "type": "text",
+       "xPct": 12.0,
+       "yPct": 64.5,
+       "wPct": 22.6667,
+       "hPct": 4.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "1:12:45",
+        "font": "Barlow Condensed",
+        "fontSizePt": 27.78,
+        "align": "center",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.05,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-bike",
+       "name": "Cykel",
+       "type": "text",
+       "xPct": 38.6667,
+       "yPct": 64.5,
+       "wPct": 22.6667,
+       "hPct": 4.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "5:41:10",
+        "font": "Barlow Condensed",
+        "fontSizePt": 27.78,
+        "align": "center",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.05,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-run",
+       "name": "Löpning",
+       "type": "text",
+       "xPct": 65.3333,
+       "yPct": 64.5,
+       "wPct": 22.6667,
+       "hPct": 4.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "3:58:02",
+        "font": "Barlow Condensed",
+        "fontSizePt": 27.78,
+        "align": "center",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.05,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-total",
+       "name": "Totaltid",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 77.25,
+       "wPct": 84.0,
+       "hPct": 8.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "10:58:57",
+        "font": "Barlow Condensed",
+        "fontSizePt": 63.5,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true,
+        "formGroup": "Tider",
+        "formHalf": true,
+        "sumTimesOf": [
+         "tri-swim",
+         "tri-t1",
+         "tri-bike",
+         "tri-t2",
+         "tri-run"
+        ]
+       }
+      },
+      {
+       "id": "tri-totaldist",
+       "name": "Total sträcka",
+       "type": "text",
+       "xPct": 14.0,
+       "yPct": 49.75,
+       "wPct": 72.0,
+       "hPct": 2.75,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": false,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "226 km",
+        "font": "Barlow",
+        "fontSizePt": 13.89,
+        "align": "center",
+        "valign": "middle",
+        "color": "#4A4A4A",
+        "letterSpacingEm": 0.0,
+        "lineHeight": 1.15,
+        "fitWidth": true,
+        "formGroup": "Distans",
+        "formHalf": true
+       }
+      },
+      {
+       "id": "tri-l-sport",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 10.0,
+       "yPct": 10.5,
+       "wPct": 80.0,
+       "hPct": 5.5,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "TRIATHLON",
+        "font": "Barlow Condensed",
+        "fontSizePt": 39.69,
+        "align": "center",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.14,
+        "lineHeight": 1.0,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-swim",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 10.0,
+       "yPct": 62.5,
+       "wPct": 26.6667,
+       "hPct": 2.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "SIM",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "center",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-bike",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 36.6667,
+       "yPct": 62.5,
+       "wPct": 26.6667,
+       "hPct": 2.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "CYKEL",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "center",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-run",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 63.3333,
+       "yPct": 62.5,
+       "wPct": 26.6667,
+       "hPct": 2.0,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "LÖPNING",
+        "font": "Barlow Condensed",
+        "fontSizePt": 12.9,
+        "align": "center",
+        "valign": "middle",
+        "color": "#FFFFFF",
+        "letterSpacingEm": 0.2,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      },
+      {
+       "id": "tri-l-total",
+       "name": "Etikett",
+       "type": "text",
+       "xPct": 8.0,
+       "yPct": 75.0,
+       "wPct": 84.0,
+       "hPct": 2.25,
+       "rotation": 0,
+       "zIndex": 10,
+       "locks": {
+        "position": true,
+        "move": true,
+        "size": true,
+        "shape": true,
+        "font": true,
+        "content": true,
+        "visibility": true,
+        "style": true
+       },
+       "defaults": {
+        "text": "TOTALTID",
+        "font": "Barlow Condensed",
+        "fontSizePt": 13.89,
+        "align": "center",
+        "valign": "middle",
+        "color": "#1B1B1B",
+        "letterSpacingEm": 0.32,
+        "lineHeight": 1.15,
+        "spans": [
+         {
+          "start": 0,
+          "end": 200,
+          "bold": true
+         }
+        ],
+        "fitWidth": true
+       }
+      }
+     ]
+    },
+    "landscape": {
+     "aspect": "4:3",
+     "background": {
+      "color": "#E7E3DB"
+     },
+     "layers": []
+    }
+   }
+  }
+ ],
+ "contentVariants": [
+  {
+   "id": "sprint",
+   "name": "Sprint",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/tri-v-sprint.svg?v=1",
+   "overrides": {
+    "tri-kicker": {
+     "text": "Triathlon · Sprintdistans"
+    },
+    "tri-swimdist": {
+     "text": "750 m"
+    },
+    "tri-bikedist": {
+     "text": "20 km"
+    },
+    "tri-rundist": {
+     "text": "5 km"
+    },
+    "tri-totaldist": {
+     "text": "25,75 km"
+    }
+   }
+  },
+  {
+   "id": "olympisk",
+   "name": "Olympisk",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/tri-v-olympisk.svg?v=1",
+   "overrides": {
+    "tri-kicker": {
+     "text": "Triathlon · Olympisk distans"
+    },
+    "tri-swimdist": {
+     "text": "1,5 km"
+    },
+    "tri-bikedist": {
+     "text": "40 km"
+    },
+    "tri-rundist": {
+     "text": "10 km"
+    },
+    "tri-totaldist": {
+     "text": "51,5 km"
+    }
+   }
+  },
+  {
+   "id": "medel",
+   "name": "Medel",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/tri-v-medel.svg?v=1",
+   "overrides": {
+    "tri-kicker": {
+     "text": "Triathlon · Medeldistans"
+    },
+    "tri-swimdist": {
+     "text": "1,9 km"
+    },
+    "tri-bikedist": {
+     "text": "90 km"
+    },
+    "tri-rundist": {
+     "text": "21,1 km"
+    },
+    "tri-totaldist": {
+     "text": "113 km"
+    }
+   }
+  },
+  {
+   "id": "lang",
+   "name": "Lång",
+   "thumbnailUrl": "https://artful-create-studio-87.lovable.app/sport/tri-v-lang.svg?v=1",
+   "overrides": {
+    "tri-kicker": {
+     "text": "Triathlon · Långdistans"
+    },
+    "tri-swimdist": {
+     "text": "3,8 km"
+    },
+    "tri-bikedist": {
+     "text": "180 km"
+    },
+    "tri-rundist": {
+     "text": "42,2 km"
+    },
+    "tri-totaldist": {
+     "text": "226 km"
+    }
+   }
+  }
+ ],
+ "contentVariantLabel": "Distans",
+ "defaultContentVariantId": "lang",
+ "i18n": {
+  "en": {
+   "Tre discipliner": "Three disciplines",
+   "Dagen i tre färger": "The day in three colours",
+   "Medaljen": "The medal",
+   "Nummerlappen": "The race bib",
+   "Distans": "Distance",
+   "Sprint": "Sprint",
+   "Olympisk": "Olympic",
+   "Medel": "Middle",
+   "Lång": "Long",
+   "Om dig": "About you",
+   "Tider": "Times",
+   "Namn": "Name",
+   "Ort och datum": "Place and date",
+   "Egen rad": "Your own line",
+   "Startnummer": "Bib number",
+   "Simning": "Swim",
+   "Cykel": "Bike",
+   "Löpning": "Run",
+   "Växling T1": "Transition T1",
+   "Växling T2": "Transition T2",
+   "Totaltid": "Total time",
+   "Rubrik": "Heading",
+   "Sträcka simning": "Swim distance",
+   "Sträcka cykel": "Bike distance",
+   "Sträcka löpning": "Run distance",
+   "Total sträcka": "Total distance",
+   "SIM": "SWIM",
+   "CYKEL": "BIKE",
+   "LÖPNING": "RUN",
+   "TOTALTID": "TOTAL TIME",
+   "VÄXLING T1": "TRANSITION T1",
+   "VÄXLING T2": "TRANSITION T2",
+   "DISTANS": "DISTANCE",
+   "STARTNUMMER": "BIB",
+   "TRIATHLON": "TRIATHLON",
+   "Kalmar · augusti 2026": "Kalmar · August 2026",
+   "Mitt första långdistanstriathlon": "My first long-distance triathlon",
+   "Triathlon · Sprintdistans": "Triathlon · Sprint distance",
+   "Triathlon · Olympisk distans": "Triathlon · Olympic distance",
+   "Triathlon · Medeldistans": "Triathlon · Middle distance",
+   "Triathlon · Långdistans": "Triathlon · Long distance",
+   "3,8 km": "3.8 km",
+   "42,2 km": "42.2 km",
+   "1,5 km": "1.5 km",
+   "1,9 km": "1.9 km",
+   "21,1 km": "21.1 km",
+   "25,75 km": "25.75 km",
+   "51,5 km": "51.5 km",
+   "750 m": "750 m"
+  },
+  "da": {
+   "Tre discipliner": "Tre discipliner",
+   "Dagen i tre färger": "Dagen i tre farver",
+   "Medaljen": "Medaljen",
+   "Nummerlappen": "Startnummeret",
+   "Distans": "Distance",
+   "Sprint": "Sprint",
+   "Olympisk": "Olympisk",
+   "Medel": "Mellem",
+   "Lång": "Lang",
+   "Om dig": "Om dig",
+   "Tider": "Tider",
+   "Namn": "Navn",
+   "Ort och datum": "Sted og dato",
+   "Egen rad": "Egen linje",
+   "Startnummer": "Startnummer",
+   "Simning": "Svømning",
+   "Cykel": "Cykling",
+   "Löpning": "Løb",
+   "Växling T1": "Skift T1",
+   "Växling T2": "Skift T2",
+   "Totaltid": "Samlet tid",
+   "Rubrik": "Overskrift",
+   "Sträcka simning": "Distance svømning",
+   "Sträcka cykel": "Distance cykling",
+   "Sträcka löpning": "Distance løb",
+   "Total sträcka": "Samlet distance",
+   "SIM": "SVØM",
+   "CYKEL": "CYKEL",
+   "LÖPNING": "LØB",
+   "TOTALTID": "SAMLET TID",
+   "VÄXLING T1": "SKIFT T1",
+   "VÄXLING T2": "SKIFT T2",
+   "DISTANS": "DISTANCE",
+   "STARTNUMMER": "STARTNUMMER",
+   "TRIATHLON": "TRIATLON",
+   "Kalmar · augusti 2026": "Kalmar · august 2026",
+   "Mitt första långdistanstriathlon": "Min første langdistancetriatlon",
+   "Triathlon · Sprintdistans": "Triatlon · Sprintdistance",
+   "Triathlon · Olympisk distans": "Triatlon · Olympisk distance",
+   "Triathlon · Medeldistans": "Triatlon · Mellemdistance",
+   "Triathlon · Långdistans": "Triatlon · Langdistance",
+   "3,8 km": "3,8 km",
+   "42,2 km": "42,2 km",
+   "1,5 km": "1,5 km",
+   "1,9 km": "1,9 km",
+   "21,1 km": "21,1 km",
+   "25,75 km": "25,75 km",
+   "51,5 km": "51,5 km",
+   "750 m": "750 m"
+  },
+  "fi": {
+   "Tre discipliner": "Kolme lajia",
+   "Dagen i tre färger": "Päivä kolmessa värissä",
+   "Medaljen": "Mitali",
+   "Nummerlappen": "Kilpailunumero",
+   "Distans": "Matka",
+   "Sprint": "Sprintti",
+   "Olympisk": "Olympia",
+   "Medel": "Puolimatka",
+   "Lång": "Pitkä",
+   "Om dig": "Sinusta",
+   "Tider": "Ajat",
+   "Namn": "Nimi",
+   "Ort och datum": "Paikka ja päivämäärä",
+   "Egen rad": "Oma rivi",
+   "Startnummer": "Kilpailunumero",
+   "Simning": "Uinti",
+   "Cykel": "Pyöräily",
+   "Löpning": "Juoksu",
+   "Växling T1": "Vaihto T1",
+   "Växling T2": "Vaihto T2",
+   "Totaltid": "Kokonaisaika",
+   "Rubrik": "Otsikko",
+   "Sträcka simning": "Uintimatka",
+   "Sträcka cykel": "Pyöräilymatka",
+   "Sträcka löpning": "Juoksumatka",
+   "Total sträcka": "Kokonaismatka",
+   "SIM": "UINTI",
+   "CYKEL": "PYÖRÄILY",
+   "LÖPNING": "JUOKSU",
+   "TOTALTID": "KOKONAISAIKA",
+   "VÄXLING T1": "VAIHTO T1",
+   "VÄXLING T2": "VAIHTO T2",
+   "DISTANS": "MATKA",
+   "STARTNUMMER": "NUMERO",
+   "TRIATHLON": "TRIATHLON",
+   "Kalmar · augusti 2026": "Kalmar · elokuu 2026",
+   "Mitt första långdistanstriathlon": "Ensimmäinen pitkän matkan triathlonini",
+   "Triathlon · Sprintdistans": "Triathlon · Sprinttimatka",
+   "Triathlon · Olympisk distans": "Triathlon · Olympiamatka",
+   "Triathlon · Medeldistans": "Triathlon · Puolimatka",
+   "Triathlon · Långdistans": "Triathlon · Pitkä matka",
+   "3,8 km": "3,8 km",
+   "42,2 km": "42,2 km",
+   "1,5 km": "1,5 km",
+   "1,9 km": "1,9 km",
+   "21,1 km": "21,1 km",
+   "25,75 km": "25,75 km",
+   "51,5 km": "51,5 km",
+   "750 m": "750 m"
+  }
+ }
+}

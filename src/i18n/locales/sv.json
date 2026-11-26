@@ -113,7 +113,8 @@
     "font": "Typsnitt",
     "tab": "Text {{n}}",
     "autoHint": "Lämna tomt för att återgå till automatisk text",
-    "fontSize": "Textstorlek"
+    "fontSize": "Textstorlek",
+    "autoSum": "Räknas ut automatiskt. Skriv en egen tid för att ändra."
   },
   "layer": {
     "size": "Storlek",

@@ -2,6 +2,7 @@
 // Uses pt-based font sizing (A4 reference), supports rich-text spans,
 // linked-token placeholders, multiline (\n), and decoration ("box" /
 // "side-rules" — auto-fits to text bbox, not the layer rect).
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { TemplateLayer } from "@/lib/template-schema";
 import type { TextSpan } from "@/lib/template-schema";
 import {
@@ -11,7 +12,56 @@ import {
   resolveSpans,
   decorationDefaults,
   mmToPx,
+  displayText,
+  fitWidthScale,
+  piecesByLine,
 } from "@/lib/text-typography";
+
+let measureCtx: CanvasRenderingContext2D | null = null;
+function measureText(text: string, cssFont: string): number {
+  if (typeof document === "undefined") return 0;
+  if (!measureCtx) measureCtx = document.createElement("canvas").getContext("2d");
+  if (!measureCtx) return 0;
+  measureCtx.font = cssFont;
+  return measureCtx.measureText(text).width;
+}
+
+/** Räknar upp när webbtypsnitt har laddats, så att mätningen för
+ *  krympning till bredd görs om med rätt typsnitt. */
+function useFontsVersion(enabled: boolean): number {
+  const [v, setV] = useState(0);
+  useEffect(() => {
+    if (!enabled || typeof document === "undefined" || !document.fonts) return;
+    let alive = true;
+    const bump = () => {
+      if (alive) setV((x) => x + 1);
+    };
+    document.fonts.ready.then(bump).catch(() => undefined);
+    document.fonts.addEventListener?.("loadingdone", bump);
+    return () => {
+      alive = false;
+      document.fonts.removeEventListener?.("loadingdone", bump);
+    };
+  }, [enabled]);
+  return v;
+}
+
+/** Lagrets bredd i px (för krympning till bredd). */
+function useBoxWidth(enabled: boolean) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [w, setW] = useState(0);
+  useLayoutEffect(() => {
+    if (!enabled) return;
+    const el = ref.current;
+    if (!el) return;
+    setW(el.clientWidth);
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setW(el.clientWidth));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [enabled]);
+  return { ref, width: w };
+}
 
 type TextLayer = Extract<TemplateLayer, { type: "text" }>;
 
@@ -41,7 +91,10 @@ export function TextLayerView({
   effectiveFontSizePt,
 }: Props) {
   const d = layer.defaults;
-  const fontPx =
+  const fitEnabled = !!d.fitWidth;
+  const box = useBoxWidth(fitEnabled);
+  const fontsVersion = useFontsVersion(fitEnabled);
+  const unscaledPx =
     typeof effectiveFontSizePt === "number" && effectiveFontSizePt > 0
       ? resolveFontPx({ fontSizePt: effectiveFontSizePt }, canvasShortPx)
       : resolveFontPx(d, canvasShortPx, layerHeightPx);
@@ -49,7 +102,25 @@ export function TextLayerView({
   const letterSp = resolveLetterSpacingEm(d);
   const dec = decorationDefaults(d.decoration);
 
-  const segments = resolveSpans(effectiveText, effectiveSpans ?? d.spans);
+  // Versaler ändrar bara visningen (samma som tryckfilen).
+  const shownText = displayText(d, effectiveText);
+  const segments = resolveSpans(shownText, effectiveSpans ?? d.spans);
+  // Krymp till bredd: samma beräkning som tryckfilen (template-snapshot).
+  const fit = useMemo(
+    () =>
+      fitEnabled && box.width > 0
+        ? fitWidthScale(
+            piecesByLine(segments, unscaledPx, canvasShortPx, effectiveFont),
+            unscaledPx,
+            letterSp,
+            box.width,
+            measureText,
+          )
+        : 1,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fitEnabled, box.width, shownText, effectiveFont, unscaledPx, letterSp, canvasShortPx, fontsVersion, effectiveSpans, d.spans],
+  );
+  const fontPx = unscaledPx * fit;
   const padPx = dec ? mmToPx(dec.paddingMm, canvasShortPx) : 0;
   const thickPx = dec ? Math.max(1, mmToPx(dec.thicknessMm, canvasShortPx)) : 0;
 
@@ -69,7 +140,7 @@ export function TextLayerView({
     >
       {segments.map((s, i) => {
         const segFontPx = s.fontSizePt
-          ? resolveFontPx({ fontSizePt: s.fontSizePt }, canvasShortPx)
+          ? resolveFontPx({ fontSizePt: s.fontSizePt }, canvasShortPx) * fit
           : undefined;
         return (
           <span
@@ -94,6 +165,7 @@ export function TextLayerView({
   if (!dec) {
     return (
       <div
+        ref={box.ref}
         className="absolute inset-0 flex items-center"
         style={{
           alignItems: alignV,

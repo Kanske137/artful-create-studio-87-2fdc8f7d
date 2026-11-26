@@ -113,7 +113,8 @@
     "font": "Skrifttype",
     "tab": "Tekst {{n}}",
     "autoHint": "Lad være tom for at vende tilbage til automatisk tekst",
-    "fontSize": "Tekststørrelse"
+    "fontSize": "Tekststørrelse",
+    "autoSum": "Beregnes automatisk. Skriv din egen tid for at ændre den."
   },
   "layer": {
     "size": "Størrelse",

@@ -68,7 +68,9 @@ type SnapshotState = Pick<
   | "photoAiResults"
   | "aiPhotoResults"
   | "aiPhotoSelectedRefUrl"
->;
+> &
+  // Valfria: saknas i designer sparade före sporttavlorna.
+  Partial<Pick<EditorState, "textStash" | "manualSumIds">>;
 
 type RaceSnapshot = Pick<
   ReturnType<typeof useRaceStore.getState>,
@@ -241,6 +243,8 @@ export async function saveDesignSnapshot(designId: string): Promise<boolean> {
         photoAiResults: s.photoAiResults,
         aiPhotoResults: s.aiPhotoResults,
         aiPhotoSelectedRefUrl: s.aiPhotoSelectedRefUrl,
+        textStash: s.textStash,
+        manualSumIds: s.manualSumIds,
       },
       photos: Object.fromEntries(photoList),
       aiPhotos: Object.fromEntries(aiList),

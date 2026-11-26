@@ -319,6 +319,21 @@ export const textDefaultsSchema = z.object({
   /** Lodrät placering i lagret. Utelämnad ⇒ mitten (tidigare beteende).
    *  "top" behövs för rubriker vars radantal varierar (ett eller två rader). */
   valign: z.enum(["top", "middle", "bottom"]).optional(),
+  /** Visa texten med versaler (kunden skriver som vanligt, t.ex. "Anna
+   *  Lindqvist" → ANNA LINDQVIST). Ändrar bara visningen, inte värdet. */
+  uppercase: z.boolean().optional(),
+  /** Krymp texten så att längsta raden får plats i lagrets bredd i stället
+   *  för att radbrytas (långa namn och tider). Krymper till som minst 40 %. */
+  fitWidth: z.boolean().optional(),
+  /** Kundpanelens formulär: fält med samma grupp visas tillsammans under
+   *  gruppnamnet som kompakta enradsfält (lagrets namn = fältets etikett).
+   *  Utelämnad ⇒ vanlig textruta per lager. */
+  formGroup: z.string().optional(),
+  /** Formulärfältet tar halva bredden (två fält per rad). */
+  formHalf: z.boolean().optional(),
+  /** Summafält: texten räknas ut som summan av tiderna (h:mm:ss eller m:ss)
+   *  i de angivna textlagren tills kunden skriver en egen text i fältet. */
+  sumTimesOf: z.array(z.string()).optional(),
   // DEPRECATED — kept for back-compat. Migrated to `linkedTokens`.
   linkedMapFields: z
     .object({

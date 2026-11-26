@@ -1455,6 +1455,33 @@ function TextLayerDefaults({
         </div>
       </Field>
 
+      <div className="flex items-center justify-between gap-2">
+        <Label className="text-xs">Visa med versaler</Label>
+        <Switch checked={!!d.uppercase} onCheckedChange={(v) => updateDefaults({ uppercase: v || undefined })} />
+      </div>
+      <div className="flex items-center justify-between gap-2">
+        <Label className="text-xs">Krymp långa texter till lagrets bredd</Label>
+        <Switch checked={!!d.fitWidth} onCheckedChange={(v) => updateDefaults({ fitWidth: v || undefined })} />
+      </div>
+      <Field label="Formulärgrupp i kundpanelen (tom = egen textruta)">
+        <Input
+          value={d.formGroup ?? ""}
+          placeholder="t.ex. Om dig"
+          onChange={(e) => updateDefaults({ formGroup: e.target.value.trim() ? e.target.value : undefined })}
+        />
+      </Field>
+      {d.formGroup && (
+        <div className="flex items-center justify-between gap-2">
+          <Label className="text-xs">Halv bredd i formuläret</Label>
+          <Switch checked={!!d.formHalf} onCheckedChange={(v) => updateDefaults({ formHalf: v || undefined })} />
+        </div>
+      )}
+      {d.sumTimesOf?.length ? (
+        <p className="text-[11px] text-muted-foreground">
+          Summafält: räknas ut från {d.sumTimesOf.join(", ")} tills kunden skriver en egen tid.
+        </p>
+      ) : null}
+
       {/* Decoration */}
       <div className="rounded-md border bg-muted/30 p-3 space-y-2">
         <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">

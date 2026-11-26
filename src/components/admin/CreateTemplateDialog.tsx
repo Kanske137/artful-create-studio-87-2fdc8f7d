@@ -24,8 +24,11 @@ import { DEFAULT_PRODUCT_VARIANTS } from "@/lib/product-defaults";
 import type { Template } from "@/lib/template-schema";
 import type { ProductType } from "@/lib/product-config";
 import { applyRaceSeed } from "@/lib/race/seed-template";
+import { applySportSeed, SPORT_MAX_CHARS, SPORT_PRESET_META, type SportSeedKey } from "@/lib/sport/seed-templates";
 
-type Preset = "empty" | "race";
+type Preset = "empty" | "race" | SportSeedKey;
+
+const isSportPreset = (p: Preset): p is SportSeedKey => p in SPORT_PRESET_META;
 
 interface Props {
   open: boolean;
@@ -152,10 +155,15 @@ export default function CreateTemplateDialog({ open, onOpenChange }: Props) {
     const templateSlug = trimmedHandle.replace(/-(poster|posters|canvas|aluminum|acrylic)$/i, "");
     const enabledProductTypes = kinds.map((k) => KIND_META[k].productType);
 
-    const tpl = preset === "race" ? applyRaceSeed(buildSeedTemplate(kinds)) : buildSeedTemplate(kinds);
+    const tpl =
+      preset === "race"
+        ? applyRaceSeed(buildSeedTemplate(kinds))
+        : isSportPreset(preset)
+          ? applySportSeed(buildSeedTemplate(kinds), preset)
+          : buildSeedTemplate(kinds);
     const baseTextConfig = {
       fonts: ["Inter", "Playfair Display"],
-      maxChars: 24,
+      maxChars: isSportPreset(preset) ? SPORT_MAX_CHARS : 24,
       defaultFont: "Inter",
     } as unknown as never;
     const baseStyles = ["light-v11", "dark-v11", "outdoors-v12", "satellite-v9"] as unknown as never;
@@ -244,11 +252,19 @@ export default function CreateTemplateDialog({ open, onOpenChange }: Props) {
               {([
                 { id: "empty", label: "Tom mall", hint: "Bygg från grunden" },
                 { id: "race", label: "Löpartavla", hint: "Rutt, höjdprofil, statistik" },
-              ] as const).map((p) => (
+                ...(Object.keys(SPORT_PRESET_META) as SportSeedKey[]).map((k) => ({
+                  id: k,
+                  label: SPORT_PRESET_META[k].label,
+                  hint: SPORT_PRESET_META[k].hint,
+                })),
+              ] as Array<{ id: Preset; label: string; hint: string }>).map((p) => (
                 <button
                   key={p.id}
                   type="button"
-                  onClick={() => setPreset(p.id)}
+                  onClick={() => {
+                    setPreset(p.id);
+                    if (isSportPreset(p.id) && !title.trim()) setTitle(SPORT_PRESET_META[p.id].title);
+                  }}
                   className={`rounded-md border p-3 text-left transition ${
                     preset === p.id ? "ring-2 ring-primary border-transparent" : "hover:bg-muted/40"
                   }`}

@@ -124,12 +124,16 @@ export function remapSpans(
 function localizeLayer(layer: TemplateLayer, dict: TemplateDictionary): TemplateLayer {
   const name = translateString(layer.name, dict);
   if (layer.type === "text") {
-    const d = layer.defaults;
+    // Formulärgruppens rubrik (kundpanelen) översätts som lagernamnen.
+    const d0 = layer.defaults;
+    const formGroup = d0.formGroup ? translateString(d0.formGroup, dict) : d0.formGroup;
+    const d = formGroup === d0.formGroup ? d0 : { ...d0, formGroup };
+    const base = d === d0 ? layer : { ...layer, defaults: d };
     if (d.mirrorTextLayerId || !hasTranslatableText(d.text)) {
-      return name === layer.name ? layer : { ...layer, name };
+      return name === layer.name ? base : { ...base, name };
     }
     const text = translateString(d.text, dict);
-    if (text === d.text) return name === layer.name ? layer : { ...layer, name };
+    if (text === d.text) return name === layer.name ? base : { ...base, name };
     return { ...layer, name, defaults: { ...d, text, spans: remapSpans(d.spans, d.text, text) } };
   }
   if (layer.type === "aiPhoto") {
@@ -308,7 +312,10 @@ export function collectTranslatableStrings(template: Template): TranslatableStri
         add("place", d.city);
         add("place", d.country);
       }
-      if (customerSeesLayerName(layer)) add("layerName", layer.name);
+      if (customerSeesLayerName(layer)) {
+        add("layerName", layer.name);
+        if (layer.type === "text") add("layerName", layer.defaults.formGroup);
+      }
     }
   }
 

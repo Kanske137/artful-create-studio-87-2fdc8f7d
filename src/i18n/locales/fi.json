@@ -113,7 +113,8 @@
     "font": "Fontti",
     "tab": "Teksti {{n}}",
     "autoHint": "Jätä tyhjäksi palauttaaksesi automaattisen tekstin",
-    "fontSize": "Tekstin koko"
+    "fontSize": "Tekstin koko",
+    "autoSum": "Lasketaan automaattisesti. Kirjoita oma aika muuttaaksesi sitä."
   },
   "layer": {
     "size": "Koko",

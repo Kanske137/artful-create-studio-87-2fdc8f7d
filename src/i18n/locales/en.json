@@ -113,7 +113,8 @@
     "font": "Font",
     "tab": "Text {{n}}",
     "autoHint": "Leave empty to return to automatic text",
-    "fontSize": "Font size"
+    "fontSize": "Font size",
+    "autoSum": "Calculated automatically. Type your own time to change it."
   },
   "layer": {
     "size": "Size",
