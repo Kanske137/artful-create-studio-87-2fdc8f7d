@@ -2,6 +2,7 @@
 // Image, Line, Margin. Text is handled inline in MapPreview because it shares
 // the customer's live `text`/`textFont` state.
 import type { TemplateLayer } from "@/lib/template-schema";
+import { cn } from "@/lib/utils";
 
 export function ImageLayerView({
   layer,
@@ -16,7 +17,9 @@ export function ImageLayerView({
       ? undefined
       : undefined;
   return (
-    <div className="absolute inset-0 overflow-hidden bg-muted/30" style={{ clipPath: clip }}>
+    // Grå platshållarton bara när bild saknas: tryckfilen ritar ingen bakgrund
+    // bakom bilden, och genomskinlig grafik (SVG) ska se likadan ut här.
+    <div className={cn("absolute inset-0 overflow-hidden", !d.url && "bg-muted/30")} style={{ clipPath: clip }}>
       {d.url ? (
         <img
           src={d.url}

@@ -7,7 +7,7 @@
 //   • `fill`: component takes the full size of its parent (use with a
 //     wrapper that sets `aspect-ratio`). `width`/`height` then act only as
 //     resolution hints for Mapbox/text scaling (default 240×320).
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { studBackgroundCss } from "@/lib/acrylic-stud";
 import type { Orientation, Template } from "@/lib/template-schema";
 import MapLayerPreview from "./MapLayerPreview";
@@ -41,13 +41,34 @@ interface Props {
 
 export default function TemplateThumbnail({
   template,
-  width = 120,
-  height = 160,
+  width: hintWidth = 120,
+  height: hintHeight = 160,
   fill = false,
   orientation = "portrait",
   layoutOverride,
   productType,
 }: Props) {
+  // I fill-läget styrs storleken av föräldern: mät den, så att text och
+  // linjer skalas mot miniatyrens verkliga bredd (annars blev texten för
+  // stor i små miniatyrer, t.ex. stilväljaren).
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [measured, setMeasured] = useState<{ w: number; h: number } | null>(null);
+  useLayoutEffect(() => {
+    if (!fill) return;
+    const el = boxRef.current;
+    if (!el) return;
+    const read = () => {
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) setMeasured({ w: r.width, h: r.height });
+    };
+    read();
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [fill]);
+  const width = fill && measured ? measured.w : hintWidth;
+  const height = fill && measured ? measured.h : hintHeight;
   const isCanvas = productType === "canvas";
   const isAcrylic = productType === "acrylic";
 
@@ -86,7 +107,7 @@ export default function TemplateThumbnail({
   }
 
   return (
-    <div className={containerClass} style={containerStyle}>
+    <div ref={boxRef} className={containerClass} style={containerStyle}>
       {layers.map((layer) => {
         const style: React.CSSProperties = {
           position: "absolute",
@@ -192,7 +213,8 @@ export default function TemplateThumbnail({
                 <img
                   src={layer.defaults.url}
                   alt=""
-                  className="w-full h-full object-cover"
+                  className="w-full h-full"
+                  style={{ objectFit: layer.defaults.fit }}
                   draggable={false}
                 />
               ) : (
