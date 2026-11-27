@@ -4101,7 +4101,7 @@
      "text": "1 km"
     },
     "ksk-run-race": {
-     "text": "Rosa Bandet-loppet"
+     "text": "Lidingöloppet 10"
     },
     "ksk-run-dist": {
      "text": "10 km"
@@ -4172,7 +4172,8 @@
    "Rosa Bandet-loppet": "Rosa Bandet-loppet",
    "Vasaloppet 30": "Vasaloppet 30",
    "Vätternrundan 100": "Vätternrundan 100",
-   "Vansbro Kortsim": "Vansbro Kortsim"
+   "Vansbro Kortsim": "Vansbro Kortsim",
+   "Lidingöloppet 10": "Lidingöloppet 10"
   },
   "da": {
    "Året runt": "Året rundt",
@@ -4234,7 +4235,8 @@
    "Rosa Bandet-loppet": "Rosa Bandet-loppet",
    "Vasaloppet 30": "Vasaloppet 30",
    "Vätternrundan 100": "Vätternrundan 100",
-   "Vansbro Kortsim": "Vansbro Kortsim"
+   "Vansbro Kortsim": "Vansbro Kortsim",
+   "Lidingöloppet 10": "Lidingöloppet 10"
   },
   "fi": {
    "Året runt": "Ympäri vuoden",
@@ -4296,7 +4298,8 @@
    "Rosa Bandet-loppet": "Rosa Bandet-loppet",
    "Vasaloppet 30": "Vasaloppet 30",
    "Vätternrundan 100": "Vätternrundan 100",
-   "Vansbro Kortsim": "Vansbro Kortsim"
+   "Vansbro Kortsim": "Vansbro Kortsim",
+   "Lidingöloppet 10": "Lidingöloppet 10"
   }
  }
 }

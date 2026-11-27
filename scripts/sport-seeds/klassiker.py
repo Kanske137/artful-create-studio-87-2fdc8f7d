@@ -219,7 +219,7 @@ CLASSICS = [
       "swim": ("Vansbro Tjejsim", "1 km"), "run": ("Rosa Bandet-loppet", "10 km")}, "141"),
     ("korta", "Korta", "En svensk klassiker Korta · 2026",
      {"ski": ("Vasaloppet 30", "30 km"), "bike": ("Vätternrundan 100", "100 km"),
-      "swim": ("Vansbro Kortsim", "1 km"), "run": ("Rosa Bandet-loppet", "10 km")}, "141"),
+      "swim": ("Vansbro Kortsim", "1 km"), "run": ("Lidingöloppet 10", "10 km")}, "141"),
 ]
 
 
