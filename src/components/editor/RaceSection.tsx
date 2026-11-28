@@ -65,6 +65,15 @@ export function RacePickerPanel() {
     productDefault !== "all" && categories.includes(productDefault) ? productDefault : "all",
   );
 
+  // Förvalt lopp eller djuplänk med annan kategori än produktens filter:
+  // byt filter så att det valda loppet syns markerat i listan.
+  useEffect(() => {
+    if (source !== "catalog" || !raceId) return;
+    const r = races.find((x) => x.id === raceId);
+    if (r && filter !== "all" && r.category !== filter) setFilter(r.category);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [raceId, source]);
+
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     return races.filter((r) => {

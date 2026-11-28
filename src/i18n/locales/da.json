@@ -267,6 +267,7 @@
     "freeformEmpty": "Tilføj noget til dit design først",
     "freeformEmptyHint": "Tilføj mindst ét billede, kort eller tekst, før du går til kassen.",
     "blockedRace": "Vælg et løb, eller upload din GPX-fil, før du bestiller",
+    "blockedRaceExample": "Ruten vises som eksempel. Vælg dit løb, eller udfyld dine oplysninger, før du bestiller",
     "updated": "Kurven er opdateret"
   },
   "scene": {

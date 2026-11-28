@@ -262,6 +262,7 @@
     "freeformEmpty": "Add something to your design first",
     "freeformEmptyHint": "Add at least one image, map or text before checking out.",
     "blockedRace": "Choose a race or upload your GPX file before ordering",
+    "blockedRaceExample": "The course is shown as an example. Choose your race or fill in your details before ordering",
     "updated": "Cart updated"
   },
   "scene": {

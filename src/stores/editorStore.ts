@@ -422,7 +422,7 @@ export interface EditorState {
    *   - "customize": mall utan bildlager (t.ex. karttavla) där kunden inte
    *     ändrat någon parameter alls från default
    *  Freeform-mallar hanteras separat via hasDesignContent(). */
-  orderBlockReason: () => "generation" | "photo" | "photoMulti" | "customize" | "demo" | "race" | null;
+  orderBlockReason: () => "generation" | "photo" | "photoMulti" | "customize" | "demo" | "race" | "raceExample" | null;
 
   // ---------- legacy globals (derived getters; mutators apply to first layer) ----------
   // These setters/getters keep older code (EditorPage cart payload, snapshot
@@ -1958,8 +1958,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (layers.length === 0) return null;
 
     // Lopptavla: ett lopp (eller en GPX-fil) måste vara valt innan något annat.
-    if (state.template.productOptions.raceOptions?.enabled && !useRaceStore.getState().route) {
-      return "race";
+    if (state.template.productOptions.raceOptions?.enabled) {
+      const race = useRaceStore.getState();
+      if (!race.route) return "race";
+      // Förvalt exempellopp: kunden måste välja lopp eller fylla i något först.
+      if (race.autoSelected) return "raceExample";
     }
 
     // 0) Demo-resultat ("Prova med exempelbild") får aldrig beställas.

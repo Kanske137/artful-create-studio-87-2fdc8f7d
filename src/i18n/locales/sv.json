@@ -267,6 +267,7 @@
     "freeformEmpty": "Lägg till något i din design först",
     "freeformEmptyHint": "Lägg till minst en bild, karta eller text innan du går till kassan.",
     "blockedRace": "Välj ett lopp eller ladda upp din GPX-fil innan du beställer",
+    "blockedRaceExample": "Banan visas som exempel. Välj ditt lopp eller fyll i dina uppgifter innan du beställer",
     "updated": "Varukorgen är uppdaterad"
   },
   "scene": {

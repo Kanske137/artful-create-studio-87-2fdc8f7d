@@ -145,6 +145,28 @@ export const RACE_DEFAULT_FILTER: Record<string, RaceCategory | "all"> = {
   lopartavla: "all",
 };
 
+/** Exempellopp som visas direkt när produktsidan öppnas, så att tavlan inte
+ *  är tom. Kunden måste ändå välja lopp eller fylla i något innan beställning
+ *  (se raceStore.autoSelected). Övriga lopptavlor: inget exempel. */
+export const RACE_DEFAULT_RACE: Record<string, string> = {
+  maratontavla: "stockholm-marathon",
+  halvmaratontavla: "goteborgsvarvet",
+  lopartavla: "midnattsloppet-stockholm",
+};
+
+/** Lopp från en djuplänk (?race=<id>), bara om loppet har en ritad bana. */
+export function raceFromParam(value: string | null | undefined): RaceDef | null {
+  const id = (value ?? "").trim().toLowerCase();
+  if (!/^[a-z0-9-]{2,64}$/.test(id)) return null;
+  return availableRaces().find((r) => r.id === id) ?? null;
+}
+
+/** Exempelloppet för en produkt, eller null. */
+export function defaultRaceFor(handle: string | null | undefined): RaceDef | null {
+  const id = RACE_DEFAULT_RACE[handle ?? ""];
+  return id ? raceFromParam(id) : null;
+}
+
 export function productHandleForCategory(category: RaceCategory): string {
   if (category === "marathon") return "maratontavla";
   if (category === "half") return "halvmaratontavla";

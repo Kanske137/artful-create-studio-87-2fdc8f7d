@@ -267,6 +267,7 @@
     "freeformEmpty": "Lisää ensin jotain suunnitelmaasi",
     "freeformEmptyHint": "Lisää vähintään yksi kuva, kartta tai teksti ennen kassalle siirtymistä.",
     "blockedRace": "Valitse juoksutapahtuma tai lataa GPX-tiedostosi ennen tilaamista",
+    "blockedRaceExample": "Reitti näytetään esimerkkinä. Valitse juoksutapahtumasi tai täytä tietosi ennen tilaamista",
     "updated": "Ostoskori on päivitetty"
   },
   "scene": {

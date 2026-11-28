@@ -38,7 +38,15 @@ import { numericVariantId, productTypeLabel } from "@/lib/variant-match";
 import { hangerColorFromVariant } from "@/lib/mockup-scenes";
 import { FRAME_FRONT_CM, CANVAS_BLEED_CM, canvasWrapExtCm } from "@/lib/gelato-geometry";
 import { buildPrintableTemplate, withTemplateAlias } from "@/lib/printable-template";
-import { RACE_CATALOG, RACE_TEMPLATE_ALIASES, categoryForDistance, productHandleForCategory } from "@/lib/race/catalog";
+import {
+  RACE_CATALOG,
+  RACE_TEMPLATE_ALIASES,
+  categoryForDistance,
+  defaultRaceFor,
+  loadCourse,
+  productHandleForCategory,
+  raceFromParam,
+} from "@/lib/race/catalog";
 import { raceLocaleFor, raceRenderInput, useRaceStore } from "@/stores/raceStore";
 import { ensureSession, getSessionKey, track } from "@/lib/analytics";
 import { SubscriberGateDialog } from "@/components/editor/SubscriberGateDialog";
@@ -302,6 +310,7 @@ export default function EditorPage() {
   // designen faktiskt personaliserats (ingen exempel-/defaultdesign i tryck).
   // Lopptavla: spärren beror på raceStore — prenumerera så CTA:n uppdateras.
   useRaceStore((s) => s.route);
+  useRaceStore((s) => s.autoSelected);
   const blockReason = isFreeform ? null : orderBlockReason();
   const canAddToCart = (!isFreeform || hasDesignContent()) && blockReason === null;
   const blockHint = blockReason
@@ -316,7 +325,9 @@ export default function EditorPage() {
               ? "cartAdd.blockedPhotoMulti"
               : blockReason === "race"
                 ? "cartAdd.blockedRace"
-                : "cartAdd.blockedCustomize",
+                : blockReason === "raceExample"
+                  ? "cartAdd.blockedRaceExample"
+                  : "cartAdd.blockedCustomize",
       )
     : isFreeform && !hasDesignContent()
       ? t("cartAdd.freeformEmpty")
@@ -355,6 +366,29 @@ export default function EditorPage() {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editId, config, configs]);
+
+  // Lopptavla: visa ett lopp direkt i stället för en tom tavla. Djuplänk
+  // (?race=<id>, t.ex. från loppartiklarna) går före produktens exempellopp.
+  // Förvalet räknas inte som kundens val: beställningen spärras tills kunden
+  // väljer lopp, laddar upp en fil eller fyller i något (raceStore.autoSelected).
+  const raceParam = params.get("race");
+  const raceTemplate = useEditorStore((s) => s.template);
+  const racePreselectDone = useRef(false);
+  useEffect(() => {
+    if (racePreselectDone.current || editId || !config) return;
+    if (!raceTemplate?.productOptions.raceOptions?.enabled) return;
+    racePreselectDone.current = true;
+    if (useRaceStore.getState().route) return;
+    const race = raceFromParam(raceParam) ?? defaultRaceFor(config.shopify_handle);
+    if (!race) return;
+    loadCourse(race)
+      .then((course) => {
+        // Kunden hann välja själv medan banan laddades.
+        if (useRaceStore.getState().route) return;
+        useRaceStore.getState().setFromCatalog(race, course, null, { auto: true });
+      })
+      .catch((err) => console.warn("[race] preselect failed", err));
+  }, [config, editId, raceParam, raceTemplate]);
 
   const handleAddToCart = async () => {
     if (!config || !size || !variant) return;
